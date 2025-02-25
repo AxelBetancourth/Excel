@@ -1,0 +1,122 @@
+/* Estilos generales */
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+header {
+    background: #217346;
+    border-bottom: none;
+    padding-top: 10px;
+}
+
+
+/* Cinta de opciones */
+
+.ribbon {
+    display: flex;
+    flex-direction: column;
+}
+
+.ribbon-title {
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+}
+
+.ribbon-title h1 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.ribbon-tabs {
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    gap: 5px;
+    justify-content: flex-start;
+}
+
+.ribbon-tabs button {
+    padding: 6px 20px;
+    border: none;
+    background: #217346;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 0.9em;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom: none;
+}
+
+.ribbon-tabs button:focus {
+    outline: none;
+}
+
+.ribbon-tabs button:hover {
+    background: #3a9e6e;
+}
+
+.ribbon-tabs button.active {
+    background: #F3F3F3;
+    color: #217346;
+    font-weight: bold;
+}
+
+
+/* Barra lateral para Archivo que cubre toda la pantalla */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    width: 100%;
+    height: 100%;
+    background: #e0e0e0;
+    transition: transform 0.3s ease;
+    padding: 10px;
+    z-index: 1000;
+}
+
+.sidebar.active {
+    transform: translateX(0);
+}
+
+.sidebar .sidebar-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.sidebar .sidebar-content button {
+    align-self: flex-start;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+
+/* Contenedor del submenú (pestañas Inicio, Insertar, etc.) */
+.submenu-container {
+    background: #F3F3F3;
+    padding: 10px;
+    border-top: none;
+    border-bottom: 1px solid #ccc;
+}
+
+.submenu {
+    display: none;
+}
+
+.submenu.active {
+    display: block;
+}
+
+/* Área principal (celdas) */
+
+main {
+    padding: 10px;
+}

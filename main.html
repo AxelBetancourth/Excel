@@ -1,13 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excel</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Excel</title>
+  <link rel="stylesheet" href="main.css">
 </head>
 <body>
-    
-    <h3>Aqui ira todo el contenido principal</h3>
+
+  <!-- Cinta de opciones -->
+  <header>
+    <div class="ribbon">
+      <div class="ribbon-title">
+        <h1>Titulo <b>- Excel</b></h1>
+      </div>
+      <nav class="ribbon-tabs">
+        <button data-tab="archivo">Archivo</button>
+        <button data-tab="inicio" class="active">Inicio</button>
+        <button data-tab="insertar">Insertar</button>
+        <button data-tab="formulas">Fórmulas</button>
+        <button data-tab="datos">Datos</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Barra lateral que se muestra al hacer clic en "Archivo" -->
+  <aside id="archivo-sidebar" class="sidebar">
+    <div class="sidebar-content">
+      <button id="sidebar-close">Regresar</button>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+        Donec vitae urna nec urna pharetra fermentum. Sed quis justo nec nisi 
+        cursus facilisis. Integer at dui ac mi placerat consequat.
+      </p>
+      <!-- Aquí claudio puedes agregar más opciones o contenido -->
+
+    </div>
+  </aside>
+
+  <!-- Contenedor para los submenús de cada pestaña -->
+  <section id="submenu-container" class="submenu-container">
+    <div id="submenu-inicio" class="submenu active">
+      <p>Contenido del submenú de Inicio</p>
+      <!-- Aquí irán las opciones de la pestaña Inicio -->
+    </div>
+
+    <div id="submenu-insertar" class="submenu">
+      <p>Contenido del submenú de Insertar</p>
+      <!-- Opciones de Insertar -->
+    </div>
+
+    <div id="submenu-formulas" class="submenu">
+      <p>Contenido del submenú de Fórmulas</p>
+      <!-- Opciones de Fórmulas -->
+    </div>
+
+    <div id="submenu-datos" class="submenu">
+      <p>Contenido del submenú de Datos</p>
+      <!-- Opciones de Datos -->
+    </div>
+  </section>
+
+  <!-- Aqui iran las celdas -->
+  <main>
+    <p>Aquí irán las celdas o el contenido principal.</p>
+  </main>
+
+  <script src="main.js"></script>
 
 </body>
 </html>
