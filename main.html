@@ -63,10 +63,44 @@
 
   <!-- Aqui iran las celdas -->
   <main>
-    <p>Aquí irán las celdas o el contenido principal.</p>
+
+    <!-- Aqui ira la parte del cuadro de nombres, barra de formulas etc -->
+    <section class="formula-bar">
+      <div class="name-box">
+        <span id="active-cell">A1</span>
+      </div>
+      <div class="formula-input-container">
+        <span class="formula-prefix">=</span>
+        <input type="text" id="formula-input" placeholder="Ingresar fórmula...">
+      </div>
+    </section>
+
+    <!-- Aqui iran las tablas -->
+    <section class="spreadsheet-container">
+      <table id="spreadsheet">
+        <thead>
+          <!-- Se generará dinámicamente -->
+        </thead>
+        <tbody>
+          <!-- Se generará dinámicamente -->
+        </tbody>
+      </table>
+    </section>
+
   </main>
+  
+  <!-- Barra de hojas de cálculo -->
+  <footer class="sheets-bar">
+    <div class="sheets-container">
+      <div class="sheet active" data-sheet="hoja1">Hoja1</div>
+      <div class="sheet" data-sheet="hoja2">Hoja2</div>
+      <div class="sheet" data-sheet="hoja3">Hoja3</div>
+    </div>
+    <button id="add-sheet">+</button>
+  </footer>
 
   <script src="main.js"></script>
+
 
 </body>
 </html>
