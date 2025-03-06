@@ -72,40 +72,6 @@ header {
     font-weight: bold;
 }
 
-
-/* Barra lateral para Archivo que cubre toda la pantalla */
-
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    transform: translateX(-100%);
-    width: 100%;
-    height: 100%;
-    background: #e0e0e0;
-    transition: transform 0.3s ease;
-    padding: 10px;
-    z-index: 1000;
-}
-
-.sidebar.active {
-    transform: translateX(0);
-}
-
-.sidebar .sidebar-content {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.sidebar .sidebar-content button {
-    align-self: flex-start;
-    margin-bottom: 10px;
-    padding: 5px 10px;
-    cursor: pointer;
-}
-
-
 /* Contenedor del submenú (pestañas Inicio, Insertar, etc.) */
 .submenu-container {
     background: #F3F3F3;
@@ -352,3 +318,132 @@ th.row-header.selected-header {
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+
+/* -------Estilos de claudio (Archivo)--------- */
+
+/* Estilos para la barra lateral "Archivo" */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #e0e0e0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+  
+.sidebar.active {
+    transform: translateX(0);
+}
+  
+  /* Contenido interno de la barra lateral */
+.sidebar-content {
+    display: flex;
+    height: 100%;
+}
+
+#sidebar-close{
+    display: flex;
+    justify-content: center;
+    height: 80px;
+}
+
+#sidebar-close:hover {
+    background-color: #3a9e6e;
+}
+
+
+#sidebar-close img {
+    margin-right: 35px;
+    width: 48px !important;
+    height: 48px !important;
+  }
+  
+/* Columna Izquierda: Navegación */
+.Izquierda {
+    width: 150px;
+    background-color: #217346;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+  
+.Izquierda button {
+    width: 100%;
+    background: none;
+    border: none;
+    color: #fff;
+    padding: 10px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 16px;
+}
+  
+.Izquierda button:hover {
+    background-color: #3a9e6e;
+}
+  
+.Izquierda button img {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}
+  
+/* Columna Derecha: Imagen u otro contenido */
+.Derecha {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+  
+.Derecha img {
+    max-width: 60%;
+    max-height: 60%;
+    object-fit: contain;
+}
+  
+/* Botón para cerrar la barra lateral */
+#sidebar-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+    padding: 0;
+}
+  
+#sidebar-close img {
+    width: 24px;
+    height: 24px;
+}
+
+
+/* ================================
+// Sección inicio (Escribe tu nombre aqui)
+// ================================*/
+
+
+/* ================================
+// Sección insertar (Escribe tu nombre aqui)
+// ================================*/
+
+
+
+/* ================================
+// Sección formulas (Escribe tu nombre aqui)
+// ================================*/
+  
+
+
+
+/* ================================
+// Sección datos (Escribe tu nombre aqui)
+// ================================*/
+  

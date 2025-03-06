@@ -1,9 +1,4 @@
-// ================================
-// Gestión de la Cinta (Ribbon) y Submenús
-// ================================
-
 // Elementos de la cinta y barra lateral
-
 const tabs = document.querySelectorAll('.ribbon-tabs button');
 const submenus = document.querySelectorAll('.submenu');
 const submenuContainer = document.getElementById('submenu-container');
@@ -17,9 +12,8 @@ const sheetsContainer = document.querySelector('.sheets-container');
 const addSheetButton = document.getElementById('add-sheet');
 
 /**
- * Activa la pestaña indicada. Si es "archivo" muestra la barra lateral
+ * Activa la pestaña indicada. Si es "archivo" muestra la barra lateral.
  */
-
 function activateTab(tabName) {
   if (tabName === 'archivo') {
     sidebar.classList.add('active');
@@ -38,7 +32,6 @@ function activateTab(tabName) {
 }
 
 // Eventos en los botones de la cinta
-
 tabs.forEach(btn => {
   btn.addEventListener('click', () => {
     activateTab(btn.dataset.tab);
@@ -46,14 +39,12 @@ tabs.forEach(btn => {
 });
 
 // Evento para cerrar la barra lateral "Archivo"
-
 sidebarClose.addEventListener('click', () => {
   sidebar.classList.remove('active');
   submenuContainer.style.display = 'block';
 });
 
 // Al cargar la página, se activa la pestaña guardada (o "inicio" por defecto)
-
 document.addEventListener('DOMContentLoaded', () => {
   const activeTab = localStorage.getItem('activeTab') || 'inicio';
   activateTab(activeTab);
@@ -97,18 +88,16 @@ sheets.forEach(sheet => {
 let state = sheets[currentSheetIndex].data;
 
 /**
- * Renderiza la hoja de excel
+ * Renderiza la hoja de excel.
  */
 
 const renderSpreadsheet = () => {
-  // Encabezado de columnas
   const headerHTML = `<tr>
     <th></th>
     ${rangeChar(cols).map(letra => `<th>${letra}</th>`).join('')}
   </tr>`;
   $head.innerHTML = headerHTML;
   
-  // Cuerpo de la tabla
   const bodyHTML = range(rows).map(row => `
     <tr>
       <th class="row-header">${row + 1}</th>
@@ -128,9 +117,8 @@ const renderSpreadsheet = () => {
 };
 
 /**
- * Convierte una referencia de celda (ej. "B3") en coordenadas [columna, fila].
+ * Convierte una referencia de celda en coordenadas [columna, fila].
  */
-
 function getCellCoords(ref) {
   ref = ref.toUpperCase();
   const letter = ref.match(/[A-Z]+/)[0];
@@ -141,7 +129,6 @@ function getCellCoords(ref) {
 /**
  * Obtiene el valor calculado de una celda mediante su referencia.
  */
-
 function getCellValue(ref) {
   try {
     const [x, y] = getCellCoords(ref);
@@ -154,7 +141,6 @@ function getCellValue(ref) {
 /**
  * Transforma los nombres de las funciones a mayúsculas (solo fuera de comillas).
  */
-
 function transformFunctionNames(formula) {
   const parts = formula.split(/(".*?")/);
   for (let i = 0; i < parts.length; i++) {
@@ -164,7 +150,6 @@ function transformFunctionNames(formula) {
   }
   return parts.join('');
 }
-
 
 /**
  * Devuelve el índice de la llave de cierre que hace match con la apertura en startIndex.
@@ -214,9 +199,27 @@ function extractFunctionArguments(str) {
 }
 
 /**
+ * Reemplaza las llamadas a MOD() por su equivalente usando el operador de módulo (%).
+ */
+function replaceMOD(formula) {
+  let index = formula.indexOf("MOD(");
+  while (index !== -1) {
+    let end = findMatchingParen(formula, index + 3);
+    if (end === -1) break;
+    let inside = formula.substring(index + 4, end);
+    let args = extractFunctionArguments(inside);
+    if (args.length !== 2) break;
+    args = args.map(arg => replaceFunctions(arg));
+    let replacement = `(${args[0]}) % (${args[1]})`;
+    formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
+    index = formula.indexOf("MOD(");
+  }
+  return formula;
+}
+
+/**
  * Reemplaza las llamadas a SI() por su equivalente ternario.
  */
-
 function replaceSI(formula) {
   let index = formula.indexOf("SI(");
   while (index !== -1) {
@@ -236,11 +239,10 @@ function replaceSI(formula) {
 /**
  * Reemplaza las llamadas a Y() por una expresión con &&.
  */
-
 function replaceY(formula) {
   let index = formula.indexOf("Y(");
   while (index !== -1) {
-    let end = findMatchingParen(formula, index + 2);
+    let end = findMatchingParen(formula, index + 1);
     if (end === -1) break;
     let inside = formula.substring(index + 2, end);
     let args = extractFunctionArguments(inside);
@@ -255,11 +257,11 @@ function replaceY(formula) {
 /**
  * Reemplaza las llamadas a O() por una expresión con ||.
  */
-
 function replaceO(formula) {
   let index = formula.indexOf("O(");
   while (index !== -1) {
-    let end = findMatchingParen(formula, index + 2);
+    // Para O, el paréntesis de apertura está en index + 1
+    let end = findMatchingParen(formula, index + 1);
     if (end === -1) break;
     let inside = formula.substring(index + 2, end);
     let args = extractFunctionArguments(inside);
@@ -272,13 +274,13 @@ function replaceO(formula) {
 }
 
 /**
- * Reemplaza recursivamente las funciones SI, Y y O.
+ * Reemplaza recursivamente las funciones MOD, SI, Y y O.
  */
-
 function replaceFunctions(formula) {
   let prev;
   do {
     prev = formula;
+    formula = replaceMOD(formula);
     formula = replaceSI(formula);
     formula = replaceY(formula);
     formula = replaceO(formula);
@@ -290,7 +292,6 @@ function replaceFunctions(formula) {
  * Calcula el valor computado de una celda a partir de su contenido.
  * Se eliminan espacios extra luego del signo "=" y entre el nombre de la función y el paréntesis.
  */
-
 function calculateComputedValue(value) {
   const strValue = String(value).trim();
   if (!strValue) return "";
@@ -300,11 +301,9 @@ function calculateComputedValue(value) {
   }
   
   let formula = strValue.slice(1).trim();
-
   formula = formula.replace(/([A-Za-z]+)\s+\(/g, "$1(");
   formula = transformFunctionNames(formula);
   
-  // Manejar CONCATENAR
   const concatRegex = /CONCATENAR\(([^)]+)\)/gi;
   formula = formula.replace(concatRegex, (match, args) => {
     const values = args.split(',').map(arg => {
@@ -319,11 +318,10 @@ function calculateComputedValue(value) {
     return values.join(' + ');
   });
   
-  // Reemplazar SI, Y y O usando el parser
+
   formula = replaceFunctions(formula);
   
   // Reemplazar referencias de celdas
-
   formula = formula.replace(/([A-Za-z]+\d+)/gi, match => {
     const val = getCellValue(match);
     if (val === "") return 0;
@@ -342,7 +340,6 @@ function calculateComputedValue(value) {
 /**
  * Actualiza una celda en la posición (x, y) con el nuevo valor y recalcula la fórmula.
  */
-
 function updateCell(x, y, value) {
   x = parseInt(x);
   y = parseInt(y);
@@ -368,12 +365,20 @@ function updateCell(x, y, value) {
 /**
  * Recalcula todas las celdas que tengan fórmulas.
  */
-
 function updateAllDependentCells() {
   state.forEach((col, x) => {
     col.forEach((cell, y) => {
       if (cell.value.startsWith('=')) {
-        state[x][y].computedValue = calculateComputedValue(cell.value);
+        // Recalcular valor
+        const newValue = calculateComputedValue(cell.value);
+        state[x][y].computedValue = newValue;
+        
+        // Actualizar DOM
+        const selector = `td[data-x="${x}"][data-y="${y}"]`;
+        const cellElement = document.querySelector(selector);
+        if (cellElement) {
+          cellElement.querySelector('span').textContent = newValue;
+        }
       }
     });
   });
@@ -382,7 +387,6 @@ function updateAllDependentCells() {
 /**
  * Limpia las selecciones (columnas, filas y celdas resaltadas).
  */
-
 function clearSelections() {
   $$('.selected-column').forEach(el => el.classList.remove('selected-column'));
   $$('.selected-row').forEach(el => el.classList.remove('selected-row'));
@@ -393,9 +397,8 @@ function clearSelections() {
 }
 
 /**
- * Actualiza la celda activa
+ * Actualiza la celda activa.
  */
-
 function updateActiveCellDisplay(x, y) {
   activeCell = { x, y };
   const columnLetter = letras[x];
@@ -405,7 +408,6 @@ function updateActiveCellDisplay(x, y) {
 }
 
 // Eventos en el encabezado
-
 $head.addEventListener('click', event => {
   const th = event.target.closest('th:not(:first-child)');
   if (!th) return;
@@ -417,7 +419,6 @@ $head.addEventListener('click', event => {
 });
 
 // Eventos en el cuerpo
-
 $body.addEventListener('click', event => {
   const th = event.target.closest('th.row-header');
   const td = event.target.closest('td');
@@ -441,7 +442,6 @@ $body.addEventListener('click', event => {
 });
 
 // Manejo de copiar
-
 document.addEventListener('copy', (e) => {
   let data = [];
   if (selectedColumn !== null) {
@@ -459,7 +459,6 @@ document.addEventListener('copy', (e) => {
 });
 
 // Manejo de pegar
-
 document.addEventListener('paste', (e) => {
   if(e.target === formulaInput) return;
   const clipboardData = e.clipboardData.getData('text/plain');
@@ -479,7 +478,6 @@ document.addEventListener('paste', (e) => {
 });
 
 // Doble clic para editar la celda
-
 $body.addEventListener('dblclick', event => {
   const td = event.target.closest('td');
   if (!td) return;
@@ -499,7 +497,6 @@ $body.addEventListener('dblclick', event => {
 });
 
 // Borrar contenido con Delete o Backspace
-
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Delete' || e.key === 'Backspace') {
     if (selectedColumn !== null) {
@@ -515,14 +512,9 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ================================
-// Gestión de Hojas de Cálculo
-// ================================
-
 /**
  * Cambia a la hoja especificada por índice.
  */
-
 function switchSheet(index) {
   sheets[currentSheetIndex].data = state;
   currentSheetIndex = index;
@@ -534,7 +526,6 @@ function switchSheet(index) {
 }
 
 // Eventos para cambiar de hoja
-
 document.querySelectorAll('.sheet').forEach((sheet, index) => {
   sheet.addEventListener('click', () => {
     switchSheet(index);
@@ -542,7 +533,6 @@ document.querySelectorAll('.sheet').forEach((sheet, index) => {
 });
 
 // Agregar nueva hoja
-
 addSheetButton.addEventListener('click', () => {
   const newIndex = sheets.length;
   const newSheetName = `Hoja${newIndex + 1}`;
@@ -568,7 +558,6 @@ addSheetButton.addEventListener('click', () => {
 // ================================
 
 // Actualizar celda al presionar Enter en el input de fórmulas
-
 formulaInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     const { x, y } = activeCell;
@@ -578,10 +567,32 @@ formulaInput.addEventListener('keydown', (e) => {
 });
 
 // Agregar el signo "=" al hacer clic en el prefijo
-
 document.querySelector('.formula-prefix').addEventListener('click', () => {
   formulaInput.value = '=';
   formulaInput.focus();
 });
 
 renderSpreadsheet();
+
+// ================================
+// Sección para guardar archivos (Claudio Tejeda)
+// ================================
+
+// Aquí irían las funciones para "Nuevo", "Descargar" y "Exportar a PDF"
+
+
+// ================================
+// Sección para guardar archivos (Coloca tu nombre aqui)
+// ================================
+
+
+
+// ================================
+// Sección para guardar archivos (Claudio Tejeda)
+// ================================
+
+
+
+// ================================
+// Sección para guardar archivos (Claudio Tejeda)
+// ================================
