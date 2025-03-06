@@ -61,7 +61,7 @@ const $table = $('table');
 const $head = $('thead');
 const $body = $('tbody');
 
-const rows = 30;
+const rows = 500;
 const cols = 26;
 const letras = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
 
@@ -260,7 +260,6 @@ function replaceY(formula) {
 function replaceO(formula) {
   let index = formula.indexOf("O(");
   while (index !== -1) {
-    // Para O, el paréntesis de apertura está en index + 1
     let end = findMatchingParen(formula, index + 1);
     if (end === -1) break;
     let inside = formula.substring(index + 2, end);
@@ -582,17 +581,22 @@ renderSpreadsheet();
 
 
 // ================================
-// Sección para guardar archivos (Coloca tu nombre aqui)
+// Sección para Inicio (Coloca tu nombre aqui)
 // ================================
 
 
 
 // ================================
-// Sección para guardar archivos (Claudio Tejeda)
+// Sección para Insertar (Coloca tu nombre aqui)
 // ================================
 
 
 
 // ================================
-// Sección para guardar archivos (Claudio Tejeda)
+// Sección para Formulas (Coloca tu nombre aqui)
+// ================================
+
+
+// ================================
+// Sección para Datos (Coloca tu nombre aqui)
 // ================================
