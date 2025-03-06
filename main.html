@@ -24,17 +24,30 @@
     </div>
   </header>
 
-  <!-- Barra lateral que se muestra al hacer clic en "Archivo" -->
+   <!-- Barra lateral que se muestra al hacer clic en "Archivo" Claudio -->
   <aside id="archivo-sidebar" class="sidebar">
     <div class="sidebar-content">
-      <button id="sidebar-close">Regresar</button>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-        Donec vitae urna nec urna pharetra fermentum. Sed quis justo nec nisi 
-        cursus facilisis. Integer at dui ac mi placerat consequat.
-      </p>
-      <!-- Aquí claudio puedes agregar más opciones o contenido -->
+      <div class="Izquierda">
+        <button id="sidebar-close">
+          <img src="images/regresar.png" alt="regresar">
+        </button>
 
+        <button class="nav-btn" id="nuevo-btn">
+          <img src="images/nuevo.png" alt="nuevo"><p>Nuevo</p>
+        </button>
+        
+        <button class="nav-btn" id="guardar-btn">
+          <img src="images/descargar.png" alt="guardar"><p>Descargar</p>
+        </button>
+        
+        <button class="nav-btn" id="exportar-btn">
+          <img src="images/exportar.png" alt="exportar"><p>Exportar</p>
+        </button>
+
+      </div>
+      <div class="Derecha">
+        <img src="images/logoexcel.png" alt="Descripción de la imagen">
+      </div>
     </div>
   </aside>
 
@@ -79,10 +92,8 @@
     <section class="spreadsheet-container">
       <table id="spreadsheet">
         <thead>
-          <!-- Se generará dinámicamente -->
         </thead>
         <tbody>
-          <!-- Se generará dinámicamente -->
         </tbody>
       </table>
     </section>
@@ -100,7 +111,6 @@
   </footer>
 
   <script src="main.js"></script>
-
 
 </body>
 </html>
