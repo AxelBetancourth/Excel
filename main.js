@@ -600,3 +600,30 @@ renderSpreadsheet();
 // ================================
 // Sección para Datos (Coloca tu nombre aqui)
 // ================================
+$(document).ready(function() {
+  //  eventos -submenús
+  $('.dropdown-submenu > a').click(function(e) {
+    var $submenu = $(this).next('.dropdown-menu');
+    if ($submenu.is(':visible')) {
+      $submenu.slideUp('400');
+    } else {
+      $submenu.stop(true, true).slideDown('400');
+    }
+    e.stopPropagation();
+  });
+});
+
+//exp arch de PDF y EXCEL
+    document.getElementById('archivo').addEventListener('change', function() {
+        if (this.files.length > 0) {
+            document.getElementById('archivoLabel').innerHTML = 
+                '<img src="../Excel-master/images/pdf.ico" alt="PDF" class="icono"> ' + this.files[0].name;
+        }
+    });
+
+    document.getElementById('archivoExcel').addEventListener('change', function() {
+      if (this.files.length > 0) {
+          document.getElementById('archivoExcelLabel').innerHTML = 
+              '<img src="../Excel-master/images/excel.ico" alt="Excel" class="icono"> ' + this.files[0].name;
+      }
+  });
