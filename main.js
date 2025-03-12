@@ -61,7 +61,7 @@ const $table = $('table');
 const $head = $('thead');
 const $body = $('tbody');
 
-const rows = 500;
+const rows = 100;
 const cols = 26;
 const letras = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
 
