@@ -80,9 +80,69 @@
             </div>
     </div>
 
-    <div id="submenu-datos" class="submenu">
-      <p>Contenido del submenú de Datos</p>
-      <!-- Opciones de Datos -->
+<!-------------------- AREA DE DATOS = obtener y transferir datos en excel -->
+
+<div id="submenu-datos" class="submenu">
+  <!-------------------- Opciones de Datos -->
+        
+    <!-- Opciones de Datos -->
+    <div id="submenu-datos" class="menu-container">
+      <!-- Botón Obtener Datos con Submenús -->
+      <div class="btn-group dropend">
+        <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          <img src="../Excel/images/obtenerdatos.ico" alt="Obtener Datos" class="icono">
+          <span> Obtener Datos</span>
+        </button>
+    
+        <ul class="dropdown-menu">
+  <!-- Submenú: De un Archivo -->
+          <li class="dropdown-submenu">
+            <a class="dropdown-item" href="#">
+              <img src="../Excel/images/archivo.ico" alt="Icono Archivo" class="icono"> De un Archivo
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+    <!-- Abrir el Exp Archivo -->
+            <form action="procesar_pdf.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
+              <label for="archivo" class="dropdown-item" id="archivoLabel" style="cursor: pointer;">
+                  <img src="../Excel/images/pdf.ico" alt="PDF" class="icono"> Archivo PDF
+              </label>
+              <input type="file" name="archivo" id="archivo" accept=".pdf" style="display: none;">
+              <button type="submit" class="btn btn-primary ms-2">Subir</button>
+          </form>
+                
+              </li>
+  
+              <li>
+                <form action="procesar_excel.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
+                  <label for="archivoExcel" class="dropdown-item" id="archivoExcelLabel" style="cursor: pointer;">
+                      <img src="../Excel/images/excel.ico" alt="Excel" class="icono"> Archivo Excel
+                  </label>
+                  <input type="file" name="archivoExcel" id="archivoExcel" accept=".xls,.xlsx" style="display: none;">
+                  <button type="submit" class="btn btn-success ms-2">Subir</button>
+              </form>
+              </li>
+            </ul>
+          </li>
+    
+          <!-- Submenú: De una Base de Datos -->
+          <li class="dropdown-submenu">
+            <a class="dropdown-item" href="#">
+              <img src="../Excel/images/basedatos.ico" alt="Base de Datos" class="icono"> De una Base de Datos
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#">Opción 1</a></li>
+              <li><a class="dropdown-item" href="#">Opción 2</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    
+      <!-- Botones de Ordenación -->
+      <div class="iconos-container">
+        <img src="../Excel/images/ordenarAZ.ico" alt="Ordenar A-Z" class="icono">
+        <img src="../Excel/images/ordenarZA.ico" alt="Ordenar Z-A" class="icono">
+      </div>
     </div>
   </section>
 
