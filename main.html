@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Excel</title>
+  <title>Excalibur</title>
   <link rel="stylesheet" href="main.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
   <header>
     <div class="ribbon">
       <div class="ribbon-title">
-        <h1>Titulo <b>- Excel</b></h1>
+        <h1>Titulo</h1>
       </div>
       <nav class="ribbon-tabs">
         <button data-tab="archivo">Archivo</button>
@@ -25,31 +25,97 @@
   </header>
 
    <!-- Barra lateral que se muestra al hacer clic en "Archivo" Claudio -->
-  <aside id="archivo-sidebar" class="sidebar">
+   <aside id="archivo-sidebar" class="sidebar">
     <div class="sidebar-content">
       <div class="Izquierda">
         <button id="sidebar-close">
           <img src="images/regresar.png" alt="regresar">
         </button>
+    
+        <button class="nav-btn" data-target="inicio">
+          <img src="images/home.png" alt="inicio"><p>Inicio</p>
+        </button>
 
-        <button class="nav-btn" id="nuevo-btn">
-          <img src="images/nuevo.png" alt="nuevo"><p>Nuevo</p>
+        <button class="nav-btn" data-target="abrir">
+          <img src="images/abrir.png" alt="abrir"><p>Abrir</p>
         </button>
         
-        <button class="nav-btn" id="guardar-btn">
-          <img src="images/descargar.png" alt="guardar"><p>Descargar</p>
+        <button class="nav-btn" data-target="guardar">
+          <img src="images/guardar.png" alt="descargar"><p>Guardar</p>
         </button>
         
-        <button class="nav-btn" id="exportar-btn">
+        <button class="nav-btn" data-target="exportar">
           <img src="images/exportar.png" alt="exportar"><p>Exportar</p>
         </button>
-
       </div>
-      <div class="Derecha">
-        <img src="images/logoexcel.png" alt="Descripción de la imagen">
+    
+        <!-- Sección de Inicio en la barra lateral -->
+        <div class="contenido-seccion" id="inicio">
+
+          <h2 id="mensaje-bienvenida">Bienvenido</h2>
+          <p>Nuevo</p>
+
+          <div class="boton-contenedor">
+            <button class="boton" id="btnNuevo">
+                <img src="images/en_blanco.png" alt="Icono">
+            </button>
+          </div>
+
+          <div class="recientes-container">
+            <h2>Archivos Recientes</h2>
+            <ul id="lista-recientes"></ul>  
+          </div>   
+               
+        </div>
+
+        <div class="contenido-seccion" id="abrir">
+          <h2>Abrir</h2>
+          <p>Aquí puedes abrir un nuevo archivo.</p>
+          <input type="file" id="fileInput" accept=".xlsx, .xls">
+          <button onclick="abrirExcel()">abrir un archivo</button>
+        </div>
+    
+        <div class="contenido-seccion" id="guardar">
+          <h2>Guardar</h2>
+          <p>Opciones para Guardar archivos.</p>
+          <button id="openSaveModal" >Guardar este archivo</button>
+        </div>
+    
+        <div class="contenido-seccion" id="exportar">
+          <h2>Exportar</h2>
+          <p>Pronto....</p>
+        </div>
       </div>
     </div>
+
+<!-- Ventana modal de guardar archivo -->
+
+<div id="saveModal" class="modal">
+  <div class="modal-content">
+    <h2>Guardar este archivo</h2>
+    
+    <!-- Input para el nombre del archivo -->
+    <label for="filename">Nombre del archivo:</label>
+    <input type="text" id="filename" placeholder="Escribe el nombre del archivo" value="datos_guardados">
+
+    <div class="location-section">
+      <label for="location">Ubicación Predeterminada:</label>
+      <select id="location">
+        <option value="default">Descargas</option>
+        <!-- Opcionalmente puedes añadir más opciones aquí si se desea -->
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <!-- Botones de guardar y cancelar -->
+      <button id="saveFile">Guardar</button>
+      <button id="cancelSave">Cancelar</button>
+    </div>
+
+    </div>
+  </div>
   </aside>
+
 
   <!-- Contenedor para los submenús de cada pestaña -->
   <section id="submenu-container" class="submenu-container">
@@ -79,6 +145,7 @@
                 <a href="#">Más funciones...</a>
             </div>
     </div>
+    </div>
 
 <!-------------------- AREA DE DATOS = obtener y transferir datos en excel -->
 
@@ -90,7 +157,7 @@
       <!-- Botón Obtener Datos con Submenús -->
       <div class="btn-group dropend">
         <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="../Excel/images/obtenerdatos.ico" alt="Obtener Datos" class="icono">
+          <img src="images/obtenerdatos.ico" alt="Obtener Datos" class="icono">
           <span> Obtener Datos</span>
         </button>
     
@@ -98,14 +165,14 @@
   <!-- Submenú: De un Archivo -->
           <li class="dropdown-submenu">
             <a class="dropdown-item" href="#">
-              <img src="../Excel/images/archivo.ico" alt="Icono Archivo" class="icono"> De un Archivo
+              <img src="images/archivo.ico" alt="Icono Archivo" class="icono"> De un Archivo
             </a>
             <ul class="dropdown-menu">
               <li>
     <!-- Abrir el Exp Archivo -->
             <form action="procesar_pdf.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
               <label for="archivo" class="dropdown-item" id="archivoLabel" style="cursor: pointer;">
-                  <img src="../Excel/images/pdf.ico" alt="PDF" class="icono"> Archivo PDF
+                  <img src="images/pdf.ico" alt="PDF" class="icono"> Archivo PDF
               </label>
               <input type="file" name="archivo" id="archivo" accept=".pdf" style="display: none;">
               <button type="submit" class="btn btn-primary ms-2">Subir</button>
@@ -116,7 +183,7 @@
               <li>
                 <form action="procesar_excel.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
                   <label for="archivoExcel" class="dropdown-item" id="archivoExcelLabel" style="cursor: pointer;">
-                      <img src="../Excel/images/excel.ico" alt="Excel" class="icono"> Archivo Excel
+                      <img src="images/excel.ico" alt="Excel" class="icono"> Archivo Excel
                   </label>
                   <input type="file" name="archivoExcel" id="archivoExcel" accept=".xls,.xlsx" style="display: none;">
                   <button type="submit" class="btn btn-success ms-2">Subir</button>
@@ -128,7 +195,7 @@
           <!-- Submenú: De una Base de Datos -->
           <li class="dropdown-submenu">
             <a class="dropdown-item" href="#">
-              <img src="../Excel/images/basedatos.ico" alt="Base de Datos" class="icono"> De una Base de Datos
+              <img src="images/basedatos.ico" alt="Base de Datos" class="icono"> De una Base de Datos
             </a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="#">Opción 1</a></li>
@@ -140,10 +207,11 @@
     
       <!-- Botones de Ordenación -->
       <div class="iconos-container">
-        <img src="../Excel/images/ordenarAZ.ico" alt="Ordenar A-Z" class="icono">
-        <img src="../Excel/images/ordenarZA.ico" alt="Ordenar Z-A" class="icono">
+        <img src="images/ordenarAZ.ico" alt="Ordenar A-Z" class="icono">
+        <img src="images/ordenarZA.ico" alt="Ordenar Z-A" class="icono">
       </div>
     </div>
+  </div>
   </section>
 
   <!-- Aqui iran las celdas -->
@@ -156,7 +224,9 @@
       </div>
       <div class="formula-input-container">
         <span class="formula-prefix">=</span>
-        <input type="text" id="formula-input" placeholder="Ingresar fórmula...">
+        <div class="centrar_formula">
+          <input type="text" id="formula-input" placeholder="Ingresar fórmula...">
+        </div>
       </div>
     </section>
 
@@ -176,13 +246,12 @@
   <footer class="sheets-bar">
     <div class="sheets-container">
       <div class="sheet active" data-sheet="hoja1">Hoja1</div>
-      <div class="sheet" data-sheet="hoja2">Hoja2</div>
-      <div class="sheet" data-sheet="hoja3">Hoja3</div>
     </div>
     <button id="add-sheet">+</button>
   </footer>
 
   <script src="main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
 
 </body>
 </html>
