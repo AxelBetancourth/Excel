@@ -1,0 +1,107 @@
+/* ================================
+// Sección datos (Escribe tu nombre aqui)
+// ================================*/
+#submenu-datos {
+    background-color: #ffffff;
+    border-top: 1px solid #ddd;
+    padding: 2px;
+}
+  
+.menu-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+  
+#submenu-datos .btn-group {
+    position: relative;
+}
+  
+#submenu-datos .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+}
+  
+#submenu-datos .btn:hover {
+    background-color: #e0e0e0;
+}
+  
+#submenu-datos .icono {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    margin-right: 5px;
+}
+  
+#submenu-datos .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    min-width: 200px;
+    padding: 5px 0;
+    margin: 2px 0 0;
+    list-style: none;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.175);
+}
+  
+.dropdown-menu {
+    display: block;
+}
+ 
+.dropdown-menu li {
+    position: relative;
+}
+  
+.dropdown-submenu {
+    position: relative;
+}
+  
+.dropdown-submenu > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-left: -1px;
+    display: none;
+}
+  
+.dropdown-submenu:hover > .dropdown-menu {
+    display: block;
+}
+  
+.dropdown-menu li a.dropdown-item {
+    display: block;
+    padding: 5px 15px;
+    font-weight: 400;
+    color: #333;
+    white-space: nowrap;
+    text-decoration: none;
+}
+  
+#submenu-datos .dropdown-menu li a.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+  
+#submenu-datos .iconos-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+  
+#submenu-datos .iconos-container img.icono {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    margin: 0;
+    cursor: pointer;
+}
+  
