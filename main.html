@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Excalibur</title>
+  <title>LiteCell</title>
   <link rel="stylesheet" href="main.css">
   <link rel="stylesheet" href="celdas.css">
   <link rel="stylesheet" href="archivo.css">
@@ -13,6 +13,18 @@
   <link rel="stylesheet" href="datos.css">
 </head>
 <body>
+
+  <!-- Pantalla de carga -->
+  <div id="loader">
+    <div class="loader-content">
+      <img src="images/logoexcel.png" alt="Logo Excel" class="logo-excel">
+      <h1 class="app-title">LiteCell</h1>
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <div class="progress-percentage" id="progress-percentage">0%</div>
+    </div>
+  </div>
 
   <!-- Cinta de opciones -->
   <header>
@@ -58,7 +70,7 @@
         <!-- Sección de Inicio en la barra lateral -->
         <div class="contenido-seccion" id="inicio">
 
-          <h2 id="mensaje-bienvenida">Bienvenido</h2>
+          <h2 id="mensaje-bienvenida" class="h2_archivo">Bienvenido</h2>
           <p>Nuevo</p>
 
           <div class="boton-contenedor">
@@ -68,27 +80,27 @@
           </div>
 
           <div class="recientes-container">
-            <h2>Archivos Recientes</h2>
+            <h2 class="h2_archivo">Archivos Recientes</h2>
             <ul id="lista-recientes"></ul>  
           </div>   
                
         </div>
 
         <div class="contenido-seccion" id="abrir">
-          <h2>Abrir</h2>
+          <h2 class="h2_archivo"></h2>>Abrir</h2>
           <p>Aquí puedes abrir un nuevo archivo.</p>
           <input type="file" id="fileInput" accept=".xlsx, .xls">
           <button onclick="abrirExcel()">abrir un archivo</button>
         </div>
     
         <div class="contenido-seccion" id="guardar">
-          <h2>Guardar</h2>
+          <h2 class="h2_archivo"></h2>>Guardar</h2>
           <p>Opciones para Guardar archivos.</p>
           <button id="openSaveModal" >Guardar este archivo</button>
         </div>
     
         <div class="contenido-seccion" id="exportar">
-          <h2>Exportar</h2>
+          <h2 class="h2_archivo"></h2>>Exportar</h2>
           <p>Pronto....</p>
         </div>
       </div>
@@ -98,7 +110,7 @@
 
 <div id="saveModal" class="modal">
   <div class="modal-content">
-    <h2>Guardar este archivo</h2>
+    <h2 class="h2_archivo"></h2>>Guardar este archivo</h2>
     
     <!-- Input para el nombre del archivo -->
     <label for="filename">Nombre del archivo:</label>
@@ -230,9 +242,7 @@
       </div>
       <div class="formula-input-container">
         <span class="formula-prefix">=</span>
-        <div class="centrar_formula">
-          <input type="text" id="formula-input" placeholder="Ingresar fórmula...">
-        </div>
+        <input type="text" id="formula-input" placeholder="Ingresar fórmula...">
       </div>
     </section>
 
