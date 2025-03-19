@@ -620,11 +620,12 @@ function calculateComputedValue(value) {
 function updateCell(x, y, value) {
 	x = parseInt(x);
 	y = parseInt(y);
-
+	
 	const newState = structuredClone(state);
+
 	newState[x][y] = {
 		value: value,
-		computedValue: value.trim() === '' ? '' : calculateComputedValue(value)
+		computedValue: value.startsWith('=') ? value : calculateComputedValue(value)
 	};
 
 	state = newState;
@@ -632,7 +633,7 @@ function updateCell(x, y, value) {
 	updateAllDependentCells();
 
 	const selector = `td[data-x="${x}"][data-y="${y}"]`;
-	const cell = $(selector);
+	const cell = document.querySelector(selector);
 	if (cell) {
 		cell.querySelector('input').value = value;
 		cell.querySelector('span').textContent = state[x][y].computedValue;
@@ -1067,10 +1068,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 			// Editar nombre
 			document.getElementById("rename-sheet").addEventListener("click", function () {
-				let newName = prompt("Nuevo nombre de la hoja:", selectedSheet.textContent);
-				if (newName) selectedSheet.textContent = newName;
-				contextMenu.remove();
-			});
+                let newName = prompt("Nuevo nombre de la hoja:", selectedSheet.textContent);
+                if (newName) {
+                    selectedSheet.textContent = newName;
+                    // Obtener índice de la hoja
+                    let sheetIndex = Array.from(document.querySelectorAll(".sheet")).indexOf(selectedSheet);
+
+                    // Actualizar el nombre en el array `sheets`
+                    sheets[sheetIndex].name = newName;
+                }
+                contextMenu.remove();
+                });
 
 			// Eliminar hoja
 			document.getElementById("delete-sheet").addEventListener("click", function () {
