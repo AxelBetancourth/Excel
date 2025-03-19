@@ -47,7 +47,7 @@ function contarNumeros() {
     });
 
     const formulaInput = document.getElementById('formula-input');
-    formulaInput.value = `=CONTAR.NUMEROS(${Array.from(selectedCells).map(celda => celda.id).join(',')})`;
+    formulaInput.value = `=CONTAR(${Array.from(selectedCells).map(celda => celda.id).join(',')})`;
 }
 
 // Función para encontrar el máximo de celdas seleccionadas
