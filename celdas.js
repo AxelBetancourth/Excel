@@ -104,21 +104,20 @@ function transformFunctionNames(formula) {
 
 //Devuelve el índice de la llave de cierre que hace match con la apertura en startIndex
 function findMatchingParen(str, startIndex) {
-	let open = 1;
+	let count = 0;
 	for (let i = startIndex; i < str.length; i++) {
-	  if (str[i] === '(') {
-		open++;
-	  } else if (str[i] === ')') {
-		open--;
-		if (open === 0) return i;
-	  }
+		if (str[i] === '(') count++;
+		else if (str[i] === ')') {
+			count--;
+			if (count === 0) return i;
+		}
 	}
 	return -1;
 }
 
 //Extrae los argumentos de una función ignorando comas dentro de paréntesis o comillas
 function extractFunctionArguments(str) {
-	const delimiter = str.includes(';') ? ';' : ',';
+	const delimiter = str.includes(";") ? ";" : ",";
 	let args = [];
 	let current = "";
 	let count = 0;
@@ -144,6 +143,7 @@ function extractFunctionArguments(str) {
 	}
 	return args;
 }
+
 
 //Funcion mod o residuo
 function replaceMOD(formula) {
