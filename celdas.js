@@ -18,6 +18,10 @@ let sheets = [
 	{ name: 'Hoja1', data: [] }
 ];
 
+let isSelectingRange = false;
+let selectionStart = null;
+let selectionEnd = null;
+
 const range = length => Array.from({ length }, (_, i) => i);
 const rangeChar = length => letras.slice(0, length);
 
@@ -99,43 +103,44 @@ function transformFunctionNames(formula) {
 }
 
 //Devuelve el índice de la llave de cierre que hace match con la apertura en startIndex
-
 function findMatchingParen(str, startIndex) {
-	let count = 0;
+	let open = 1;
 	for (let i = startIndex; i < str.length; i++) {
-		if (str[i] === '(') count++;
-		else if (str[i] === ')') {
-			count--;
-			if (count === 0) return i;
-		}
+	  if (str[i] === '(') {
+		open++;
+	  } else if (str[i] === ')') {
+		open--;
+		if (open === 0) return i;
+	  }
 	}
 	return -1;
 }
 
 //Extrae los argumentos de una función ignorando comas dentro de paréntesis o comillas
 function extractFunctionArguments(str) {
+	const delimiter = str.includes(';') ? ';' : ',';
 	let args = [];
 	let current = "";
 	let count = 0;
 	let inQuote = false;
 	for (let i = 0; i < str.length; i++) {
-		let char = str[i];
-		if (char === '"' && (i === 0 || str[i - 1] !== '\\')) {
-			inQuote = !inQuote;
-		}
-		if (!inQuote && char === ',' && count === 0) {
-			args.push(current.trim());
-			current = "";
-			continue;
-		}
-		if (!inQuote) {
-			if (char === '(') count++;
-			if (char === ')') count--;
-		}
-		current += char;
+	  let char = str[i];
+	  if (char === '"' && (i === 0 || str[i - 1] !== '\\')) {
+		inQuote = !inQuote;
+	  }
+	  if (!inQuote && char === delimiter && count === 0) {
+		args.push(current.trim());
+		current = "";
+		continue;
+	  }
+	  if (!inQuote) {
+		if (char === '(') count++;
+		if (char === ')') count--;
+	  }
+	  current += char;
 	}
 	if (current.trim() !== "") {
-		args.push(current.trim());
+	  args.push(current.trim());
 	}
 	return args;
 }
@@ -346,6 +351,169 @@ function replacePROMEDIO(formula) {
 	return formula;
 }
 
+// Funcion MAX
+function replaceMAX(formula) {
+	let index = formula.indexOf("MAX(");
+	while (index !== -1) {
+	  let end = findMatchingParen(formula, index + 3);
+	  if (end === -1) break;
+	  let inside = formula.substring(index + 4, end);
+	  let args = extractFunctionArguments(inside);
+	  let values = [];
+	  
+	  for (let arg of args) {
+		arg = arg.trim();
+		if (arg.includes(":")) {
+		  let parts = arg.split(":");
+		  if (parts.length === 2) {
+			let startCoords = getCellCoords(parts[0].trim());
+			let endCoords = getCellCoords(parts[1].trim());
+			let startX = Math.min(startCoords[0], endCoords[0]);
+			let endX = Math.max(startCoords[0], endCoords[0]);
+			let startY = Math.min(startCoords[1], endCoords[1]);
+			let endY = Math.max(startCoords[1], endCoords[1]);
+			for (let x = startX; x <= endX; x++) {
+			  for (let y = startY; y <= endY; y++) {
+				if (state[x] && state[x][y]) {
+				  let cellVal = state[x][y].computedValue;
+				  if (cellVal !== "" && !isNaN(Number(cellVal))) {
+					values.push(Number(cellVal));
+				  } else if (cellVal === "") {
+					values.push(0);
+				  }
+				}
+			  }
+			}
+		  }
+		} else if (/^[A-Za-z]+\d+$/.test(arg)) {
+		  let val = getCellValue(arg);
+		  if (val !== "" && !isNaN(Number(val))) {
+			values.push(Number(val));
+		  } else if (val === "") {
+			values.push(0);
+		  }
+		} else if (!isNaN(Number(arg))) {
+		  values.push(Number(arg));
+		}
+	  }
+	  
+	  let replacement;
+	  if (values.length > 0) {
+		replacement = Math.max(...values);
+	  } else {
+		replacement = "#¡DIV/0!";
+	  }
+	  
+	  formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
+	  index = formula.indexOf("MÁX(");
+	}
+	return formula;
+}
+  
+  // Reemplaza las llamadas a MÍN()
+function replaceMIN(formula) {
+	let index = formula.indexOf("MIN(");
+	while (index !== -1) {
+	  let end = findMatchingParen(formula, index + 3);
+	  if (end === -1) break;
+	  let inside = formula.substring(index + 4, end);
+	  let args = extractFunctionArguments(inside);
+	  let values = [];
+	  
+	  for (let arg of args) {
+		arg = arg.trim();
+		if (arg.includes(":")) {
+		  let parts = arg.split(":");
+		  if (parts.length === 2) {
+			let startCoords = getCellCoords(parts[0].trim());
+			let endCoords = getCellCoords(parts[1].trim());
+			let startX = Math.min(startCoords[0], endCoords[0]);
+			let endX = Math.max(startCoords[0], endCoords[0]);
+			let startY = Math.min(startCoords[1], endCoords[1]);
+			let endY = Math.max(startCoords[1], endCoords[1]);
+			for (let x = startX; x <= endX; x++) {
+			  for (let y = startY; y <= endY; y++) {
+				if (state[x] && state[x][y]) {
+				  let cellVal = state[x][y].computedValue;
+				  if (cellVal !== "" && !isNaN(Number(cellVal))) {
+					values.push(Number(cellVal));
+				  } else if (cellVal === "") {
+					values.push(0);
+				  }
+				}
+			  }
+			}
+		  }
+		} else if (/^[A-Za-z]+\d+$/.test(arg)) {
+		  let val = getCellValue(arg);
+		  if (val !== "" && !isNaN(Number(val))) {
+			values.push(Number(val));
+		  } else if (val === "") {
+			values.push(0);
+		  }
+		} else if (!isNaN(Number(arg))) {
+		  values.push(Number(arg));
+		}
+	  }
+	  
+	  let replacement;
+	  if (values.length > 0) {
+		replacement = Math.min(...values);
+	  } else {
+		replacement = "#¡DIV/0!";
+	  }
+	  
+	  formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
+	  index = formula.indexOf("MÍN(");
+	}
+	return formula;
+}
+
+function replaceEXTRAE(formula) {
+	let index = formula.indexOf("EXTRAE(");
+	while (index !== -1) {
+	  let end = findMatchingParen(formula, index + 7);
+	  if (end === -1) break;
+	  let inside = formula.substring(index + 7, end);
+	  let args = extractFunctionArguments(inside);
+	  if (args.length < 3) {
+		formula = formula.substring(0, index) + "#¡ERROR!" + formula.substring(end + 1);
+		index = formula.indexOf("EXTRAE(");
+		continue;
+	  }
+	  let textArg = args[0].trim();
+	  let startArg = args[1].trim();
+	  let numCharsArg = args[2].trim();
+  
+	  let textVal = "";
+	  // Si el argumento es una referencia de celda, se obtiene su valor
+	  if (/^[A-Za-z]+\d+$/.test(textArg)) {
+		textVal = getCellValue(textArg);
+	  } else if (textArg.startsWith('"') && textArg.endsWith('"')) {
+		textVal = textArg.slice(1, -1);
+	  } else {
+		textVal = textArg;
+	  }
+	  
+	  let startIndex = Number(startArg);
+	  let lengthVal = Number(numCharsArg);
+	  let replacement;
+	  if (!isNaN(startIndex) && !isNaN(lengthVal)) {
+		// Ajustamos el índice porque Excel es 1-indexado
+		replacement = textVal.substring(startIndex - 1, startIndex - 1 + lengthVal);
+		// Se envuelve el resultado en comillas para que sea una cadena literal
+		replacement = `"${replacement}"`;
+	  } else {
+		replacement = "#¡ERROR!";
+	  }
+	  
+	  // Se reemplaza la función EXTRAE completa por el resultado obtenido
+	  formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
+	  index = formula.indexOf("EXTRAE(");
+	}
+	return formula;
+}
+
 //Reemplaza recursivamente las funciones MOD, SI, Y y O
 function replaceFunctions(formula) {
 	let prev;
@@ -357,6 +525,9 @@ function replaceFunctions(formula) {
 		formula = replaceO(formula);
 		formula = replaceSUMA(formula);
 		formula = replacePROMEDIO(formula);
+		formula = replaceMAX(formula);
+		formula = replaceMIN(formula);
+		formula = replaceEXTRAE(formula);
 	} while (formula !== prev);
 	return formula;
 }
@@ -462,6 +633,7 @@ function clearSelections() {
 	$$('.selected-row').forEach(el => el.classList.remove('selected-row'));
 	$$('.selected-header').forEach(el => el.classList.remove('selected-header'));
 	$$('.celdailumida').forEach(el => el.classList.remove('celdailumida'));
+	$$('.selected-range').forEach(el => el.classList.remove('selected-range'));
 	selectedColumn = null;
 	selectedRow = null;
 }
@@ -474,6 +646,41 @@ function updateActiveCellDisplay(x, y) {
 	activeCellDisplay.textContent = `${columnLetter}${rowNumber}`;
 	formulaInput.value = state[x][y].value;
 }
+
+//Función para resaltar el rango
+function clearRangeSelection() {
+	$$('.selected-range').forEach(el => el.classList.remove('selected-range'));
+}
+
+
+function highlightRange(start, end) {
+	clearRangeSelection();
+	const startX = Math.min(start.x, end.x);
+	const endX = Math.max(start.x, end.x);
+	const startY = Math.min(start.y, end.y);
+	const endY = Math.max(start.y, end.y);
+	for (let x = startX; x <= endX; x++) {
+	  for (let y = startY; y <= endY; y++) {
+		const cell = document.querySelector(`td[data-x="${x}"][data-y="${y}"]`);
+		if (cell) {
+		  cell.classList.add('selected-range');
+		}
+	  }
+	}
+}
+
+//Función para actualizar la visualización del rango en la "caja de nombre"
+
+function updateActiveCellDisplayRange(start, end) {
+	const startX = Math.min(start.x, end.x);
+	const endX = Math.max(start.x, end.x);
+	const startY = Math.min(start.y, end.y);
+	const endY = Math.max(start.y, end.y);
+	const startRef = letras[startX] + (startY + 1);
+	const endRef = letras[endX] + (endY + 1);
+	activeCellDisplay.textContent = (startRef === endRef) ? startRef : `${startRef}:${endRef}`;
+}
+
 
 // Eventos en el encabezado
 $head.addEventListener('click', event => {
@@ -509,7 +716,40 @@ $body.addEventListener('click', event => {
 	}
 });
 
-// Manejo de copiar
+
+//Eventos para Seleccionar Rango Body 
+$body.addEventListener('mousedown', event => {
+	const td = event.target.closest('td');
+	if (!td) return;
+	clearSelections();
+	isSelectingRange = true;
+	const x = parseInt(td.dataset.x);
+	const y = parseInt(td.dataset.y);
+	selectionStart = { x, y };
+	selectionEnd = { x, y };
+	highlightRange(selectionStart, selectionEnd);
+	updateActiveCellDisplayRange(selectionStart, selectionEnd);
+  });
+  
+  $body.addEventListener('mouseover', event => {
+	if (!isSelectingRange) return;
+	const td = event.target.closest('td');
+	if (!td) return;
+	const x = parseInt(td.dataset.x);
+	const y = parseInt(td.dataset.y);
+	selectionEnd = { x, y };
+	highlightRange(selectionStart, selectionEnd);
+	updateActiveCellDisplayRange(selectionStart, selectionEnd);
+  });
+  
+  document.addEventListener('mouseup', event => {
+	if (isSelectingRange) {
+	  isSelectingRange = false;
+	}
+});
+  
+
+// Manejo de copiar en una celda
 document.addEventListener('copy', (e) => {
 	let data = [];
 	if (selectedColumn !== null) {
@@ -526,24 +766,117 @@ document.addEventListener('copy', (e) => {
 	}
 });
 
+//En multicelda
+document.addEventListener('copy', (e) => {
+	let data = [];
+	const selectedRangeCells = document.querySelectorAll('td.selected-range');
+	if (selectedRangeCells.length > 0) {
+	  // Determinar el rectángulo que abarca el rango
+	  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+	  selectedRangeCells.forEach(cell => {
+		let x = parseInt(cell.dataset.x);
+		let y = parseInt(cell.dataset.y);
+		if (x < minX) minX = x;
+		if (x > maxX) maxX = x;
+		if (y < minY) minY = y;
+		if (y > maxY) maxY = y;
+	  });
+	  for (let y = minY; y <= maxY; y++) {
+		let rowData = [];
+		for (let x = minX; x <= maxX; x++) {
+		  const cell = document.querySelector(`td[data-x="${x}"][data-y="${y}"]`);
+		  if (cell && cell.classList.contains('selected-range')) {
+			rowData.push(cell.querySelector('span').textContent);
+		  } else {
+			rowData.push("");
+		  }
+		}
+		data.push(rowData.join("\t"));
+	  }
+	} else if (selectedColumn !== null) {
+	  data = state[selectedColumn]
+		.map(cell => cell.computedValue)
+		.filter(value => value !== "");
+	} else if (selectedRow !== null) {
+	  data = state.map(col => col[selectedRow].computedValue)
+		.filter(value => value !== "");
+	}
+	if (data.length > 0) {
+	  e.clipboardData.setData('text/plain', data.join('\n'));
+	  e.preventDefault();
+	}
+});
+  
+
 // Manejo de pegar
 document.addEventListener('paste', (e) => {
 	if (e.target === formulaInput) return;
 	const clipboardData = e.clipboardData.getData('text/plain');
 	if (!clipboardData) return;
-	const values = clipboardData.split('\n').filter(v => v !== '');
-
-	if (selectedColumn !== null) {
-		values.forEach((value, y) => {
-			if (y < rows) updateCell(selectedColumn, y, value);
+  
+	// Separamos por líneas y filtramos líneas vacías.
+	const rowsData = clipboardData.split('\n').filter(v => v !== '');
+	// Determinamos si es un único valor (sin tabuladores y solo una línea)
+	const isSingleValue = (rowsData.length === 1 && rowsData[0].indexOf('\t') === -1);
+  
+	// Revisamos si hay celdas seleccionadas como rango.
+	const selectedRangeCells = document.querySelectorAll('td.selected-range');
+	if (selectedRangeCells.length > 0) {
+	  // Obtenemos la celda superior izquierda del rango.
+	  let minX = Infinity, minY = Infinity;
+	  selectedRangeCells.forEach(cell => {
+		const x = parseInt(cell.dataset.x);
+		const y = parseInt(cell.dataset.y);
+		if (x < minX) minX = x;
+		if (y < minY) minY = y;
+	  });
+	  
+	  if (isSingleValue) {
+		// Si es un único valor, lo asignamos a todas las celdas seleccionadas.
+		selectedRangeCells.forEach(cell => {
+		  const x = parseInt(cell.dataset.x);
+		  const y = parseInt(cell.dataset.y);
+		  updateCell(x, y, clipboardData);
 		});
+	  } else {
+		// Si es un rango multi-celda, pegamos respetando la forma copiada a partir de la celda superior izquierda.
+		rowsData.forEach((row, rowIndex) => {
+		  const cells = row.split('\t');
+		  cells.forEach((cellValue, colIndex) => {
+			const targetX = minX + colIndex;
+			const targetY = minY + rowIndex;
+			if (targetX < cols && targetY < rows) {
+			  updateCell(targetX, targetY, cellValue);
+			}
+		  });
+		});
+	  }
+	  e.preventDefault();
+	  return;
+	} else if (selectedColumn !== null) {
+	  // Si se ha seleccionado una columna completa, pegamos en cada celda de esa columna.
+	  rowsData.forEach((value, y) => {
+		if (y < rows) updateCell(selectedColumn, y, value);
+	  });
+	  e.preventDefault();
+	  return;
 	} else if (selectedRow !== null) {
-		values.forEach((value, x) => {
-			if (x < cols) updateCell(x, selectedRow, value);
-		});
+	  // Si se ha seleccionado una fila completa, pegamos en cada celda de esa fila.
+	  rowsData.forEach((row, x) => {
+		if (x < cols) updateCell(x, selectedRow, row);
+	  });
+	  e.preventDefault();
+	  return;
+	} else {
+	  // Si no hay selección de rango, se pega en la celda activa.
+	  if (activeCell) {
+		updateCell(activeCell.x, activeCell.y, clipboardData);
+	  }
 	}
 	e.preventDefault();
 });
+  
+  
 
 // Doble clic para editar la celda
 $body.addEventListener('dblclick', event => {
@@ -564,7 +897,7 @@ $body.addEventListener('dblclick', event => {
 	});
 });
 
-// Borrar contenido con Delete o Backspace
+// Borrar contenido con Delete o Backspace en una celda
 document.addEventListener('keydown', (e) => {
 	if (e.key === 'Delete' || e.key === 'Backspace') {
 		if (selectedColumn !== null) {
@@ -579,6 +912,35 @@ document.addEventListener('keydown', (e) => {
 		});
 	}
 });
+
+//En multicelda
+document.addEventListener('keydown', (e) => {
+	if (e.key === 'Delete' || e.key === 'Backspace') {
+	  // Si existen celdas con la clase 'selected-range', se borra su contenido
+	  const selectedRangeCells = document.querySelectorAll('td.selected-range');
+	  if (selectedRangeCells.length > 0) {
+		selectedRangeCells.forEach(cell => {
+		  const x = parseInt(cell.dataset.x);
+		  const y = parseInt(cell.dataset.y);
+		  updateCell(x, y, "");
+		});
+		e.preventDefault();
+	  }
+	  // Si no hay rango, se revisa si se tiene una columna o fila seleccionada
+	  else if (selectedColumn !== null) {
+		state[selectedColumn].forEach((cell, y) => {
+		  updateCell(selectedColumn, y, "");
+		});
+		e.preventDefault();
+	  } else if (selectedRow !== null) {
+		state.forEach((col, x) => {
+		  updateCell(x, selectedRow, "");
+		});
+		e.preventDefault();
+	  }
+	}
+});
+  
 
 //Cambia a la hoja especificada por índice.
 

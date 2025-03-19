@@ -64,9 +64,8 @@ thead {
     top: 0;
     z-index: 3;
     border: 2px solid #ccc;
+    user-select: none;
 }
-
-/* Este */
 
 thead tr th:first-child{
     background-color: #217346;
@@ -86,6 +85,7 @@ tbody tr th:first-child{
     position: sticky;
     left: 0;
     top: 0;
+    user-select: none;
 }
 
 tr th:not(:first-child) {
@@ -162,6 +162,12 @@ th.row-header.selected-header {
 }
 
 .celdailumida {
+    background-color: #fff;
+    outline: 2px solid #217346;
+    z-index: 1;
+}
+
+.selected-range{
     background-color: #fff;
     outline: 2px solid #217346;
     z-index: 1;
