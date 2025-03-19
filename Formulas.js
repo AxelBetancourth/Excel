@@ -1,7 +1,7 @@
 // Función para calcular la suma de celdas seleccionadas
 function sumarCeldas() {
     // Obtener todas las celdas seleccionadas
-    const selectedCells = document.getSelectedRange('.selected');
+    const selectedCells = document.querySelectorAll('.selected');
     
     let suma = 0;
     
@@ -12,9 +12,8 @@ function sumarCeldas() {
     });
     
     // Mostrar el resultado en la barra de fórmulas
-    const formulaInput = document.getSelectedRangell('formula-input');
+    const formulaInput = document.getElementById('formula-input');
     formulaInput.value = `=SUMA(${Array.from(selectedCells).map(celda => celda.id).join(',')})`;
-
 }
 
 

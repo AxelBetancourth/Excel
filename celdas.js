@@ -104,13 +104,12 @@ function transformFunctionNames(formula) {
 
 //Devuelve el índice de la llave de cierre que hace match con la apertura en startIndex
 function findMatchingParen(str, startIndex) {
-	let open = 1;
-	for (let i = startIndex; i < str.length; i++) {
-	  if (str[i] === '(') {
-		open++;
-	  } else if (str[i] === ')') {
-		open--;
-		if (open === 0) return i;
+	let count = 1; // Empezamos en 1 porque ya estamos después del primer paréntesis abierto
+	for (let i = startIndex + 1; i < str.length; i++) {
+	  if (str[i] === '(') count++;
+	  else if (str[i] === ')') {
+		count--;
+		if (count === 0) return i;
 	  }
 	}
 	return -1;
@@ -118,30 +117,42 @@ function findMatchingParen(str, startIndex) {
 
 //Extrae los argumentos de una función ignorando comas dentro de paréntesis o comillas
 function extractFunctionArguments(str) {
-	const delimiter = str.includes(';') ? ';' : ',';
+	// Determinar el delimitador (punto y coma o coma)
+	const delimiter = str.includes(";") ? ";" : ",";
 	let args = [];
 	let current = "";
 	let count = 0;
 	let inQuote = false;
+	
 	for (let i = 0; i < str.length; i++) {
 	  let char = str[i];
+	  
+	  // Manejar comillas (para cadenas de texto)
 	  if (char === '"' && (i === 0 || str[i - 1] !== '\\')) {
 		inQuote = !inQuote;
 	  }
+	  
+	  // Si encontramos un delimitador y no estamos dentro de comillas o paréntesis anidados
 	  if (!inQuote && char === delimiter && count === 0) {
 		args.push(current.trim());
 		current = "";
 		continue;
 	  }
+	  
+	  // Contar paréntesis para funciones anidadas
 	  if (!inQuote) {
 		if (char === '(') count++;
 		if (char === ')') count--;
 	  }
+	  
 	  current += char;
 	}
+	
+	// Añadir el último argumento
 	if (current.trim() !== "") {
 	  args.push(current.trim());
 	}
+	
 	return args;
 }
 
@@ -472,44 +483,65 @@ function replaceMIN(formula) {
 function replaceEXTRAE(formula) {
 	let index = formula.indexOf("EXTRAE(");
 	while (index !== -1) {
-	  let end = findMatchingParen(formula, index + 7);
+	  let end = findMatchingParen(formula, index + 6);
 	  if (end === -1) break;
+	  
 	  let inside = formula.substring(index + 7, end);
 	  let args = extractFunctionArguments(inside);
+	  
 	  if (args.length < 3) {
 		formula = formula.substring(0, index) + "#¡ERROR!" + formula.substring(end + 1);
-		index = formula.indexOf("EXTRAE(");
+		index = formula.indexOf("EXTRAE(", index + 1);
 		continue;
 	  }
+	  
 	  let textArg = args[0].trim();
 	  let startArg = args[1].trim();
 	  let numCharsArg = args[2].trim();
-  
+	  
 	  let textVal = "";
-	  // Si el argumento es una referencia de celda, se obtiene su valor
+	  
 	  if (/^[A-Za-z]+\d+$/.test(textArg)) {
 		textVal = getCellValue(textArg);
+		if (textVal === undefined || textVal === null) textVal = "";
 	  } else if (textArg.startsWith('"') && textArg.endsWith('"')) {
 		textVal = textArg.slice(1, -1);
 	  } else {
-		textVal = textArg;
+		try {
+		  textVal = String(eval(replaceFunctions(textArg)));
+		} catch (e) {
+		  textVal = textArg;
+		}
 	  }
 	  
-	  let startIndex = Number(startArg);
-	  let lengthVal = Number(numCharsArg);
+	  let startIndex, lengthVal;
+	  
+	  if (/^[A-Za-z]+\d+$/.test(startArg)) {
+		startIndex = Number(getCellValue(startArg));
+	  } else {
+		startIndex = Number(startArg);
+	  }
+	  
+	  if (/^[A-Za-z]+\d+$/.test(numCharsArg)) {
+		lengthVal = Number(getCellValue(numCharsArg));
+	  } else {
+		lengthVal = Number(numCharsArg);
+	  }
+	  
 	  let replacement;
-	  if (!isNaN(startIndex) && !isNaN(lengthVal)) {
-		// Ajustamos el índice porque Excel es 1-indexado
-		replacement = textVal.substring(startIndex - 1, startIndex - 1 + lengthVal);
-		// Se envuelve el resultado en comillas para que sea una cadena literal
-		replacement = `"${replacement}"`;
+	  if (!isNaN(startIndex) && !isNaN(lengthVal) && startIndex > 0) {
+		try {
+		  replacement = textVal.substring(startIndex - 1, startIndex - 1 + lengthVal);
+		  replacement = `"${replacement}"`;
+		} catch (e) {
+		  replacement = "#¡ERROR!";
+		}
 	  } else {
 		replacement = "#¡ERROR!";
 	  }
 	  
-	  // Se reemplaza la función EXTRAE completa por el resultado obtenido
 	  formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-	  index = formula.indexOf("EXTRAE(");
+	  index = formula.indexOf("EXTRAE(", index + 1);
 	}
 	return formula;
 }
@@ -588,11 +620,12 @@ function calculateComputedValue(value) {
 function updateCell(x, y, value) {
 	x = parseInt(x);
 	y = parseInt(y);
-
+	
 	const newState = structuredClone(state);
+
 	newState[x][y] = {
 		value: value,
-		computedValue: value.trim() === '' ? '' : calculateComputedValue(value)
+		computedValue: value.startsWith('=') ? value : calculateComputedValue(value)
 	};
 
 	state = newState;
@@ -600,7 +633,7 @@ function updateCell(x, y, value) {
 	updateAllDependentCells();
 
 	const selector = `td[data-x="${x}"][data-y="${y}"]`;
-	const cell = $(selector);
+	const cell = document.querySelector(selector);
 	if (cell) {
 		cell.querySelector('input').value = value;
 		cell.querySelector('span').textContent = state[x][y].computedValue;
@@ -1035,10 +1068,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 			// Editar nombre
 			document.getElementById("rename-sheet").addEventListener("click", function () {
-				let newName = prompt("Nuevo nombre de la hoja:", selectedSheet.textContent);
-				if (newName) selectedSheet.textContent = newName;
-				contextMenu.remove();
-			});
+                let newName = prompt("Nuevo nombre de la hoja:", selectedSheet.textContent);
+                if (newName) {
+                    selectedSheet.textContent = newName;
+                    // Obtener índice de la hoja
+                    let sheetIndex = Array.from(document.querySelectorAll(".sheet")).indexOf(selectedSheet);
+
+                    // Actualizar el nombre en el array `sheets`
+                    sheets[sheetIndex].name = newName;
+                }
+                contextMenu.remove();
+                });
 
 			// Eliminar hoja
 			document.getElementById("delete-sheet").addEventListener("click", function () {
