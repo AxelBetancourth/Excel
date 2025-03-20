@@ -572,3 +572,5 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+//FIN DE TABLA
