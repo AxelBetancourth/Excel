@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="insertar.css">
   <link rel="stylesheet" href="formulas.css">
   <link rel="stylesheet" href="datos.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
@@ -139,8 +141,138 @@
   <!-- Contenedor para los submenús de cada pestaña -->
   <section id="submenu-container" class="submenu-container">
     <div id="submenu-inicio" class="submenu active">
-      <p>Contenido del submenú de Inicio</p>
-      <!-- Aquí irán las opciones de la pestaña Inicio -->
+      <!-- Grupo: Portapapeles (4 botones) -->
+      <div class="ribbon-group">
+        <h3>Portapapeles</h3>
+        <div class="ribbon-buttons cuatro-botones">
+            <button title="Cortar"><i class="fas fa-cut"></i></button>
+            <button title="Copiar"><i class="fas fa-copy"></i></button>
+            <button title="Pegar"><i class="fas fa-paste"></i></button>
+            <button title="Copiar formato"><i class="fas fa-paint-brush"></i></button>
+        </div>
+    </div>
+
+    <!-- Grupo: Fuente (modificado) -->
+    <div class="ribbon-group">
+      <h3>Fuente</h3>
+      <div class="ribbon-buttons">
+        <!-- Fila 1: Selectores de Fuente y Tamaño -->
+        <div class="fila selectores">
+          <select class="fuente">
+            <option>Arial</option>
+            <option>Calibri</option>
+            <option>Times New Roman</option>
+            <option>Helvetica</option>
+            <option>Verdana</option>
+            <option>Georgia</option>
+            <option>Courier New</option>
+            <option>Trebuchet MS</option>
+            <option>Comic Sans MS</option>
+            <option>Roboto</option>
+          </select>
+          <select class="fuente">
+            <option>8</option>
+            <option>9</option>
+            <option>10</option>
+            <option>11</option>
+            <option>12</option>
+            <option>14</option>
+            <option>16</option>
+            <option>18</option>
+            <option>20</option>
+            <option>24</option>
+            <option>28</option>
+            <option>32</option>
+            <option>36</option>
+          </select>
+        </div>
+        <!-- Fila 2: Botones de Fuente -->
+        <div class="fila botones">
+          <button title="Negrita"><i class="fas fa-bold"></i></button>
+          <button title="Cursiva"><i class="fas fa-italic"></i></button>
+          <button title="Subrayado"><i class="fas fa-underline"></i></button>
+          <button title="Bordes"><i class="fas fa-border-all"></i></button>
+          <button title="Color de relleno">
+            <i class="fas fa-fill-drip"></i>
+            <input type="color" class="color-picker" id="fill-color" style="display: none;">
+          </button>
+          <button title="Color de fuente">
+            <i class="fas fa-font"></i>
+            <input type="color" class="color-picker" id="font-color" style="display: none;">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grupo: Alineación -->
+    <div class="ribbon-group">
+        <h3>Alineación</h3>
+        <div class="ribbon-buttons alineacion-botones">
+            <button title="Alinear izquierda"><i class="fas fa-align-left"></i></button>
+            <button title="Centrar"><i class="fas fa-align-center"></i></button>
+            <button title="Alinear derecha"><i class="fas fa-align-right"></i></button>
+            <button title="Justificar"><i class="fas fa-align-justify"></i></button>
+            <button title="Combinar celdas"><i class="fas fa-object-group"></i></button>
+            <button title="Orientación"><i class="fas fa-text-height"></i></button>
+            <button title="Sangría"><i class="fas fa-indent"></i></button>
+        </div>
+    </div>
+
+    <!-- Grupo: Número -->
+    <div class="ribbon-group">
+        <h3>Número</h3>
+        <div class="ribbon-buttons">
+            <!-- Fila 1: Selector de Número -->
+            <div class="fila selectores">
+                <select class="numero">
+                    <option>General</option>
+                    <option>Número</option>
+                    <option>Moneda</option>
+                    <option>Contabilidad</option>
+                    <option>Fecha</option>
+                    <option>Porcentaje</option>
+                </select>
+            </div>
+            <!-- Fila 2: Botones de Número -->
+            <div class="fila botones">
+                <button title="Formato de número"><i class="fas fa-dollar-sign"></i></button>
+                <button title="Porcentaje"><i class="fas fa-percent"></i></button>
+                <button title="Separador de miles"><i class="fas fa-th"></i></button>
+                <button title="Aumentar decimales"><i class="fas fa-plus-circle"></i></button>
+                <button title="Disminuir decimales"><i class="fas fa-minus-circle"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grupo: Edición (3 botones) -->
+    <div class="ribbon-group">
+        <h3>Edición</h3>
+        <div class="ribbon-buttons tres-botones">
+            <button title="Buscar"><i class="fas fa-search"></i></button>
+            <button title="Reemplazar"><i class="fas fa-exchange-alt"></i></button>
+            <button title="Ordenar"><i class="fas fa-sort"></i></button>
+        </div>
+    </div>
+
+    <!-- Grupo: Celdas (3 botones) -->
+    <div class="ribbon-group">
+        <h3>Celdas</h3>
+        <div class="ribbon-buttons tres-botones">
+            <button title="Insertar"><i class="fas fa-plus"></i></button>
+            <button title="Eliminar"><i class="fas fa-minus"></i></button>
+            <button title="Formato de celdas"><i class="fas fa-cog"></i></button>
+        </div>
+    </div>
+
+    <!-- Grupo: Estilos (3 botones) -->
+    <div class="ribbon-group">
+        <h3>Estilos</h3>
+        <div class="ribbon-buttons tres-botones">
+            <button title="Formato condicional"><i class="fas fa-tint"></i></button>
+            <button title="Estilo de tabla"><i class="fas fa-table"></i></button>
+            <button title="Estilo de celda"><i class="fas fa-paint-brush"></i></button>
+        </div>
+    </div>
     </div>
 
     <div id="submenu-insertar" class="submenu">
