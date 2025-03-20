@@ -574,3 +574,4 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 //FIN DE TABLA
+// INICIO DE OTRAS FUNCIONES

@@ -75,6 +75,34 @@ tabs.forEach(btn => {
 	  }
 	}
   });
+
+//Funcion para la pantalla de carga
+window.addEventListener('load', function() {
+	var progressBar = document.getElementById('progress-bar');
+	var progressPercentage = document.getElementById('progress-percentage');
+	var loader = document.getElementById('loader');
+  
+	var progress = 0;
+	var totalDuration = 1000;
+	var intervalTime = 30;
+	var increment = (intervalTime / totalDuration) * 100;
+  
+	var interval = setInterval(function() {
+	  progress += increment;
+	  if (progress >= 100) {
+		progress = 100;
+		clearInterval(interval);
+		setTimeout(function(){
+		  loader.style.opacity = '0';
+		  setTimeout(function(){
+			loader.style.display = 'none';
+		  }, 500);
+		}, 500);
+	  }
+	  progressBar.style.width = progress + '%';
+	  progressPercentage.textContent = Math.floor(progress) + '%';
+	}, intervalTime);
+});
   
   // Exportar funciones y variables que necesiten ser accesibles desde otros módulos
   window.activateTab = activateTab;

@@ -1,107 +1,119 @@
-/* ================================
-// Sección datos (Escribe tu nombre aqui)
-// ================================*/
-#submenu-datos {
-    background-color: #ffffff;
-    border-top: 1px solid #ddd;
-    padding: 2px;
-}
-  
-.menu-container {
+/* ================================ 
+   Sección datos (ANAHI)
+   ================================ */
+.submenu {
+    display: none;
+  }
+
+  .submenu.active {
+    display: flex;
+  }
+  /* Estilos generales para el contenedor de submenús */
+  #submenu-container {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+  }
+  /* Estilos para cada submenú, pueden ajustarse según necesidades */
+  #submenu-inicio,
+  #submenu-insertar,
+  #submenu-formulas,
+  #submenu-datos {
+    align-items: center;
+    gap: 5px;
+  }
+  /* Otros estilos propios de la sección "Datos" */
+  .container {
+    width: 200px;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    margin-left: 0;
+  }
+  .menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .menu li {
+    position: relative;
+  }
+  .menu a {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-}
-  
-#submenu-datos .btn-group {
-    position: relative;
-}
-  
-#submenu-datos .btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 14px;
-}
-  
-#submenu-datos .btn:hover {
+    text-decoration: none;
+    color: #000;
+    font-size: 17px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: 0.3s ease;
+  }
+  .menu a:hover {
     background-color: #e0e0e0;
-}
-  
-#submenu-datos .icono {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-    margin-right: 5px;
-}
-  
-#submenu-datos .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1000;
+  }
+  .menu ul ul {
     display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
     min-width: 200px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
     padding: 5px 0;
-    margin: 2px 0 0;
-    list-style: none;
+    z-index: 1000;
+  }
+  .menu li:hover > ul {
+    display: block;
+  }
+  .menu ul ul ul {
+    left: 100%;
+    top: 0;
+  }
+  .icono {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+  }
+  .iconos-container {
+    display: flex;
+    gap: 10px;
+    position: relative;
+  }
+  .BotonesOrdenar {
+    width: 320px;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between; 
+    gap: 10px; 
+    margin-left: 0;
+  }
+  button {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    font-size: 15px;
     background-color: #fff;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.175);
-}
-  
-.dropdown-menu {
-    display: block;
-}
- 
-.dropdown-menu li {
-    position: relative;
-}
-  
-.dropdown-submenu {
-    position: relative;
-}
-  
-.dropdown-submenu > .dropdown-menu {
-    top: 0;
-    left: 100%;
-    margin-left: -1px;
-    display: none;
-}
-  
-.dropdown-submenu:hover > .dropdown-menu {
-    display: block;
-}
-  
-.dropdown-menu li a.dropdown-item {
-    display: block;
-    padding: 5px 15px;
-    font-weight: 400;
-    color: #333;
-    white-space: nowrap;
-    text-decoration: none;
-}
-  
-#submenu-datos .dropdown-menu li a.dropdown-item:hover {
-    background-color: #f5f5f5;
-}
-  
-#submenu-datos .iconos-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-  
-#submenu-datos .iconos-container img.icono {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-    margin: 0;
+    border-radius: 5px;
     cursor: pointer;
-}
-  
+  }
+  button:hover {
+    background-color: #f1f1f1;
+  }
+  button img.icono {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px; 
+  }
+  .flecha {
+    margin-left: auto;
+    font-size: 12px;
+  }

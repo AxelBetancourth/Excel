@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Excalibur</title>
+  <title>LiteCell</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="main.css">
   <link rel="stylesheet" href="celdas.css">
   <link rel="stylesheet" href="archivo.css">
@@ -11,11 +12,28 @@
   <link rel="stylesheet" href="insertar.css">
   <link rel="stylesheet" href="formulas.css">
   <link rel="stylesheet" href="datos.css">
+<<<<<<< HEAD
   <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+=======
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+>>>>>>> fb9c11af473d568c5719676848e93746d1222a1c
 </head>
 <body>
+
+  <!-- Pantalla de carga -->
+  <div id="loader">
+    <div class="loader-content">
+      <img src="images/logoexcel.png" alt="Logo Excel" class="logo-excel">
+      <h1 class="app-title">LiteCell</h1>
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <div class="progress-percentage" id="progress-percentage">0%</div>
+    </div>
+  </div>
 
   <!-- Cinta de opciones -->
   <header>
@@ -61,7 +79,7 @@
         <!-- Sección de Inicio en la barra lateral -->
         <div class="contenido-seccion" id="inicio">
 
-          <h2 id="mensaje-bienvenida">Bienvenido</h2>
+          <h2 id="mensaje-bienvenida" class="h2_archivo">Bienvenido</h2>
           <p>Nuevo</p>
 
           <div class="boton-contenedor">
@@ -71,27 +89,27 @@
           </div>
 
           <div class="recientes-container">
-            <h2>Archivos Recientes</h2>
+            <h2 class="h2_archivo">Archivos Recientes</h2>
             <ul id="lista-recientes"></ul>  
           </div>   
                
         </div>
 
         <div class="contenido-seccion" id="abrir">
-          <h2>Abrir</h2>
+          <h2 class="h2_archivo"></h2>>Abrir</h2>
           <p>Aquí puedes abrir un nuevo archivo.</p>
           <input type="file" id="fileInput" accept=".xlsx, .xls">
           <button onclick="abrirExcel()">abrir un archivo</button>
         </div>
     
         <div class="contenido-seccion" id="guardar">
-          <h2>Guardar</h2>
+          <h2 class="h2_archivo"></h2>>Guardar</h2>
           <p>Opciones para Guardar archivos.</p>
           <button id="openSaveModal" >Guardar este archivo</button>
         </div>
     
         <div class="contenido-seccion" id="exportar">
-          <h2>Exportar</h2>
+          <h2 class="h2_archivo"></h2>>Exportar</h2>
           <p>Pronto....</p>
         </div>
       </div>
@@ -101,7 +119,7 @@
 
 <div id="saveModal" class="modal">
   <div class="modal-content">
-    <h2>Guardar este archivo</h2>
+    <h2 class="h2_archivo"></h2>>Guardar este archivo</h2>
     
     <!-- Input para el nombre del archivo -->
     <label for="filename">Nombre del archivo:</label>
@@ -129,8 +147,138 @@
   <!-- Contenedor para los submenús de cada pestaña -->
   <section id="submenu-container" class="submenu-container">
     <div id="submenu-inicio" class="submenu active">
-      <p>Contenido del submenú de Inicio</p>
-      <!-- Aquí irán las opciones de la pestaña Inicio -->
+      <!-- Grupo: Portapapeles (4 botones) -->
+      <div class="ribbon-group">
+        <h3>Portapapeles</h3>
+        <div class="ribbon-buttons cuatro-botones">
+            <button title="Cortar"><i class="fas fa-cut"></i></button>
+            <button title="Copiar"><i class="fas fa-copy"></i></button>
+            <button title="Pegar"><i class="fas fa-paste"></i></button>
+            <button title="Copiar formato"><i class="fas fa-paint-brush"></i></button>
+        </div>
+    </div>
+
+    <!-- Grupo: Fuente (modificado) -->
+    <div class="ribbon-group">
+      <h3>Fuente</h3>
+      <div class="ribbon-buttons">
+        <!-- Fila 1: Selectores de Fuente y Tamaño -->
+        <div class="fila selectores">
+          <select class="fuente">
+            <option>Arial</option>
+            <option>Calibri</option>
+            <option>Times New Roman</option>
+            <option>Helvetica</option>
+            <option>Verdana</option>
+            <option>Georgia</option>
+            <option>Courier New</option>
+            <option>Trebuchet MS</option>
+            <option>Comic Sans MS</option>
+            <option>Roboto</option>
+          </select>
+          <select class="fuente">
+            <option>8</option>
+            <option>9</option>
+            <option>10</option>
+            <option>11</option>
+            <option>12</option>
+            <option>14</option>
+            <option>16</option>
+            <option>18</option>
+            <option>20</option>
+            <option>24</option>
+            <option>28</option>
+            <option>32</option>
+            <option>36</option>
+          </select>
+        </div>
+        <!-- Fila 2: Botones de Fuente -->
+        <div class="fila botones">
+          <button title="Negrita"><i class="fas fa-bold"></i></button>
+          <button title="Cursiva"><i class="fas fa-italic"></i></button>
+          <button title="Subrayado"><i class="fas fa-underline"></i></button>
+          <button title="Bordes"><i class="fas fa-border-all"></i></button>
+          <button title="Color de relleno">
+            <i class="fas fa-fill-drip"></i>
+            <input type="color" class="color-picker" id="fill-color" style="display: none;">
+          </button>
+          <button title="Color de fuente">
+            <i class="fas fa-font"></i>
+            <input type="color" class="color-picker" id="font-color" style="display: none;">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grupo: Alineación -->
+    <div class="ribbon-group">
+        <h3>Alineación</h3>
+        <div class="ribbon-buttons alineacion-botones">
+            <button title="Alinear izquierda"><i class="fas fa-align-left"></i></button>
+            <button title="Centrar"><i class="fas fa-align-center"></i></button>
+            <button title="Alinear derecha"><i class="fas fa-align-right"></i></button>
+            <button title="Justificar"><i class="fas fa-align-justify"></i></button>
+            <button title="Combinar celdas"><i class="fas fa-object-group"></i></button>
+            <button title="Orientación"><i class="fas fa-text-height"></i></button>
+            <button title="Sangría"><i class="fas fa-indent"></i></button>
+        </div>
+    </div>
+
+    <!-- Grupo: Número -->
+    <div class="ribbon-group">
+        <h3>Número</h3>
+        <div class="ribbon-buttons">
+            <!-- Fila 1: Selector de Número -->
+            <div class="fila selectores">
+                <select class="numero">
+                    <option>General</option>
+                    <option>Número</option>
+                    <option>Moneda</option>
+                    <option>Contabilidad</option>
+                    <option>Fecha</option>
+                    <option>Porcentaje</option>
+                </select>
+            </div>
+            <!-- Fila 2: Botones de Número -->
+            <div class="fila botones">
+                <button title="Formato de número"><i class="fas fa-dollar-sign"></i></button>
+                <button title="Porcentaje"><i class="fas fa-percent"></i></button>
+                <button title="Separador de miles"><i class="fas fa-th"></i></button>
+                <button title="Aumentar decimales"><i class="fas fa-plus-circle"></i></button>
+                <button title="Disminuir decimales"><i class="fas fa-minus-circle"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grupo: Edición (3 botones) -->
+    <div class="ribbon-group">
+        <h3>Edición</h3>
+        <div class="ribbon-buttons tres-botones">
+            <button title="Buscar"><i class="fas fa-search"></i></button>
+            <button title="Reemplazar"><i class="fas fa-exchange-alt"></i></button>
+            <button title="Ordenar"><i class="fas fa-sort"></i></button>
+        </div>
+    </div>
+
+    <!-- Grupo: Celdas (3 botones) -->
+    <div class="ribbon-group">
+        <h3>Celdas</h3>
+        <div class="ribbon-buttons tres-botones">
+            <button title="Insertar"><i class="fas fa-plus"></i></button>
+            <button title="Eliminar"><i class="fas fa-minus"></i></button>
+            <button title="Formato de celdas"><i class="fas fa-cog"></i></button>
+        </div>
+    </div>
+
+    <!-- Grupo: Estilos (3 botones) -->
+    <div class="ribbon-group">
+        <h3>Estilos</h3>
+        <div class="ribbon-buttons tres-botones">
+            <button title="Formato condicional"><i class="fas fa-tint"></i></button>
+            <button title="Estilo de tabla"><i class="fas fa-table"></i></button>
+            <button title="Estilo de celda"><i class="fas fa-paint-brush"></i></button>
+        </div>
+    </div>
     </div>
 
 
@@ -282,71 +430,74 @@
     </div>
     </div>
 
-<!-------------------- AREA DE DATOS = obtener y transferir datos en excel -->
+    <div id="submenu-datos" class="submenu">
+      <!-- Menú de Datos -->
+      <div class="menu-container">
+        <div class="container">
+          <div class="menu">
+            <ul>
+              <li>
+                <a href="">
+                  <img src="images/obtenerdatos.ico" alt="Icono Principal" class="icono"> 
+                  Obtener Datos
+                  <span class="flecha"></span>
+                </a>
+                <ul>
+                  <li>
+                    <a href="">
+                      <img src="images/archivo.ico" alt="Carpeta" class="icono"> 
+                      De un Archivos
+                      <span class="flecha"></span>
+                    </a>
+                    <ul>
+                      <li>
+                        <a href="#" onclick="document.getElementById('archivoPDF').click(); return false;">
+                          <img src="images/pdf.ico" alt="PDF" class="icono"> Archivo PDF
+                          <span class="flecha"></span>
+                        </a>
+                        <form action="procesar_pdf.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center px-3">
+                          <input type="file" name="archivoPDF" id="archivoPDF" accept=".pdf" style="display: none;">
+                        </form>
+                      </li>
+                      <li>
+                        <a href="#" onclick="document.getElementById('archivoExcel').click(); return false;">
+                          <img src="images/excel.ico" alt="Excel" class="icono"> Archivo EXCEL
+                          <span class="flecha"></span>
+                        </a>
+                        <form action="procesar_excel.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center px-3">
+                          <input type="file" name="archivoExcel" id="archivoExcel" accept=".xls,.xlsx" style="display: none;">
+                        </form>
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <a href="">
+                      <img src="images/basedatos.ico" alt="Base de datos" class="icono"> 
+                      De una base de datos
+                      <span class="flecha">&#9658;</span>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+        <!-- Botones de Ordenación -->
+        <div class="BotonesOrdenar">
+          <button id="OrdenarAZ">
+              <img src="images/ordenarAZ.ico" alt="Ordenar A-Z" class="icono">
+              Ordenar A-Z
+          </button>
+          <button id="OrdenarZA">
+              <img src="images/ordenarZA.ico" alt="Ordenar Z-A" class="icono">
+              Ordenar Z-A
+          </button>
+          
+        </div>
 
-<div id="submenu-datos" class="submenu">
-  <!-------------------- Opciones de Datos -->
-        
-    <!-- Opciones de Datos -->
-    <div id="submenu-datos" class="menu-container">
-      <!-- Botón Obtener Datos con Submenús -->
-      <div class="btn-group dropend">
-        <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="images/obtenerdatos.ico" alt="Obtener Datos" class="icono">
-          <span> Obtener Datos</span>
-        </button>
-    
-        <ul class="dropdown-menu">
-  <!-- Submenú: De un Archivo -->
-          <li class="dropdown-submenu">
-            <a class="dropdown-item" href="#">
-              <img src="images/archivo.ico" alt="Icono Archivo" class="icono"> De un Archivo
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-    <!-- Abrir el Exp Archivo -->
-            <form action="procesar_pdf.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
-              <label for="archivo" class="dropdown-item" id="archivoLabel" style="cursor: pointer;">
-                  <img src="images/pdf.ico" alt="PDF" class="icono"> Archivo PDF
-              </label>
-              <input type="file" name="archivo" id="archivo" accept=".pdf" style="display: none;">
-              <button type="submit" class="btn btn-primary ms-2">Subir</button>
-          </form>
-                
-              </li>
-  
-              <li>
-                <form action="procesar_excel.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
-                  <label for="archivoExcel" class="dropdown-item" id="archivoExcelLabel" style="cursor: pointer;">
-                      <img src="images/excel.ico" alt="Excel" class="icono"> Archivo Excel
-                  </label>
-                  <input type="file" name="archivoExcel" id="archivoExcel" accept=".xls,.xlsx" style="display: none;">
-                  <button type="submit" class="btn btn-success ms-2">Subir</button>
-              </form>
-              </li>
-            </ul>
-          </li>
-    
-          <!-- Submenú: De una Base de Datos -->
-          <li class="dropdown-submenu">
-            <a class="dropdown-item" href="#">
-              <img src="images/basedatos.ico" alt="Base de Datos" class="icono"> De una Base de Datos
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Opción 1</a></li>
-              <li><a class="dropdown-item" href="#">Opción 2</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    
-      <!-- Botones de Ordenación -->
-      <div class="iconos-container">
-        <img src="images/ordenarAZ.ico" alt="Ordenar A-Z" class="icono">
-        <img src="images/ordenarZA.ico" alt="Ordenar Z-A" class="icono">
-      </div>
     </div>
-  </div>
+  
   </section>
 
   <!-- Aqui iran las celdas -->
@@ -359,9 +510,7 @@
       </div>
       <div class="formula-input-container">
         <span class="formula-prefix">=</span>
-        <div class="centrar_formula">
-          <input type="text" id="formula-input" placeholder="Ingresar fórmula...">
-        </div>
+        <input type="text" id="formula-input" placeholder="Ingresar fórmula...">
       </div>
     </section>
 
@@ -390,7 +539,8 @@
   <script src="Formulas.js"></script>
   <script src="celdas.js"></script>
   <script src="archivo.js"></script>
+  <script src="datos.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

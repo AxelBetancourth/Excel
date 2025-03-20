@@ -138,12 +138,11 @@ button[data-target="exportar"]:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-h2 {
+#h2_archivo {
     color: #333;
     font-size: 18px;
     font-weight: normal;
     margin-top: 0;
-    /* margin-bottom: 20px; */
     text-align: left;
 }
 
@@ -161,10 +160,6 @@ select {
     padding: 8px;
     border: 1px solid #ddd;
     box-sizing: border-box;
-}
-
-input[type="text"] {
-    margin-bottom: 10px;
 }
 
 select {
@@ -186,7 +181,7 @@ select {
     color: #217346;
 }
 
-button {
+#nav-btn {
     padding: 8px 16px;
     border: none;
     border-radius: 2px;
@@ -258,15 +253,13 @@ button {
 .recientes-container {
     width: 100%;
     background: #f8f8f8;
-    padding: 20px;
+    padding: 5px;
     border-radius: 10px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    margin: 20px auto;
 }
 
 .recientes-container h2 {
     font-size: 20px;
-    margin-bottom: 15px;
     color: #333;
     text-align: left;
 }
