@@ -1,3 +1,435 @@
 /* ================================
-// Sección insertar (Escribe tu nombre aqui)
+// Sección insertar (Dayana Espino)
 // ================================*/
+
+/* =================================== */
+/* Estilos Generales para el Menú     */
+/* ===================================*/
+
+/* Contenedor principal para los botones */
+.menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Menú desplegable principal */
+.menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 200px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+/* Mostrar menú cuando se activa la clase .show */
+.menu.show {
+  display: block;
+}
+
+/* Estilos para los ítems del menú */
+.menu-item {
+  padding: 10px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  font-size: 14px;
+}
+
+.menu-item img {
+  width: 30px; /* Tamaño de los íconos */
+  height: 30px;
+  margin-right: 10px; /* Espacio entre imagen y texto */
+}
+
+.menu-item p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.menu-item:hover {
+  background-color: #f1f1f1;
+}
+
+/* =================================== */
+/* Estilos para Submenú (Dropdown)    */
+/* ===================================*/
+
+/* Contenedor para el submenú */
+.sub-menu-container {
+  position: relative;
+}
+
+/* Estilos para el submenú oculto por defecto */
+.sub-menu {
+  display: none; /* Oculto inicialmente */
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 200px;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  border-radius: 5px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Estilo para cada ítem dentro del submenú */
+.sub-menu .menu-item {
+  display: block; /* Los elementos están apilados verticalmente */
+  padding: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-align: left;
+  width: 100%;
+  font-size: 14px;
+}
+
+/* Estilo al pasar el cursor sobre los elementos del submenú */
+.sub-menu .menu-item:hover {
+  background-color: #f1f1f1;
+}
+
+/* Para los íconos en los botones del submenú */
+.sub-menu .menu-item img {
+  width: 25px; /* Ajustable dependiendo del tamaño deseado */
+  height: 25px;
+  margin-right: 10px;
+}
+
+/* =================================== */
+/* Estilos de Animación para Menú     */
+/* ===================================*/
+
+/* Agrega una animación suave para cuando se abre el submenú */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu.show {
+  animation: slideIn 0.2s ease-out;
+}
+
+/* =================================== */
+/* Estilos para Submenú de Insertar Formas */
+/* ===================================*/
+
+/* Estilo para los botones del submenú de formas */
+.sub-menu-container button {
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  padding: 12px;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+}
+
+/* Efecto al pasar el cursor sobre los botones */
+.sub-menu-container button:hover {
+  background-color: #e0e0e0;
+}
+
+/* Estilo para el texto dentro del submenú */
+.sub-menu-container button p {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+/* =================================== */
+/* Estilos para el Botón de Opciones */
+/* ===================================*/
+
+/* Estilo para el botón que abre el submenú */
+.insert-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Estilo general para los botones de inserción */
+.insert-btn {
+  display: flex;
+  flex-direction: column; /* Colocar imagen arriba y texto abajo */
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+}
+
+/* Estilo para las imágenes dentro de los botones */
+.insert-btn img {
+  width: 30px; /* Tamaño de los íconos */
+  height: 30px;
+  margin-bottom: 5px; /* Espacio entre imagen y texto */
+}
+
+/* Estilo para el texto de cada botón de inserción */
+.insert-btn p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* =================================== */
+/* Estilos para la Eliminación de Imagen */
+/* ===================================*/
+
+/* Menú de contexto para eliminar imagen */
+.context-menu {
+  position: absolute;
+  z-index: 9999; /* Asegura que esté por encima de la imagen */
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  display: none;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.context-menu.active {
+  display: block;
+}
+
+.context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 5px 0;
+}
+
+.context-menu ul li {
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.context-menu ul li:hover {
+  background-color: #f1f1f1;
+}
+
+.context-menu .cut-option {
+  color: red;
+}
+
+//FORMAS
+
+/* Estilos generales para las formas */
+
+.shape {
+  display: inline-block;
+  margin: 5px;
+}
+
+/* Rectángulo */
+.shape.rectangle {
+  width: 50px;
+  height: 30px;
+  background-color: #3498db;
+}
+
+/* Círculo */
+.shape.circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #e74c3c;
+}
+
+/* Triángulo */
+.shape.triangle {
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 50px solid #2ecc71;
+}
+
+//TABLAS
+
+/* =================================== */
+/* Estilos para Menú Contextual de Tablas */
+/* ===================================*/
+
+.context-menu {
+  position: absolute;
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 5px 0;
+  min-width: 150px;
+}
+
+.context-menu-item {
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.context-menu-item:hover {
+  background-color: #f2f2f2;
+}
+
+/* =================================== */
+/* Estilos para Tablas tipo Excel */
+/* ===================================*/
+
+.excel-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.excel-table td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  position: relative;
+  min-width: 40px;
+  height: 24px;
+  cursor: cell;
+}
+
+.excel-table td:hover {
+  background-color: rgba(0, 120, 215, 0.1);
+}
+
+.excel-table td:focus {
+  outline: 2px solid #0078d7;
+  outline-offset: -2px;
+  background-color: rgba(0, 120, 215, 0.05);
+}
+
+/* Estilos para diferentes tipos de tablas */
+.table-default {
+  border: 1px solid #ccc;
+}
+
+.table-grid td {
+  border: 1px solid #000;
+}
+
+.table-striped tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+.table-striped tr:first-child {
+  background-color: #e6e6e6;
+  font-weight: bold;
+}
+
+.table-borderless td {
+  border: none;
+  border-bottom: 1px solid #eee;
+}
+
+/* Estilo para celda seleccionada */
+.cell-selected {
+  background-color: rgba(0, 120, 215, 0.2) !important;
+  position: relative;
+}
+
+/* Manijas para redimensionar */
+.resize-handle {
+  position: absolute;
+  width: 5px;
+  height: 100%;
+  right: 0;
+  top: 0;
+  cursor: col-resize;
+  z-index: 10;
+}
+
+.resize-handle-row {
+  position: absolute;
+  height: 5px;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  cursor: row-resize;
+  z-index: 10;
+}
+
+/* Tabla anidada dentro de celda */
+.nested-table-container {
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.nested-table-container table {
+  width: 100%;
+  height: 100%;
+}
+
+/* =================================== */
+/* Estilos para el Modal de Tabla     */
+/* ===================================*/
+
+.table-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.table-modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 300px;
+}
+
+.modal-row {
+  margin: 15px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-buttons button {
+  padding: 8px 15px;
+  cursor: pointer;
+}
+
+#create-table {
+  background-color: #4472c4;
+  color: white;
+  border: none;
+  border-radius: 3px;
+}
+
+#cancel-table {
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
