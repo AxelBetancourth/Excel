@@ -166,80 +166,73 @@
     </div>
     </div>
 
-  <!-------------------- AREA DE DATOS = obtener y transferir datos en excel -->
-  <div id="submenu-datos" class="submenu">
-      <div id="submenu-datos" class="menu-container">
-          <div class="container">
-            <div class="menu">
+    <div id="submenu-datos" class="submenu">
+      <!-- Menú de Datos -->
+      <div class="menu-container">
+        <div class="container">
+          <div class="menu">
+            <ul>
+              <li>
+                <a href="">
+                  <img src="images/obtenerdatos.ico" alt="Icono Principal" class="icono"> 
+                  Obtener Datos
+                  <span class="flecha"></span>
+                </a>
                 <ul>
-                    <!-- Menú principal -->
-                    <li>
-                        <a href="">
-                            <img src="images/obtenerdatos.ico" alt="Icono Principal" class="icono"> Obtener Datos
-                            <span class="flecha"></span>
+                  <li>
+                    <a href="">
+                      <img src="images/archivo.ico" alt="Carpeta" class="icono"> 
+                      De un Archivos
+                      <span class="flecha"></span>
+                    </a>
+                    <ul>
+                      <li>
+                        <a href="#" onclick="document.getElementById('archivoPDF').click(); return false;">
+                          <img src="images/pdf.ico" alt="PDF" class="icono"> Archivo PDF
+                          <span class="flecha"></span>
                         </a>
-                        <ul>
-                            <!-- Submenú: De un Archivo -->
-                            <li>
-                                <a href="">
-                                    <img src="images/archivo.ico" alt="Carpeta" class="icono"> De un Archivos
-                                    <span class="flecha"></span>
-                                </a>
-                                <ul>
-                                    <!-- Submenú: Archivo PDF -->
-                                    <li>
-                                        <a href="#" onclick="document.getElementById('archivoPDF').click(); return false;">
-                                            <img src="images/pdf.ico" alt="PDF" class="icono"> Archivo PDF
-                                            <span class="flecha"></span>
-                                        </a>
-                                        <!-- Formulario para subir archivo PDF -->
-                                        <form action="procesar_pdf.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center px-3">
-                                            <input type="file" name="archivoPDF" id="archivoPDF" accept=".pdf" style="display: none;">
-                                        </form>
-                                    </li>
-          
-                                    <!-- Submenú: Archivo EXCEL -->
-                                    <li>
-                                        <a href="#" onclick="document.getElementById('archivoExcel').click(); return false;">
-                                            <img src="images/excel.ico" alt="Excel" class="icono"> Archivo EXCEL
-                                            <span class="flecha"></span>
-                                        </a>
-                                        <!-- Formulario para subir archivo Excel -->
-                                        <form action="procesar_excel.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center px-3">
-                                            <input type="file" name="archivoExcel" id="archivoExcel" accept=".xls,.xlsx" style="display: none;">
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                            
-                            <!-- Opción de base de datos -->
-                            <li>
-                                <a href="">
-                                    <img src="images/basedatos.ico" alt="Base de datos" class="icono"> De una base de datos
-                                    <span class="flecha">&#9658</span>
-                                </a>
-                            </li> 
-                        </ul>
-                        
+                        <form action="procesar_pdf.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center px-3">
+                          <input type="file" name="archivoPDF" id="archivoPDF" accept=".pdf" style="display: none;">
+                        </form>
                       </li>
+                      <li>
+                        <a href="#" onclick="document.getElementById('archivoExcel').click(); return false;">
+                          <img src="images/excel.ico" alt="Excel" class="icono"> Archivo EXCEL
+                          <span class="flecha"></span>
+                        </a>
+                        <form action="procesar_excel.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center px-3">
+                          <input type="file" name="archivoExcel" id="archivoExcel" accept=".xls,.xlsx" style="display: none;">
+                        </form>
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <a href="">
+                      <img src="images/basedatos.ico" alt="Base de datos" class="icono"> 
+                      De una base de datos
+                      <span class="flecha">&#9658;</span>
+                    </a>
+                  </li>
                 </ul>
-              </div>
+              </li>
+            </ul>
           </div>
+        </div>
       </div>
-      <!-- Botones de Ordenación -->
-      <div class="BotonesOrdenar">
-        <button id="OrdenarAZ">
-            <img src="images/ordenarAZ.ico" alt="Ordenar A-Z" class="icono">
-            Ordenar A-Z
-        </button>
-        <button id="OrdenarZA">
-            <img src="images/ordenarZA.ico" alt="Ordenar Z-A" class="icono">
-            Ordenar Z-A
-        </button>
-        
-      </div>
+        <!-- Botones de Ordenación -->
+        <div class="BotonesOrdenar">
+          <button id="OrdenarAZ">
+              <img src="images/ordenarAZ.ico" alt="Ordenar A-Z" class="icono">
+              Ordenar A-Z
+          </button>
+          <button id="OrdenarZA">
+              <img src="images/ordenarZA.ico" alt="Ordenar Z-A" class="icono">
+              Ordenar Z-A
+          </button>
+          
+        </div>
 
-  </div>
+    </div>
   
   </section>
 

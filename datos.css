@@ -1,11 +1,30 @@
 /* ================================ 
    Sección datos (ANAHI)
    ================================ */
-   .submenu {
+.submenu {
     display: none;
-}
+  }
 
-.container {
+  .submenu.active {
+    display: flex;
+  }
+  /* Estilos generales para el contenedor de submenús */
+  #submenu-container {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+  }
+  /* Estilos para cada submenú, pueden ajustarse según necesidades */
+  #submenu-inicio,
+  #submenu-insertar,
+  #submenu-formulas,
+  #submenu-datos {
+    align-items: center;
+    gap: 5px;
+  }
+  /* Otros estilos propios de la sección "Datos" */
+  .container {
     width: 200px;
     background-color: #f8f9fa;
     padding: 10px;
@@ -14,77 +33,58 @@
     display: flex;
     justify-content: center;
     margin-left: 0;
-}
-
-/* Estilos del menú */
-.menu ul {
+  }
+  .menu ul {
     list-style: none;
     padding: 0;
     margin: 0;
-}
-
-.menu li {
+  }
+  .menu li {
     position: relative;
-}
-
-/* Estilos de los enlaces del menú */
-.menu a {
+  }
+  .menu a {
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: #000000;
-    font-size: 17px; /* Tamaño de texto consistente */
-    padding: 10px 15px; /* Espaciado consistente con los botones */
+    color: #000;
+    font-size: 17px;
+    padding: 10px 15px;
     border-radius: 5px;
-    transition: background 0.3s ease;
-}
-
-/* Efecto hover en los elementos del menú */
-.menu a:hover {
+    transition: 0.3s ease;
+  }
+  .menu a:hover {
     background-color: #e0e0e0;
-}
-
-/* Submenús */
-.menu ul ul {
+  }
+  .menu ul ul {
     display: none;
     position: absolute;
     left: 100%;
     top: 0;
     min-width: 200px;
-    background: #ffffff;
+    background: #fff;
     border-radius: 5px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
     padding: 5px 0;
     z-index: 1000;
-}
-
-/* Mostrar submenú cuando se pasa el mouse */
-.menu li:hover > ul {
+  }
+  .menu li:hover > ul {
     display: block;
-}
-
-/* Ajuste de submenú anidado */
-.menu ul ul ul {
+  }
+  .menu ul ul ul {
     left: 100%;
     top: 0;
-}
-
-/* Iconos en el menú */
-.icono {
+  }
+  .icono {
     width: 20px;
     height: 20px;
     margin-right: 10px;
-}
-
-/* Contenedor de los íconos de ordenación */
-.iconos-container {
+  }
+  .iconos-container {
     display: flex;
     gap: 10px;
     position: relative;
-}
-
-/* Contenedor de botones de ordenación */
-.BotonesOrdenar {
+  }
+  .BotonesOrdenar {
     width: 320px;
     background-color: #f8f9fa;
     padding: 10px;
@@ -94,41 +94,26 @@
     justify-content: space-between; 
     gap: 10px; 
     margin-left: 0;
-}
-
-/* Estilo de los botones */
-button {
+  }
+  button {
     display: flex;
-    align-items: center; /* Centra el texto y la imagen */
-    padding: 10px 15px; /* Tamaño de padding consistente */
-    font-size: 15px; /* Tamaño de texto consistente con el menú */
-    background-color: #ffffff;
+    align-items: center;
+    padding: 10px 15px;
+    font-size: 15px;
+    background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
-}
-
-/* Hover en los botones */
-button:hover {
-    background-color: #f1f1f1; /* Cambia el color de fondo al pasar el ratón */
-}
-
-/* Estilo de los iconos en los botones */
-button img.icono {
+  }
+  button:hover {
+    background-color: #f1f1f1;
+  }
+  button img.icono {
     width: 20px;
     height: 20px;
     margin-right: 10px; 
-}
-
-/* Submenú de datos */
-#submenu-datos {
-    display: flex;
-    align-items: center; /* Alinea verticalmente los elementos */
-    gap: 5px; /* Espacio entre el menú y los íconos */
-}
-
-/* Flecha indicadora de submenú */
-.flecha {
+  }
+  .flecha {
     margin-left: auto;
     font-size: 12px;
-}
+  }
