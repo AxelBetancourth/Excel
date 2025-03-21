@@ -12,14 +12,12 @@
   <link rel="stylesheet" href="insertar.css">
   <link rel="stylesheet" href="formulas.css">
   <link rel="stylesheet" href="datos.css">
-<<<<<<< HEAD
+
   <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-=======
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
->>>>>>> fb9c11af473d568c5719676848e93746d1222a1c
 </head>
 <body>
 
@@ -281,13 +279,13 @@
     </div>
     </div>
 
+<!-- Pestaña insertar -->
 
-    <div id="submenu-insertar" class="submenu">
-      <div class="insert-options grid grid-cols-6 gap-2 p-2 bg-gray-100 border-b border-gray-300">
-          <button class="insert-btn" aria-label="Tabla dinámica">
-              <img src="images/tabla_dinamica.png" alt="Tabla dinámica">
-              <span>Tabla dinámica</span>
-          </button>
+<div id="submenu-insertar" class="submenu">
+  <button class="insert-btn" aria-label="Tabla dinámica">
+      <img src="images/tabla_dinamica.png" alt="Tabla dinámica">
+      <span>Tabla dinámica</span>
+  </button>
   
           <button class="insert-btn" aria-label="Tabla dinámica recomendada">
               <img src="images/tabla_dinamica_recomendada.png" alt="Tabla dinámica recomendada">
@@ -339,9 +337,6 @@
                       </button>
                   </div>
               </div>
-              
-              
-              
             </div>
         </div>
 
@@ -351,10 +346,59 @@
               <span>Gráficos recomendados</span>
           </button>
   
-          <button class="insert-btn">
-              <img src="images/grafico_dinamico.png" alt="Gráfico dinámico">
-              <span>Gráfico dinámico</span>
+           <!-- Grupo de botones para gráficos -->
+        <div class="menu-container">
+          <button class="insert-btn" data-menu="dropdown-graficos" aria-label="Gráficos">
+              <img src="images/grafico_dinamico.png" alt="Gráficos">
+              <span>Gráficos</span>
           </button>
+          <div class="menu" id="dropdown-graficos">
+              <button class="menu-item" id="btn-grafico-barras">
+                  <img src="images/barras.png" alt="Gráfico de barras">
+                  <span>Barras</span>
+              </button>
+              <button class="menu-item" id="btn-grafico-lineas">
+                  <img src="images/lineas.png" alt="Gráfico de líneas">
+                  <span>Líneas</span>
+              </button>
+              <button class="menu-item" id="btn-grafico-circular">
+                  <img src="images/pastel.png" alt="Gráfico circular">
+                  <span>Circular</span>
+              </button>
+              <button class="menu-item" id="btn-grafico-dispersion">
+                  <img src="images/dispersion.png" alt="Gráfico dispersión">
+                  <span>Dispersión</span>
+              </button>
+          </div>
+      </div>
+
+      <!-- Modal para Configuración de Gráficos -->
+      <div id="chart-modal" class="chart-modal">
+        <div class="chart-modal-content">
+            <div class="chart-modal-header">
+                <h2>Configurar Gráfico</h2>
+                <button class="close-button">&times;</button>
+            </div>
+            <div class="chart-modal-body">
+                <div class="form-group">
+                    <label for="chart-title">Título del gráfico:</label>
+                    <input type="text" id="chart-title" placeholder="Ingrese el título">
+                </div>
+                <div class="form-group">
+                    <label for="data-range">Rango de datos:</label>
+                    <input type="text" id="data-range" placeholder="Ejemplo: A1:B5">
+                </div>
+                <div class="preview-container">
+                    <label>Vista previa:</label>
+                    <canvas id="preview-canvas"></canvas>
+                </div>
+            </div>
+            <div class="chart-modal-footer">
+                <button id="create-chart">Crear</button>
+                <button id="cancel-chart">Cancelar</button>
+            </div>
+        </div>
+    </div>
   
           <button class="insert-btn">
               <img src="images/mapa.png" alt="Mapas">
@@ -402,11 +446,6 @@
       </div>
   </div>
   
-
-
-
-
-
 
 
     <!-- Fin de Insertar -->
@@ -541,6 +580,7 @@
   <script src="archivo.js"></script>
   <script src="datos.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
