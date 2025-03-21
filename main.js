@@ -15,21 +15,31 @@
 	 * Activa la pestaña indicada. Si es "archivo" muestra la barra lateral.
 	 */
 	function activateTab(tabName) {
-	  if (tabName === 'archivo') {
-	    sidebar.classList.add('active');
-	    submenuContainer.style.display = 'none';
-	  } else {
-	    sidebar.classList.remove('active');
-	    submenuContainer.style.display = 'block';
-	    tabs.forEach(btn => {
-	      btn.classList.toggle('active', btn.dataset.tab === tabName);
-	    });
-	    submenus.forEach(menu => {
-	      menu.classList.toggle('active', menu.id === 'submenu-' + tabName);
-	    });
-	    localStorage.setItem('activeTab', tabName);
+		// Ocultar todos los submenús
+		submenus.forEach(menu => {
+		  menu.style.display = 'none';
+		});
+	  
+		if (tabName === 'archivo') {
+		  sidebar.classList.add('active');
+		  submenuContainer.style.display = 'none';
+		} else {
+		  sidebar.classList.remove('active');
+		  submenuContainer.style.display = 'block';
+		  tabs.forEach(btn => {
+			btn.classList.toggle('active', btn.dataset.tab === tabName);
+		  });
+		  submenus.forEach(menu => {
+			// Mostrar solo el submenú correspondiente
+			if (menu.id === 'submenu-' + tabName) {
+			  menu.style.display = 'block';
+			}
+		  });
+		}
+	  
+		localStorage.setItem('activeTab', tabName);
 	  }
-	}
+	  
 	
 	
 // Eventos en los botones de la cinta

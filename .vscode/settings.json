@@ -1,4 +1,8 @@
 {
+<<<<<<< HEAD
+    "liveServer.settings.port": 5502
+=======
     "CodeGPT.apiKey": "CodeGPT Plus Beta",
     "liveServer.settings.port": 5501
+>>>>>>> fb9c11af473d568c5719676848e93746d1222a1c
 }

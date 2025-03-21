@@ -12,8 +12,14 @@
   <link rel="stylesheet" href="insertar.css">
   <link rel="stylesheet" href="formulas.css">
   <link rel="stylesheet" href="datos.css">
+<<<<<<< HEAD
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+=======
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+>>>>>>> fb9c11af473d568c5719676848e93746d1222a1c
 </head>
 <body>
 
@@ -275,10 +281,136 @@
     </div>
     </div>
 
+
     <div id="submenu-insertar" class="submenu">
-      <p>Contenido del submenú de Insertar</p>
-      <!-- Opciones de Insertar -->
-    </div>
+      <div class="insert-options grid grid-cols-6 gap-2 p-2 bg-gray-100 border-b border-gray-300">
+          <button class="insert-btn" aria-label="Tabla dinámica">
+              <img src="images/tabla_dinamica.png" alt="Tabla dinámica">
+              <span>Tabla dinámica</span>
+          </button>
+  
+          <button class="insert-btn" aria-label="Tabla dinámica recomendada">
+              <img src="images/tabla_dinamica_recomendada.png" alt="Tabla dinámica recomendada">
+              <span>Tabla dinámica recomendada</span>
+          </button>
+  
+          <button class="insert-btn" id="insert-table-btn" aria-label="Insertar tabla">
+              <img src="images/tabla.png" alt="Tabla">
+              <span>Tabla</span>
+          </button>
+  
+          <div class="menu-container">
+            <button class="insert-btn" data-menu="dropdown-ilustraciones" aria-label="Ilustraciones">
+                <img src="images/ilustraciones.png" alt="Ilustraciones">
+                <span>Ilustraciones</span>
+            </button>
+            <div class="menu" id="dropdown-ilustraciones">
+                <!-- Opción de Imágenes -->
+                <div class="submenu-item">
+                    <button class="menu-item" id="btn-imagenes" aria-label="Imágenes">
+                        <img src="images/imagenes.png" alt="Imágenes">
+                        <span>Imágenes</span>
+                    </button>
+                    <div class="submenu" id="submenu-imagenes">
+                        <button class="menu-item" id="upload-image-btn">
+                            <span>Este dispositivo</span>
+                        </button>
+                        <input type="file" id="image-input" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="submenu-item">
+                  <button class="menu-item" id="btn-formas" aria-label="Formas" onclick="toggleSubmenu()">
+                      <img src="images/formas.png" alt="Formas">
+                      <span>Formas</span>
+                  </button>
+                  <div class="submenu" id="submenu-formas">
+                      <button class="menu-item" onclick="insertShape('rect')">
+                          <img src="images/rectangulo.png" alt="Rectángulo">
+                          <span>Rectángulo</span>
+                      </button>
+                      <button class="menu-item" onclick="insertShape('circle')">
+                          <img src="images/circulo.png" alt="Círculo">
+                          <span>Círculo</span>
+                      </button>
+                      <button class="menu-item" onclick="insertShape('triangle')">
+                          <img src="images/triangulo.png" alt="Triángulo">
+                          <span>Triángulo</span>
+                      </button>
+                  </div>
+              </div>
+              
+              
+              
+            </div>
+        </div>
+
+          <!-- Otros botones de inserción -->
+          <button class="insert-btn">
+              <img src="images/graficos_recomendados.png" alt="Gráficos recomendados">
+              <span>Gráficos recomendados</span>
+          </button>
+  
+          <button class="insert-btn">
+              <img src="images/grafico_dinamico.png" alt="Gráfico dinámico">
+              <span>Gráfico dinámico</span>
+          </button>
+  
+          <button class="insert-btn">
+              <img src="images/mapa.png" alt="Mapas">
+              <span>Mapas</span>
+          </button>
+  
+          <button class="insert-btn">
+              <img src="images/segmento_datos.png" alt="Segmentación de datos">
+              <span>Segmentación de datos</span>
+          </button>
+  
+          <!-- Botón desplegable de Texto -->
+          <div class="menu-container">
+            <button class="insert-btn" data-menu="dropdown-texto" aria-label="Texto">
+                <img src="images/texto.png" alt="Texto">
+                <span>Texto</span>
+            </button>
+            <div class="menu" id="dropdown-texto">
+                <button class="menu-item">
+                    <img src="images/cuadroTexto.png" alt="Cuadro de texto">
+                    <span>Cuadro de texto</span>
+                </button>
+                <button class="menu-item">
+                    <img src="images/wordart.png" alt="WordArt">
+                    <span>WordArt</span>
+                </button>
+            </div>
+        </div>
+        
+        
+        <!-- Botón desplegable de Texto -->
+        <div class="menu-container">
+          <button class="insert-btn" data-menu="dropdown-simbolos" aria-label="Simbolos">
+              <img src="images/simbolo.png" alt="simbolos">
+              <span>simbolos</span>
+          </button>
+          <div class="menu" id="dropdown-simbolos">
+              <button class="menu-item">
+                  <img src="images/pi.png" alt="Ecuaciones">
+                  <span>Ecuaciones</span>
+              </button>
+          </div>
+      </div>
+      
+      </div>
+  </div>
+  
+
+
+
+
+
+
+
+    <!-- Fin de Insertar -->
+
 
     <div id="submenu-formulas" class="submenu">
       <!-- Opciones de Fórmulas -->
