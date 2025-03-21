@@ -260,128 +260,33 @@
   border-bottom: 50px solid #2ecc71;
 }
 
-//TABLAS
-
 /* =================================== */
-/* Estilos para Menú Contextual de Tablas */
+/* Estilos para la tablas */
 /* ===================================*/
 
-.context-menu {
-  position: absolute;
-  z-index: 1000;
-  background-color: white;
+/* Estilos para las celdas de tabla */
+.table-cell {
   border: 1px solid #ccc;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  padding: 5px 0;
-  min-width: 150px;
+  background-color: #f9f9f9;
 }
 
-.context-menu-item {
-  padding: 8px 15px;
-  cursor: pointer;
-  font-size: 14px;
+.table-top {
+  border-top: 2px solid #4472c4;
 }
 
-.context-menu-item:hover {
-  background-color: #f2f2f2;
+.table-bottom {
+  border-bottom: 2px solid #4472c4;
 }
 
-/* =================================== */
-/* Estilos para Tablas tipo Excel */
-/* ===================================*/
-
-.excel-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  margin-bottom: 10px;
+.table-left {
+  border-left: 2px solid #4472c4;
 }
 
-.excel-table td {
-  border: 1px solid #ddd;
-  padding: 6px;
-  position: relative;
-  min-width: 40px;
-  height: 24px;
-  cursor: cell;
+.table-right {
+  border-right: 2px solid #4472c4;
 }
 
-.excel-table td:hover {
-  background-color: rgba(0, 120, 215, 0.1);
-}
-
-.excel-table td:focus {
-  outline: 2px solid #0078d7;
-  outline-offset: -2px;
-  background-color: rgba(0, 120, 215, 0.05);
-}
-
-/* Estilos para diferentes tipos de tablas */
-.table-default {
-  border: 1px solid #ccc;
-}
-
-.table-grid td {
-  border: 1px solid #000;
-}
-
-.table-striped tr:nth-child(odd) {
-  background-color: #f2f2f2;
-}
-
-.table-striped tr:first-child {
-  background-color: #e6e6e6;
-  font-weight: bold;
-}
-
-.table-borderless td {
-  border: none;
-  border-bottom: 1px solid #eee;
-}
-
-/* Estilo para celda seleccionada */
-.cell-selected {
-  background-color: rgba(0, 120, 215, 0.2) !important;
-  position: relative;
-}
-
-/* Manijas para redimensionar */
-.resize-handle {
-  position: absolute;
-  width: 5px;
-  height: 100%;
-  right: 0;
-  top: 0;
-  cursor: col-resize;
-  z-index: 10;
-}
-
-.resize-handle-row {
-  position: absolute;
-  height: 5px;
-  width: 100%;
-  bottom: 0;
-  left: 0;
-  cursor: row-resize;
-  z-index: 10;
-}
-
-/* Tabla anidada dentro de celda */
-.nested-table-container {
-  padding: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.nested-table-container table {
-  width: 100%;
-  height: 100%;
-}
-
-/* =================================== */
-/* Estilos para el Modal de Tabla     */
-/* ===================================*/
-
+/* Estilos para el modal de tabla */
 .table-modal {
   position: fixed;
   top: 0;
@@ -433,3 +338,314 @@
   border: 1px solid #ccc;
   border-radius: 3px;
 }
+
+/* Estilos para el panel de opciones de tabla */
+.table-options-panel {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 5px;
+  z-index: 100;
+}
+
+.table-options-panel button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background-color: #f9f9f9;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.table-options-panel button:hover {
+  background-color: #e9e9e9;
+}
+
+#delete-table-btn {
+  color: #d32f2f;
+}
+
+#delete-table-btn:hover {
+  background-color: #ffebee;
+}
+
+/*Seleccion de celdas*/
+
+td.celdailumida {
+  background-color: rgba(0, 120, 215, 0.2);
+  border: 2px solid #0078d7 !important;
+}
+
+/* Para selección de múltiples celdas */
+td.celdailumida:not(:first-child):not(:last-child) {
+  border-left: 1px solid #0078d7 !important;
+  border-right: 1px solid #0078d7 !important;
+}
+
+td.celdailumida:not(:first-child):not(:last-child) {
+  border-top: 1px solid #0078d7 !important;
+  border-bottom: 1px solid #0078d7 !important;
+}
+
+// Celda color
+
+td {
+  cursor: crosshair; /* Cambia el cursor a una cruz */
+}
+
+.selected-cell {
+  background-color: rgb(
+    165,
+    203,
+    246
+  ); /* Color de fondo para las celdas seleccionadas */
+}
+
+/* =================================== */
+/* Fin de Estilos para la tablas */
+/* ===================================*/
+
+/* =================================== */
+/* Estilos para la Graficos */
+/* ===================================*/
+
+/* Estilos para el contenedor del gráfico en la hoja */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  resize: both;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.chart-container:hover {
+  border-color: #007bff;
+}
+
+.chart-container::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  cursor: se-resize;
+  background: linear-gradient(135deg, transparent 50%, #007bff 50%);
+}
+
+.chart-container-flotante {
+  border-radius: 8px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.chart-context-menu {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.chart-context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chart-context-menu li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.chart-context-menu li:hover {
+  background-color: #f0f0f0;
+}
+
+/* =================================== */
+/* Estilos para el Modal de Gráficos  */
+/* ===================================*/
+
+.chart-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.chart-modal-content {
+  position: relative;
+  background-color: #fff;
+  margin: 50px auto;
+  padding: 20px;
+  width: 80%;
+  max-width: 600px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.chart-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.chart-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.chart-modal-body {
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.preview-container {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  height: 250px;
+  position: relative;
+}
+
+.preview-container label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #555;
+}
+
+.preview-container canvas {
+  width: 100% !important;
+  height: 200px !important;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#preview-canvas {
+  width: 100%;
+  height: 200px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.chart-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.chart-modal-footer button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#create-chart {
+  background-color: #007bff;
+  color: white;
+}
+
+#cancel-chart {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* =================================== */
+/* Estilos para la celda activa */
+/* ===================================*/
+
+.table-cell {
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
+.table-cell input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+}
+
+/* =================================== */
+/* Estilos para la MAPAS */
+/* ===================================*/
+
+/* =================================== */
+/* Fin de Estilos para la MAPAS */
+/* ===================================*/
+
+/* =================================== */
+/* Estilos para la SEGMENTACION DE DATOS */
+/* ===================================*/
+
+/* =================================== */
+/* Fin de Estilos para la SEGMENTACION DE DATOS */
+/* ===================================*/
+
+/* =================================== */
+/* Estilos para la TEXTO */
+/* ===================================*/
+
+/* =================================== */
+/* Fin de Estilos para la TEXTO */
+/* ===================================*/
+
+/* =================================== */
+/* Estilos para la SIMBOLOS */
+/* ===================================*/
+
+/* =================================== */
+/* Fin de Estilos para la SIMBOLOS */
+/* ===================================*/
