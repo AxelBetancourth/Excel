@@ -149,70 +149,137 @@ function stringToArrayBuffer(s) {
 
 // Función para agregar archivos recientes
 function agregarArchivoReciente(nombreArchivo) {
-  let archivos = JSON.parse(localStorage.getItem("archivosRecientes")) || [];
-  
-  // Evitar duplicados
-  const index = archivos.indexOf(nombreArchivo);
-  if (index !== -1) {
-    // Si ya existe, quítalo primero para ponerlo al inicio
-    archivos.splice(index, 1);
-  }
-  
-  archivos.unshift(nombreArchivo); // Agregar al inicio
-  if (archivos.length > 5) archivos.pop(); // Máximo 5 recientes
-  localStorage.setItem('file_' + nombreArchivo + ".xlsx", JSON.stringify(state));
-  
-  mostrarArchivosRecientes();
+    console.log("Agregando archivo reciente:", nombreArchivo); // Para depuración
+    
+    // Obtener la lista actual de archivos recientes
+    let archivos = JSON.parse(localStorage.getItem("archivosRecientes")) || [];
+    
+    // Evitar duplicados
+    const index = archivos.indexOf(nombreArchivo);
+    if (index !== -1) {
+        archivos.splice(index, 1);
+    }
+    
+    // Agregar al inicio del array
+    archivos.unshift(nombreArchivo);
+    
+    // Mantener solo los últimos 10 archivos
+    archivos = archivos.slice(0, 10);
+    
+    // Guardar la lista actualizada
+    localStorage.setItem("archivosRecientes", JSON.stringify(archivos));
+    
+    // Guardar el estado actual del archivo
+    localStorage.setItem('file_' + nombreArchivo, JSON.stringify(state));
+    
+    // Actualizar la visualización
+    mostrarArchivosRecientes();
 }
 
-// Función para mostrar archivos recientes con mejor formato
+// Función para mostrar archivos recientes
 function mostrarArchivosRecientes() {
-  let archivos = JSON.parse(localStorage.getItem("archivosRecientes")) || [];
-  let lista = document.getElementById("lista-recientes");
-  lista.innerHTML = ""; // Limpiar antes de actualizar
+    console.log("Actualizando lista de recientes"); // Para depuración
+    
+    let archivos = JSON.parse(localStorage.getItem("archivosRecientes")) || [];
+    let lista = document.getElementById("lista-recientes");
+    
+    // Limpiar la lista actual
+    lista.innerHTML = "";
+    
+    if (archivos.length === 0) {
+        let li = document.createElement("li");
+        li.className = "no-recent-files";
+        li.textContent = "No hay archivos recientes";
+        lista.appendChild(li);
+        return;
+    }
 
-  if (archivos.length === 0) {
-    let li = document.createElement("li");
-    li.className = "no-recent-files";
-    li.textContent = "No hay archivos recientes";
-    lista.appendChild(li);
-    return;
-  }
-
-  archivos.forEach(archivo => {
-    let li = document.createElement("li");
-    li.className = "recent-file-item";
-    
-    // Crear icono
-    let icon = document.createElement("img");
-    icon.src = "images/logoexcel.png"; // Asegúrate de tener este icono
-    icon.alt = "Excel";
-    icon.className = "file-icon";
-    
-    // Crear nombre de archivo
-    let nameSpan = document.createElement("span");
-    nameSpan.textContent = archivo;
-    nameSpan.className = "file-name";
-    
-    // Añadir elementos al li
-    li.appendChild(icon);
-    li.appendChild(nameSpan);
-    
-    // Añadir evento de clic para abrir el archivo
-    li.addEventListener("click", function() {
-      // Guarda el estado actual antes de abrir el archivo
-      localStorage.setItem("tempState", JSON.stringify(state));
-      
-      // Abre el archivo seleccionado
-      window.location.href = `main.html?archivo=${encodeURIComponent(archivo)}`;
+    archivos.forEach(archivo => {
+        let li = document.createElement("li");
+        li.className = "recent-file-item";
+        
+        // Contenedor principal
+        let fileContainer = document.createElement("div");
+        fileContainer.className = "file-container";
+        
+        // Icono del archivo
+        let icon = document.createElement("img");
+        icon.src = "images/logoexcel.png";
+        icon.alt = "Excel";
+        icon.className = "file-icon";
+        
+        // Nombre del archivo
+        let nameSpan = document.createElement("span");
+        nameSpan.textContent = archivo;
+        nameSpan.className = "file-name";
+        
+        // Botón de eliminar
+        let deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete-file-btn";
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteBtn.title = "Eliminar de recientes";
+        
+        // Agregar elementos al contenedor
+        fileContainer.appendChild(icon);
+        fileContainer.appendChild(nameSpan);
+        li.appendChild(fileContainer);
+        li.appendChild(deleteBtn);
+        
+        // Evento para eliminar archivo
+        deleteBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            eliminarArchivoReciente(archivo);
+        });
+        
+        // Evento para abrir archivo
+        fileContainer.addEventListener("click", () => {
+            abrirArchivoReciente(archivo);
+        });
+        
+        lista.appendChild(li);
     });
-    
-    lista.appendChild(li);
-  });
 }
 
-// Llamar a la función al cargar la página
-document.addEventListener("DOMContentLoaded", mostrarArchivosRecientes);
+// Función para eliminar archivo de recientes
+function eliminarArchivoReciente(nombreArchivo) {
+    let archivos = JSON.parse(localStorage.getItem("archivosRecientes")) || [];
+    const index = archivos.indexOf(nombreArchivo);
+    
+    if (index !== -1) {
+        archivos.splice(index, 1);
+        localStorage.setItem("archivosRecientes", JSON.stringify(archivos));
+        localStorage.removeItem('file_' + nombreArchivo); // Eliminar también el estado guardado
+        mostrarArchivosRecientes();
+    }
+}
+
+// Función para abrir archivo reciente
+function abrirArchivoReciente(nombreArchivo) {
+    const savedState = localStorage.getItem('file_' + nombreArchivo);
+    if (savedState) {
+        // Abrir en nueva pestaña
+        window.open(`main.html?archivo=${encodeURIComponent(nombreArchivo)}`, '_blank');
+    } else {
+        alert("No se encontró el archivo en el almacenamiento local.");
+    }
+}
+
+// Asegurarse de que la lista se actualice cuando se carga la página
+document.addEventListener("DOMContentLoaded", function() {
+    mostrarArchivosRecientes();
+    
+    // Verificar si hay un archivo en la URL
+    const params = new URLSearchParams(window.location.search);
+    const archivo = params.get("archivo");
+    if (archivo) {
+        const savedState = localStorage.getItem('file_' + archivo);
+        if (savedState) {
+            state = JSON.parse(savedState);
+            sheets[currentSheetIndex].data = state;
+            renderSpreadsheet();
+        }
+    }
+});
 
 //script para poder abrir una nueva pestana
 
@@ -266,6 +333,262 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+// Función para exportar la hoja de cálculo a diferentes formatos
+function exportarHojaCalculo(formato) {
+  // Obtener el nombre del archivo sin extensión
+  const nombreBase = document.getElementById('nombre-exportacion').value.trim() || "datos_exportados";
+  
+  // Exportar según el formato seleccionado
+  switch (formato) {
+    case 'txt':
+      exportarTXT(nombreBase);
+      break;
+    case 'pdf':
+      exportarPDF(nombreBase);
+      break;
+    default:
+      alert("Formato no válido");
+  }
+}
+
+
+
+// Función para exportar a TXT
+function exportarTXT(nombreArchivo) {
+  let contenidoTXT = [];
+  
+  // Recorrer las filas y columnas de la hoja actual
+  for (let y = 0; y < rows; y++) {
+    let fila = [];
+    for (let x = 0; x < cols; x++) {
+      // Agregar el valor computado o un texto vacío
+      fila.push(state[x][y].computedValue || "");
+    }
+    contenidoTXT.push(fila.join('\t'));  // Usar tabulación como separador
+  }
+  
+  // Convertir a string y crear blob
+  const txtString = contenidoTXT.join('\n');
+  const blob = new Blob([txtString], { type: 'text/plain;charset=utf-8;' });
+  
+  // Crear enlace de descarga
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `${nombreArchivo}.txt`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  // Añadir a archivos recientes
+  agregarArchivoReciente(`${nombreArchivo}.txt`);
+}
+
+// Función para exportar a PDF
+function exportarPDF(nombreArchivo) {
+  // Crear un elemento HTML temporal para generar el PDF
+  const elemento = document.createElement('div');
+  elemento.style.width = '100%';
+  elemento.style.padding = '20px';
+  
+  // Crear tabla para el PDF
+  const tabla = document.createElement('table');
+  tabla.style.width = '100%';
+  tabla.style.borderCollapse = 'collapse';
+  
+  // Generar encabezados de columnas
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  
+  // Celda vacía para la esquina superior izquierda
+  headerRow.appendChild(document.createElement('th'));
+  
+  // Agregar letras de columnas
+  for (let x = 0; x < cols; x++) {
+    const th = document.createElement('th');
+    th.textContent = letras[x];
+    th.style.border = '1px solid #ccc';
+    th.style.padding = '8px';
+    th.style.backgroundColor = '#f2f2f2';
+    headerRow.appendChild(th);
+  }
+  thead.appendChild(headerRow);
+  tabla.appendChild(thead);
+  
+  // Generar cuerpo de la tabla
+  const tbody = document.createElement('tbody');
+  for (let y = 0; y < rows; y++) {
+    const tr = document.createElement('tr');
+    
+    // Agregar número de fila
+    const thRow = document.createElement('th');
+    thRow.textContent = y + 1;
+    thRow.style.border = '1px solid #ccc';
+    thRow.style.padding = '8px';
+    thRow.style.backgroundColor = '#f2f2f2';
+    tr.appendChild(thRow);
+    
+    // Agregar celdas
+    for (let x = 0; x < cols; x++) {
+      if (state[x][y].computedValue !== "") {  // Solo agregar celdas con contenido
+        const td = document.createElement('td');
+        td.textContent = state[x][y].computedValue;
+        td.style.border = '1px solid #ccc';
+        td.style.padding = '8px';
+        tr.appendChild(td);
+      } else {
+        // Celda vacía
+        const td = document.createElement('td');
+        td.style.border = '1px solid #ccc';
+        td.style.padding = '8px';
+        tr.appendChild(td);
+      }
+    }
+    tbody.appendChild(tr);
+  }
+  tabla.appendChild(tbody);
+  elemento.appendChild(tabla);
+  
+  // Agregar título
+  const titulo = document.createElement('h2');
+  titulo.textContent = `${nombreArchivo}`;
+  titulo.style.textAlign = 'center';
+  elemento.insertBefore(titulo, elemento.firstChild);
+  
+  // Insertar el elemento en el documento
+  document.body.appendChild(elemento);
+  
+  // Configuración para html2pdf
+  const opciones = {
+    margin: 10,
+    filename: `${nombreArchivo}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+  };
+  
+  // Generar el PDF
+  html2pdf().from(elemento).set(opciones).save().then(() => {
+    // Eliminar el elemento temporal
+    document.body.removeChild(elemento);
+    
+    // Añadir a archivos recientes
+    agregarArchivoReciente(`${nombreArchivo}.pdf`);
+  });
+}
+
+// Configurar el modal de exportación
+document.addEventListener('DOMContentLoaded', function() {
+  // Crear el modal de exportación si no existe
+  if (!document.getElementById('exportModal')) {
+    const modalHTML = `
+      <div id="exportModal" class="modal">
+        <div class="modal-content">
+          <h2 class="h2_archivo">Exportar archivo</h2>
+          
+          <label for="nombre-exportacion">Nombre del archivo:</label>
+          <input type="text" id="nombre-exportacion" placeholder="Nombre del archivo" value="datos_exportados">
+          
+          <div class="formato-section">
+            <h3>Formato de exportación:</h3>
+            <div class="export-buttons">
+              <button id="exportCSV" class="export-btn">
+                <img src="images/csv.png" alt="CSV">
+                <span>CSV</span>
+              </button>
+              <button id="exportTXT" class="export-btn">
+                <img src="images/txt.png" alt="TXT">
+                <span>TXT</span>
+              </button>
+              <button id="exportPDF" class="export-btn">
+                <img src="images/pdf.png" alt="PDF">
+                <span>PDF</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="modal-actions">
+            <button id="cancelExport">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Insertar el modal en el documento
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Añadir estilos para el modal de exportación
+    const style = document.createElement('style');
+    style.textContent = `
+      .export-buttons {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px 0;
+      }
+      
+      .export-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #f9f9f9;
+        transition: all 0.3s;
+      }
+      
+      .export-btn:hover {
+        background-color: #e3e3e3;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      }
+      
+      .export-btn img {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 5px;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Eventos para los botones de exportación
+    document.getElementById('exportCSV').addEventListener('click', function() {
+      exportarHojaCalculo('csv');
+      document.getElementById('exportModal').style.display = 'none';
+    });
+    
+    document.getElementById('exportTXT').addEventListener('click', function() {
+      exportarHojaCalculo('txt');
+      document.getElementById('exportModal').style.display = 'none';
+    });
+    
+    document.getElementById('exportPDF').addEventListener('click', function() {
+      exportarHojaCalculo('pdf');
+      document.getElementById('exportModal').style.display = 'none';
+    });
+    
+    document.getElementById('cancelExport').addEventListener('click', function() {
+      document.getElementById('exportModal').style.display = 'none';
+    });
+  }
+  
+  // Configurar el botón de la sección exportar
+  const seccionExportar = document.getElementById('exportar');
+  if (seccionExportar) {
+    // Eliminar el contenido existente
+    seccionExportar.innerHTML = `
+      <h2 class="h2_archivo">Exportar</h2>
+      <p>Exporta tu hoja de cálculo a diferentes formatos.</p>
+      <button id="openExportModal">Exportar archivo</button>
+    `;
+    
+    // Evento para abrir el modal de exportación
+    document.getElementById('openExportModal').addEventListener('click', function() {
+      document.getElementById('exportModal').style.display = 'flex';
+    });
+  }
+});
+
 //Funcion para el boton abrir
 
 function abrirExcel() {
@@ -282,15 +605,104 @@ function abrirExcel() {
   reader.onload = function (e) {
       let data = new Uint8Array(e.target.result);
       let workbook = XLSX.read(data, { type: 'array' });
-
-      let sheetName = workbook.SheetNames[0]; // Tomar la primera hoja
-      let sheet = workbook.Sheets[sheetName];
-
-      let htmlTable = XLSX.utils.sheet_to_html(sheet); // Convertir la hoja a HTML
-      document.getElementById('excelTable').innerHTML = htmlTable;
+      
+      // Crear nuevas hojas basadas en el archivo Excel
+      sheets = [];
+      
+      // Procesar cada hoja del archivo Excel
+      workbook.SheetNames.forEach((sheetName, index) => {
+          let excelSheet = workbook.Sheets[sheetName];
+          let jsonData = XLSX.utils.sheet_to_json(excelSheet, { header: 1 });
+          
+          // Crear estructura de datos para la hoja
+          let sheetData = range(cols).map(() =>
+              range(rows).map(() => ({ computedValue: "", value: "" }))
+          );
+          
+          // Llenar los datos de la hoja
+          jsonData.forEach((row, rowIndex) => {
+              if (rowIndex < rows) { // Asegurar que no exceda el máximo de filas
+                  row.forEach((cellValue, colIndex) => {
+                      if (colIndex < cols) { // Asegurar que no exceda el máximo de columnas
+                          // Verificar si es una fórmula en Excel
+                          let cellRef = XLSX.utils.encode_cell({r: rowIndex, c: colIndex});
+                          let cell = excelSheet[cellRef];
+                          
+                          if (cell && cell.f) { // Si tiene fórmula
+                              let formula = '=' + cell.f;
+                              sheetData[colIndex][rowIndex] = {
+                                  value: formula,
+                                  computedValue: calculateComputedValue(formula)
+                              };
+                          } else if (cell && cell.v !== undefined) { // Si tiene valor calculado
+                              sheetData[colIndex][rowIndex] = {
+                                  value: String(cell.v),
+                                  computedValue: cell.v
+                              };
+                          } else {
+                              sheetData[colIndex][rowIndex] = {
+                                  value: cellValue !== undefined ? String(cellValue) : "",
+                                  computedValue: cellValue
+                              };
+                          }
+                      }
+                  });
+              }
+          });
+          
+          // Añadir la hoja procesada
+          sheets.push({
+              name: sheetName,
+              data: sheetData
+          });
+      });
+      
+      // Actualizar la UI para reflejar las nuevas hojas
+      const sheetsContainer = document.querySelector(".sheets-container");
+      sheetsContainer.innerHTML = '';
+      
+      sheets.forEach((sheet, index) => {
+          let sheetElement = document.createElement("div");
+          sheetElement.classList.add("sheet");
+          if (index === 0) sheetElement.classList.add("active");
+          sheetElement.textContent = sheet.name;
+          sheetsContainer.appendChild(sheetElement);
+      });
+      
+      // Cambiar a la primera hoja
+      currentSheetIndex = 0;
+      state = sheets[0].data;
+      renderSpreadsheet();
+      
+      // Actualizar la visualización de la celda activa
+      updateActiveCellDisplay(0, 0);
+      
+      // Cerrar la barra lateral de archivo
+      document.getElementById('archivo-sidebar').classList.remove('active');
+      
+      // Guardar el nombre del archivo abierto en localStorage
+      agregarArchivoReciente(file.name);
   };
 
   reader.readAsArrayBuffer(file); // Leer el archivo como ArrayBuffer
 }
 
-
+//PARA ABRIR
+if (cell && cell.f) { // Si la celda tiene fórmula
+  // Si existe un valor calculado (cell.v) se utiliza, sino se calcula manualmente
+  const computedVal = (cell.v !== undefined) ? cell.v : calculateComputedValue('=' + cell.f);
+  sheetData[colIndex][rowIndex] = {
+      value: '=' + cell.f,
+      computedValue: computedVal
+  };
+} else if (cell && cell.v !== undefined) { // Si la celda tiene valor y no es fórmula
+  sheetData[colIndex][rowIndex] = {
+      value: String(cell.v),
+      computedValue: cell.v
+  };
+} else {
+  sheetData[colIndex][rowIndex] = {
+      value: cellValue !== undefined ? String(cellValue) : "",
+      computedValue: cellValue
+  };
+}
