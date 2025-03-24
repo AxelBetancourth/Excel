@@ -545,6 +545,18 @@ function replaceEXTRAE(formula) {
 	return formula;
 }
 
+//Reemplaza la función AHORA() por la fecha y hora actuales
+function replaceAHORA(formula) {
+    let index = formula.indexOf("AHORA()");
+    while (index !== -1) {
+        let fechaHora = new Date().toLocaleString(); // Obtener la fecha y hora actual
+        formula = formula.substring(0, index) + `"${fechaHora}"` + formula.substring(index + 7);
+        index = formula.indexOf("AHORA()", index + 1);
+    }
+    return formula;
+}
+
+
 //Reemplaza recursivamente las funciones MOD, SI, Y y O
 function replaceFunctions(formula) {
 	let prev;
@@ -559,6 +571,7 @@ function replaceFunctions(formula) {
 		formula = replaceMAX(formula);
 		formula = replaceMIN(formula);
 		formula = replaceEXTRAE(formula);
+		formula = replaceAHORA(formula); // Llamamos a la nueva función
 	} while (formula !== prev);
 	return formula;
 }
