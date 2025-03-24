@@ -42,7 +42,15 @@ document.getElementById('cancelSave').addEventListener('click', function() {
 
 // Función para guardar el archivo cuando el usuario haga clic en "Guardar"
 document.getElementById('saveFile').addEventListener('click', function() {
-  const nombreArchivo = document.getElementById('filename').value.trim() || "datos_guardados";
+  const nombreInput = document.getElementById('filename').value.trim();
+  
+  // Verificar si el campo está vacío
+  if (!nombreInput) {
+    alert("Por favor, introduce un nombre para el archivo");
+    return; // Detener la ejecución si no hay nombre
+  }
+  
+  const nombreArchivo = nombreInput;
   const tabla = document.getElementById('spreadsheet');
 // Crear array de datos con formato correcto para Excel
 const datos = [];
@@ -336,22 +344,30 @@ document.addEventListener("DOMContentLoaded", function () {
 // Función para exportar la hoja de cálculo a diferentes formatos
 function exportarHojaCalculo(formato) {
   // Obtener el nombre del archivo sin extensión
-  const nombreBase = document.getElementById('nombre-exportacion').value.trim() || "datos_exportados";
+  const nombreInput = document.getElementById('nombre-exportacion').value.trim();
+  
+  // Verificar si el campo está vacío
+  if (!nombreInput) {
+    alert("Por favor, introduce un nombre para el archivo");
+    return; // Detener la ejecución si no hay nombre
+  }
   
   // Exportar según el formato seleccionado
   switch (formato) {
+    case 'csv':
+      // Implementar exportación a CSV si se necesita
+      alert("Exportación a CSV en desarrollo");
+      break;
     case 'txt':
-      exportarTXT(nombreBase);
+      exportarTXT(nombreInput);
       break;
     case 'pdf':
-      exportarPDF(nombreBase);
+      exportarPDF(nombreInput);
       break;
     default:
       alert("Formato no válido");
   }
 }
-
-
 
 // Función para exportar a TXT
 function exportarTXT(nombreArchivo) {
@@ -478,115 +494,35 @@ function exportarPDF(nombreArchivo) {
 
 // Configurar el modal de exportación
 document.addEventListener('DOMContentLoaded', function() {
-  // Crear el modal de exportación si no existe
-  if (!document.getElementById('exportModal')) {
-    const modalHTML = `
-      <div id="exportModal" class="modal">
-        <div class="modal-content">
-          <h2 class="h2_archivo">Exportar archivo</h2>
-          
-          <label for="nombre-exportacion">Nombre del archivo:</label>
-          <input type="text" id="nombre-exportacion" placeholder="Nombre del archivo" value="datos_exportados">
-          
-          <div class="formato-section">
-            <h3>Formato de exportación:</h3>
-            <div class="export-buttons">
-              <button id="exportCSV" class="export-btn">
-                <img src="images/csv.png" alt="CSV">
-                <span>CSV</span>
-              </button>
-              <button id="exportTXT" class="export-btn">
-                <img src="images/txt.png" alt="TXT">
-                <span>TXT</span>
-              </button>
-              <button id="exportPDF" class="export-btn">
-                <img src="images/pdf.png" alt="PDF">
-                <span>PDF</span>
-              </button>
-            </div>
-          </div>
-          
-          <div class="modal-actions">
-            <button id="cancelExport">Cancelar</button>
-          </div>
-        </div>
-      </div>
-    `;
-    
-    // Insertar el modal en el documento
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // Añadir estilos para el modal de exportación
-    const style = document.createElement('style');
-    style.textContent = `
-      .export-buttons {
-        display: flex;
-        justify-content: space-around;
-        margin: 20px 0;
-      }
-      
-      .export-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        cursor: pointer;
-        background-color: #f9f9f9;
-        transition: all 0.3s;
-      }
-      
-      .export-btn:hover {
-        background-color: #e3e3e3;
-        transform: translateY(-2px);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      }
-      
-      .export-btn img {
-        width: 48px;
-        height: 48px;
-        margin-bottom: 5px;
-      }
-    `;
-    document.head.appendChild(style);
-    
-    // Eventos para los botones de exportación
-    document.getElementById('exportCSV').addEventListener('click', function() {
-      exportarHojaCalculo('csv');
-      document.getElementById('exportModal').style.display = 'none';
-    });
-    
-    document.getElementById('exportTXT').addEventListener('click', function() {
-      exportarHojaCalculo('txt');
-      document.getElementById('exportModal').style.display = 'none';
-    });
-    
-    document.getElementById('exportPDF').addEventListener('click', function() {
-      exportarHojaCalculo('pdf');
-      document.getElementById('exportModal').style.display = 'none';
-    });
-    
-    document.getElementById('cancelExport').addEventListener('click', function() {
-      document.getElementById('exportModal').style.display = 'none';
-    });
-  }
-  
-  // Configurar el botón de la sección exportar
-  const seccionExportar = document.getElementById('exportar');
-  if (seccionExportar) {
-    // Eliminar el contenido existente
-    seccionExportar.innerHTML = `
-      <h2 class="h2_archivo">Exportar</h2>
-      <p>Exporta tu hoja de cálculo a diferentes formatos.</p>
-      <button id="openExportModal">Exportar archivo</button>
-    `;
-    
-    // Evento para abrir el modal de exportación
-    document.getElementById('openExportModal').addEventListener('click', function() {
+  // Evento para el botón de abrir modal de exportación
+  const openExportModalBtn = document.getElementById('openExportModal');
+  if (openExportModalBtn) {
+    openExportModalBtn.addEventListener('click', function() {
+      // Asegurarse de que el valor del campo de texto está vacío al abrir
+      document.getElementById('nombre-exportacion').value = '';
       document.getElementById('exportModal').style.display = 'flex';
     });
   }
+  
+  // Eventos para los botones de exportación
+  document.getElementById('exportCSV')?.addEventListener('click', function() {
+    exportarHojaCalculo('csv');
+    document.getElementById('exportModal').style.display = 'none';
+  });
+  
+  document.getElementById('exportTXT')?.addEventListener('click', function() {
+    exportarHojaCalculo('txt');
+    document.getElementById('exportModal').style.display = 'none';
+  });
+  
+  document.getElementById('exportPDF')?.addEventListener('click', function() {
+    exportarHojaCalculo('pdf');
+    document.getElementById('exportModal').style.display = 'none';
+  });
+  
+  document.getElementById('cancelExport')?.addEventListener('click', function() {
+    document.getElementById('exportModal').style.display = 'none';
+  });
 });
 
 //Funcion para el boton abrir
@@ -706,3 +642,19 @@ if (cell && cell.f) { // Si la celda tiene fórmula
       computedValue: cellValue
   };
 }
+
+// Actualizar el nombre del archivo seleccionado
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInput = document.getElementById('fileInput');
+  const filePathDisplay = document.getElementById('file-path-display');
+  
+  if (fileInput && filePathDisplay) {
+    fileInput.addEventListener('change', function() {
+      if (this.files && this.files.length > 0) {
+        filePathDisplay.textContent = this.files[0].name;
+      } else {
+        filePathDisplay.textContent = 'Ningún archivo seleccionado';
+      }
+    });
+  }
+});

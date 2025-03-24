@@ -90,38 +90,46 @@
         </div>
 
         <div class="contenido-seccion" id="abrir">
-          <h2 class="h2_archivo"></h2>>Abrir</h2>
+          <h2 class="h2_archivo">Abrir</h2>
           <p>Aquí puedes abrir un nuevo archivo.</p>
-          <input type="file" id="fileInput" accept=".xlsx, .xls">
-          <button onclick="abrirExcel()">abrir un archivo</button>
+          
+          <div class="file-input-container">
+            <label for="fileInput" class="custom-file-upload">
+              <i class="fas fa-file-upload"></i> Seleccionar archivo
+            </label>
+            <input type="file" id="fileInput" accept=".xlsx, .xls">
+            <span class="file-path" id="file-path-display">Ningún archivo seleccionado</span>
+            <button onclick="abrirExcel()">Abrir archivo</button>
+          </div>
         </div>
     
         <div class="contenido-seccion" id="guardar">
-          <h2 class="h2_archivo"></h2>>Guardar</h2>
+          <h2 class="h2_archivo">Guardar</h2>
           <p>Opciones para Guardar archivos.</p>
           <button id="openSaveModal" >Guardar este archivo</button>
         </div>
     
         <div class="contenido-seccion" id="exportar">
-          <h2 class="h2_archivo"></h2>>Exportar</h2>
-          <p>Pronto....</p>
+          <h2 class="h2_archivo">Exportar</h2>
+          <p>Exporta tu hoja de cálculo a diferentes formatos.</p>
+          <button id="openExportModal">Exportar archivo</button>
         </div>
       </div>
     </div>
 
 <!-- Ventana modal de guardar archivo -->
 
-<div id="saveModal" class="modal">
-  <div class="modal-content">
-    <h2 class="h2_archivo"></h2>>Guardar este archivo</h2>
+<div id="saveModal" class="modal archivo-modal">
+  <div class="modal-content archivo-modal-content">
+    <h2 class="h2_archivo">Guardar este archivo</h2>
     
     <!-- Input para el nombre del archivo -->
-    <label for="filename">Nombre del archivo:</label>
-    <input type="text" id="filename" placeholder="Escribe el nombre del archivo" value="datos_guardados">
+    <label for="filename" class="archivo-label">Nombre del archivo:</label>
+    <input type="text" id="filename" class="archivo-input" placeholder="Escribe el nombre del archivo" value="">
 
     <div class="location-section">
-      <label for="location">Ubicación Predeterminada:</label>
-      <select id="location">
+      <label for="location" class="archivo-label">Ubicación Predeterminada:</label>
+      <select id="location" class="archivo-select">
         <option value="default">Descargas</option>
         <!-- Opcionalmente puedes añadir más opciones aquí si se desea -->
       </select>
@@ -129,14 +137,45 @@
 
     <div class="modal-actions">
       <!-- Botones de guardar y cancelar -->
-      <button id="saveFile">Guardar</button>
-      <button id="cancelSave">Cancelar</button>
+      <button id="saveFile" class="archivo-btn archivo-btn-primary">Guardar</button>
+      <button id="cancelSave" class="archivo-btn archivo-btn-secondary">Cancelar</button>
     </div>
 
     </div>
   </div>
   </aside>
 
+<!-- Ventana modal para exportar archivo -->
+<div id="exportModal" class="modal archivo-modal">
+  <div class="modal-content archivo-modal-content">
+    <h2 class="h2_archivo">Exportar archivo</h2>
+    
+    <label for="nombre-exportacion" class="archivo-label">Nombre del archivo:</label>
+    <input type="text" id="nombre-exportacion" class="archivo-input" placeholder="Nombre del archivo" value="">
+    
+    <div class="formato-section">
+      <h3>Formato de exportación:</h3>
+      <div class="export-buttons">
+        <button id="exportCSV" class="export-btn">
+          <img src="images/csv.png" alt="CSV">
+          <span>CSV</span>
+        </button>
+        <button id="exportTXT" class="export-btn">
+          <img src="images/archivo_txt.png" alt="TXT">
+          <span>TXT</span>
+        </button>
+        <button id="exportPDF" class="export-btn">
+          <img src="images/pdf.png" alt="PDF">
+          <span>PDF</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="modal-actions">
+      <button id="cancelExport" class="archivo-btn archivo-btn-secondary">Cancelar</button>
+    </div>
+  </div>
+</div>
 
   <!-- Contenedor para los submenús de cada pestaña -->
   <section id="submenu-container" class="submenu-container">

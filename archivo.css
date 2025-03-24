@@ -27,7 +27,13 @@
 #sidebar-close {
     display: flex;
     justify-content: center;
-    height: 80px;
+    align-items: center;
+    height: 70px;
+    background-color: #217346;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    width: 100%;
 }
 
 #sidebar-close:hover {
@@ -35,87 +41,220 @@
 }
 
 #sidebar-close img {
-    margin-right: 35px;
-    width: 48px !important;
-    height: 48px !important;
+    width: 32px !important;
+    height: 32px !important;
 }
 
 /* Columna Izquierda: Navegación */
 .Izquierda {
-    width: 150px;
+    width: 180px;
     background-color: #217346;
     color: #fff;
     display: flex;
     flex-direction: column;
 }
 
-.Izquierda button {
-    transition: background-color 0.3s ease;
+.nav-btn {
     width: 100%;
+    height: 70px;
+    margin-top: 5px;
     background: none;
     border: none;
     color: #fff;
-    padding: 10px;
+    padding: 12px 15px;
     text-align: left;
     display: flex;
     align-items: center;
     cursor: pointer;
-    font-size: 16px;
-}
-
-.Izquierda button:hover,
-.Izquierda button.active {
-    background-color: #3a9e6e;
-}
-
-.contenido-seccion.activo[data-section="inicio"] ~ .Izquierda 
-button[data-target="inicio"]:hover,
-.contenido-seccion.activo[data-section="nuevo"] ~ .Izquierda 
-button[data-target="nuevo"]:hover,
-.contenido-seccion.activo[data-section="descargar"] ~ .Izquierda 
-button[data-target="descargar"]:hover,
-.contenido-seccion.activo[data-section="guardar"] ~ .Izquierda 
-button[data-target="guardar"]:hover,
-.contenido-seccion.activo[data-section="exportar"] ~ .Izquierda 
-button[data-target="exportar"]:hover {
-    background-color: #3a9e6e;
-}
-
-.Izquierda button img {
-    width: 24px;
-    height: 24px;
-    margin-right: 8px;
-}
-
-/* Botón para cerrar la barra lateral */
-#sidebar-close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-bottom: 20px;
-    padding: 0;
-}
-
-#sidebar-close img {
-    width: 24px;
-    height: 24px;
-}
-
-/* Modal */
-#openSaveModal {
-    padding: 5px;
-    color: white;
-    background-color: #217346;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
+    font-size: 14px;
     transition: background-color 0.3s ease;
 }
 
-#openSaveModal:hover {
+.nav-btn:hover,
+.nav-btn.activo {
     background-color: #3a9e6e;
 }
 
+.nav-btn img {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+}
+
+.nav-btn p {
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* Estilos para secciones de contenido */
+.contenido-seccion {
+    display: none;
+    background: white;
+    width: 100%;
+    padding: 25px 30px;
+    overflow-y: auto;
+}
+
+.contenido-seccion.activo {
+    display: block;
+}
+
+.contenido-seccion h2 {
+    color: #217346;
+    font-size: 20px;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.h2_archivo {
+    color: #217346 !important;
+    font-size: 20px !important;
+    margin-bottom: 15px !important;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.contenido-seccion p {
+    color: #555;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+/* Estilos para botones - ESPECÍFICOS PARA ARCHIVO */
+.sidebar-content button,
+.contenido-seccion button,
+.modal-actions button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+/* Botones en las secciones */
+.contenido-seccion button {
+    background-color: #217346;
+    color: white;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.contenido-seccion button:hover {
+    background-color: #3a9e6e;
+}
+
+/* Estilos para inputs de archivos */
+.contenido-seccion input[type="file"] {
+    margin: 15px 0;
+    max-width: 100%;
+}
+
+/* Contenedor de inputs de archivo */
+.file-input-container {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.file-input-container button {
+    margin-top: 15px;
+}
+
+/* Estilo para el input de seleccionar archivo */
+#fileInput {
+    display: none;
+}
+
+/* Personalización para el botón "abrir un archivo" */
+.contenido-seccion#abrir button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #217346;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 4px;
+    margin: 15px 0;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.contenido-seccion#abrir button:hover {
+    background-color: #1b613c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.contenido-seccion#abrir button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Estilo para el input personalizado de archivo */
+.contenido-seccion#abrir label.custom-file-upload {
+    display: inline-block;
+    padding: 10px 16px;
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 15px 0;
+    text-align: center;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.contenido-seccion#abrir label.custom-file-upload:hover {
+    background-color: #e0e0e0;
+}
+
+.contenido-seccion#abrir .file-path {
+    display: block;
+    margin-top: 8px;
+    color: #666;
+    font-size: 13px;
+    font-style: italic;
+}
+
+.boton-contenedor {
+    display: flex;
+    margin: 20px 0;
+    justify-content: flex-start;
+}
+
+.boton {
+    width: 130px;
+    height: 130px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 15px;
+}
+
+.boton:hover {
+    background-color: #f0f0f0;
+    transform: translateY(-3px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.boton img {
+    width: 120px;
+    height: 120px;
+}
+
+/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -131,39 +270,50 @@ button[data-target="exportar"]:hover {
 
 .modal-content {
     background-color: white;
-    padding: 20px;
-    border-radius: 5px;
-    width: 300px;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-#h2_archivo {
-    color: #333;
+.modal-content h2 {
+    color: #217346;
     font-size: 18px;
-    font-weight: normal;
     margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
     text-align: left;
 }
 
-label {
+/* Estilos para etiquetas dentro de modales y archivo */
+.sidebar-content label,
+.modal-content label {
     display: block;
     margin-bottom: 8px;
     font-size: 14px;
-    color: #333;
+    color: #555;
     text-align: left;
 }
 
-input[type="text"],
-select {
+/* Estilos para inputs y selects específicos del módulo archivo */
+.sidebar-content input[type="text"],
+.sidebar-content select,
+.modal-content input[type="text"], 
+.modal-content select {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     border: 1px solid #ddd;
+    border-radius: 4px;
     box-sizing: border-box;
+    margin-bottom: 15px;
+    font-size: 14px;
 }
 
-select {
+.sidebar-content select,
+.modal-content select {
     background-color: #f5f5f5;
+    cursor: pointer;
 }
 
 .location-section {
@@ -173,176 +323,251 @@ select {
 
 .modal-actions {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 10px;
     margin-top: 20px;
 }
 
-.modal-content h2 {
-    color: #217346;
-}
-
-#nav-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 2px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-#saveFile {
-    background-color: #217346;
-    color: white;
-}
-
-#cancelSave {
-    background-color: #f0f0f0;
-    color: #333;
-}
-
-/* Clase para mostrar el modal */
-.show-modal {
-    display: flex;
-}
-
-/* Columna Derecha: Imagen u otro contenido */
-.Derecha {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-}
-
-.Derecha img {
-    max-width: 60%;
-    max-height: 60%;
-    object-fit: contain;
-}
-
-.contenido-seccion {
-    display: none;
-    background: white;
-    width: 100%;
-    padding-left: 20px;
-    padding-top: 20px;
-}
-
-.contenido-seccion.activo {
-    display: block;
-}
-
 /* Contenedor de archivos recientes */
-.lista-recientes::-webkit-scrollbar {
-    width: 8px;
-}
-
-.lista-recientes::-webkit-scrollbar-track {
-    background: #e0e0e0;
-    border-radius: 5px;
-}
-
-.lista-recientes::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 5px;
-}
-
-.lista-recientes::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
 .recientes-container {
     width: 100%;
     background: #f8f8f8;
-    padding: 5px;
-    border-radius: 10px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-top: 25px;
 }
 
-.recientes-container h2 {
-    font-size: 20px;
-    color: #333;
-    text-align: left;
-}
-
-.recientes-container ul {
+#lista-recientes {
     list-style: none;
     padding: 0;
     margin: 0;
-    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
-.recientes-container li {
+.recent-file-item {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     background: white;
-    padding: 12px;
+    padding: 10px 15px;
     margin-bottom: 8px;
-    border-radius: 8px;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.recientes-container li:hover {
-    background: #e0e0e0;
-    transform: scale(1.02);
-}
-
-.recientes-container li img {
-    width: 40px;
-    height: 40px;
-    margin-right: 15px;
     border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.recientes-container li span {
-    font-size: 16px;
+.recent-file-item:hover {
+    background: #f2f2f2;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.file-container {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    cursor: pointer;
+}
+
+.file-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 15px;
+}
+
+.file-name {
     color: #333;
-    flex-grow: 1;
+    font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.sheet {
-    padding: 10px;
-    margin: 5px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+.delete-file-btn {
+    background: none;
+    border: none;
+    color: #999;
+    padding: 5px;
     cursor: pointer;
+    transition: color 0.2s ease;
 }
 
-.sheet.active {
-    background-color: #d3eaff;
+.delete-file-btn:hover {
+    color: #e74c3c;
 }
 
-/* FOOTER */
+.no-recent-files {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Estilos para botones personalizados como el de Seleccionar archivo */
+.custom-file-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #217346;
+    color: white;
+    border-radius: 3px;
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+.custom-file-btn:hover {
+    background-color: #3a9e6e;
+}
+
+.file-btn-label {
+    margin-left: 10px;
+    color: #555;
+}
+
+/* Menú contextual en hojas */
 .context-menu {
     margin-left: 0px;
     position: absolute;
     background: white;
     border: 1px solid #ccc;
     border-radius: 5px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     padding: 5px;
     display: flex;
     flex-direction: column;
-    min-width: 120px;
+    min-width: 150px;
 }
 
 .context-menu button {
     background: none;
     border: none;
-    padding: 8px;
+    padding: 10px 15px;
     text-align: left;
     width: 100%;
     cursor: pointer;
     font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s ease;
 }
 
 .context-menu button:hover {
     background: #f0f0f0;
+}
+
+/* Estilos específicos para botones de exportación */
+.export-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+      
+.export-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    transition: all 0.3s;
+}
+      
+.export-btn:hover {
+    background-color: #e3e3e3;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+      
+.export-btn img {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 5px;
+}
+
+/* Modal específico para archivo */
+.archivo-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.archivo-modal-content {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.archivo-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+    text-align: left;
+}
+
+.archivo-input,
+.archivo-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.archivo-select {
+    background-color: #f5f5f5;
+    cursor: pointer;
+}
+
+.archivo-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.archivo-btn-primary {
+    background-color: #217346;
+    color: white;
+}
+
+.archivo-btn-primary:hover {
+    background-color: #3a9e6e;
+}
+
+.archivo-btn-secondary {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.archivo-btn-secondary:hover {
+    background-color: #e0e0e0;
+}
+
+/* Estilos específicos para exportación */
+.formato-section {
+  margin: 20px 0;
+}
+
+.formato-section h3 {
+  color: #444;
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: 500;
 }
