@@ -107,6 +107,12 @@ td {
     text-align: left;
     position: relative;
     background: white;
+    user-select: none;
+}
+
+td span {
+    user-select: none;
+    cursor: default;
 }
 
 td input {
@@ -191,10 +197,13 @@ th.row-header.selected-header {
 #add-sheet{
     background-color: #ffffff;
     border: 1px solid #ccc;
-    border-radius: 80%;
-    width: 25px;
-    height: 25px;
+    border-radius: 50%;
+    width: 20px;
+    height: 30px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Scrollbar personalizado */
