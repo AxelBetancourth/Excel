@@ -784,24 +784,9 @@ $body.addEventListener('mousedown', event => {
 // Manejo de copiar en una celda
 document.addEventListener('copy', (e) => {
 	let data = [];
-	if (selectedColumn !== null) {
-		data = state[selectedColumn]
-			.map(cell => cell.computedValue)
-			.filter(value => value !== "");
-	} else if (selectedRow !== null) {
-		data = state.map(col => col[selectedRow].computedValue)
-			.filter(value => value !== "");
-	}
-	if (data.length > 0) {
-		e.clipboardData.setData('text/plain', data.join('\n'));
-		e.preventDefault();
-	}
-});
-
-//En multicelda
-document.addEventListener('copy', (e) => {
-	let data = [];
 	const selectedRangeCells = document.querySelectorAll('td.selected-range');
+	
+	// Si hay un rango de celdas seleccionado
 	if (selectedRangeCells.length > 0) {
 	  // Determinar el rectángulo que abarca el rango
 	  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -813,6 +798,7 @@ document.addEventListener('copy', (e) => {
 		if (y < minY) minY = y;
 		if (y > maxY) maxY = y;
 	  });
+	  
 	  for (let y = minY; y <= maxY; y++) {
 		let rowData = [];
 		for (let x = minX; x <= maxX; x++) {
@@ -825,20 +811,33 @@ document.addEventListener('copy', (e) => {
 		}
 		data.push(rowData.join("\t"));
 	  }
-	} else if (selectedColumn !== null) {
+	} 
+	// Si hay una columna seleccionada
+	else if (selectedColumn !== null) {
 	  data = state[selectedColumn]
 		.map(cell => cell.computedValue)
 		.filter(value => value !== "");
-	} else if (selectedRow !== null) {
+	} 
+	// Si hay una fila seleccionada
+	else if (selectedRow !== null) {
 	  data = state.map(col => col[selectedRow].computedValue)
 		.filter(value => value !== "");
 	}
+	// Si hay una celda individual seleccionada
+	else {
+	  const selectedCell = document.querySelector('td.celdailumida');
+	  if (selectedCell) {
+		const x = parseInt(selectedCell.dataset.x);
+		const y = parseInt(selectedCell.dataset.y);
+		data.push(state[x][y].computedValue);
+	  }
+	}
+	
 	if (data.length > 0) {
 	  e.clipboardData.setData('text/plain', data.join('\n'));
 	  e.preventDefault();
 	}
 });
-  
 
 // Manejo de pegar
 document.addEventListener('paste', (e) => {
