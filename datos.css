@@ -1,119 +1,121 @@
 /* ================================ 
    Sección datos (ANAHI)
    ================================ */
-.submenu {
-    display: none;
-  }
 
-  .submenu.active {
-    display: flex;
-  }
-  /* Estilos generales para el contenedor de submenús */
-  #submenu-container {
-    margin: 10px 0;
-    padding: 10px;
-    background-color: #f1f1f1;
-    border-radius: 5px;
-  }
-  /* Estilos para cada submenú, pueden ajustarse según necesidades */
-  #submenu-inicio,
-  #submenu-insertar,
-  #submenu-formulas,
-  #submenu-datos {
-    align-items: center;
-    gap: 5px;
-  }
-  /* Otros estilos propios de la sección "Datos" */
-  .container {
-    width: 200px;
-    background-color: #f8f9fa;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: center;
-    margin-left: 0;
-  }
-  .menu ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  .menu li {
-    position: relative;
-  }
-  .menu a {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: #000;
-    font-size: 17px;
-    padding: 10px 15px;
-    border-radius: 5px;
-    transition: 0.3s ease;
-  }
-  .menu a:hover {
-    background-color: #e0e0e0;
-  }
-  .menu ul ul {
-    display: none;
-    position: absolute;
-    left: 100%;
-    top: 0;
-    min-width: 200px;
-    background: #fff;
-    border-radius: 5px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 5px 0;
-    z-index: 1000;
-  }
-  .menu li:hover > ul {
-    display: block;
-  }
-  .menu ul ul ul {
-    left: 100%;
-    top: 0;
-  }
-  .icono {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-  }
-  .iconos-container {
-    display: flex;
-    gap: 10px;
-    position: relative;
-  }
-  .BotonesOrdenar {
-    width: 320px;
-    background-color: #f8f9fa;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between; 
-    gap: 10px; 
-    margin-left: 0;
-  }
-  button {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    font-size: 15px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: #f1f1f1;
-  }
-  button img.icono {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px; 
-  }
-  .flecha {
-    margin-left: auto;
-    font-size: 12px;
-  }
+/* Estilos para cada submenú, pueden ajustarse según necesidades */
+#submenu-inicio,
+#submenu-insertar,
+#submenu-formulas,
+#submenu-datos {
+  align-items: center;
+  gap: 5px;
+}
+
+/* Otros estilos propios de la sección "Datos" */
+.container {
+  width: 200px;
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  margin-left: 0;
+}
+
+.menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu li {
+  position: relative;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #000;
+  font-size: 17px;
+  padding: 10px 15px;
+  border-radius: 5px;
+  transition: 0.3s ease;
+}
+
+.menu a:hover {
+  background-color: #e0e0e0;
+}
+
+.menu ul ul {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 0;
+  min-width: 200px;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  z-index: 1000;
+}
+
+.menu li:hover>ul {
+  display: block;
+}
+
+.menu ul ul ul {
+  left: 100%;
+  top: 0;
+}
+
+.icono {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.iconos-container {
+  display: flex;
+  gap: 10px;
+  position: relative;
+}
+
+.BotonesOrdenar {
+  width: 320px;
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-left: 0;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  font-size: 15px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #f1f1f1;
+}
+
+button img.icono {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.flecha {
+  margin-left: auto;
+  font-size: 12px;
+}
