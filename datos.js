@@ -25,6 +25,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 container.style.marginRight = '0';
                 container.style.borderTopRightRadius = '0';
                 container.style.borderBottomRightRadius = '0';
+                container.style.display = 'flex';
+                container.style.alignItems = 'center';
+                
+                // Centrar verticalmente los elementos dentro del contenedor
+                const ul = container.querySelector('ul');
+                if (ul) {
+                    ul.style.display = 'flex';
+                    ul.style.flexDirection = 'column';
+                    ul.style.justifyContent = 'center';
+                }
             }
             
             // Mover los botones de ordenar junto al contenedor principal
