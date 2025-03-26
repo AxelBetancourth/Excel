@@ -314,17 +314,181 @@
     </div>
     </div>
 
+
+    
+
     <div id="submenu-insertar" class="submenu">
-      <p>Contenido del submenú de Insertar</p>
-      <!-- Opciones de Insertar -->
+      <button class="insert-btn" aria-label="Tabla dinámica">
+          <img src="images/tabla_dinamica.png" alt="Tabla dinámica">
+          <span>Tabla dinámica</span>
+      </button>
+      
+              <button class="insert-btn" aria-label="Tabla dinámica recomendada">
+                  <img src="images/tabla_dinamica_recomendada.png" alt="Tabla dinámica recomendada">
+                  <span>Tabla dinámica recomendada</span>
+              </button>
+      
+              <button class="insert-btn" id="insert-table-btn" aria-label="Insertar tabla">
+                  <img src="images/tabla.png" alt="Tabla">
+                  <span>Tabla</span>
+              </button>
+      
+              <div class="menu-container">
+                <button class="insert-btn" data-menu="dropdown-ilustraciones" aria-label="Ilustraciones">
+                    <img src="images/ilustraciones.png" alt="Ilustraciones">
+                    <span>Ilustraciones</span>
+                </button>
+                <div class="menu" id="dropdown-ilustraciones">
+                    <!-- Opción de Imágenes -->
+                    <div class="submenu-item">
+                        <button class="menu-item" id="btn-imagenes" aria-label="Imágenes">
+                            <img src="images/imagenes.png" alt="Imágenes">
+                            <span>Imágenes</span>
+                        </button>
+                        <div class="submenu" id="submenu-imagenes">
+                            <button class="menu-item" id="upload-image-btn">
+                                <span>Este dispositivo</span>
+                            </button>
+                            <input type="file" id="image-input" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                    
+                    <div class="submenu-item">
+                      <button class="menu-item" id="btn-formas" aria-label="Formas" onclick="toggleSubmenu()">
+                          <img src="images/formas.png" alt="Formas">
+                          <span>Formas</span>
+                      </button>
+                      <div class="submenu" id="submenu-formas">
+                          <button class="menu-item" onclick="insertShape('rect')">
+                              <img src="images/rectangulo.png" alt="Rectángulo">
+                              <span>Rectángulo</span>
+                          </button>
+                          <button class="menu-item" onclick="insertShape('circle')">
+                              <img src="images/circulo.png" alt="Círculo">
+                              <span>Círculo</span>
+                          </button>
+                          <button class="menu-item" onclick="insertShape('triangle')">
+                              <img src="images/triangulo.png" alt="Triángulo">
+                              <span>Triángulo</span>
+                          </button>
+                      </div>
+                  </div>
+                </div>
+            </div>
+    
+              <!-- Otros botones de inserción -->
+              <button class="insert-btn">
+                  <img src="images/graficos_recomendados.png" alt="Gráficos recomendados">
+                  <span>Gráficos recomendados</span>
+              </button>
+      
+               <!-- Grupo de botones para gráficos -->
+            <div class="menu-container">
+              <button class="insert-btn" data-menu="dropdown-graficos" aria-label="Gráficos">
+                  <img src="images/grafico_dinamico.png" alt="Gráficos">
+                  <span>Gráficos</span>
+              </button>
+              <div class="menu" id="dropdown-graficos">
+                  <button class="menu-item" id="btn-grafico-barras">
+                      <img src="images/barras.png" alt="Gráfico de barras">
+                      <span>Barras</span>
+                  </button>
+                  <button class="menu-item" id="btn-grafico-lineas">
+                      <img src="images/lineas.png" alt="Gráfico de líneas">
+                      <span>Líneas</span>
+                  </button>
+                  <button class="menu-item" id="btn-grafico-circular">
+                      <img src="images/pastel.png" alt="Gráfico circular">
+                      <span>Circular</span>
+                  </button>
+                  <button class="menu-item" id="btn-grafico-dispersion">
+                      <img src="images/dispersion.png" alt="Gráfico dispersión">
+                      <span>Dispersión</span>
+                  </button>
+              </div>
+          </div>
+    
+          <!-- Modal para Configuración de Gráficos -->
+          <div id="chart-modal" class="chart-modal">
+            <div class="chart-modal-content">
+                <div class="chart-modal-header">
+                    <h2>Configurar Gráfico</h2>
+                    <button class="close-button">&times;</button>
+                </div>
+                <div class="chart-modal-body">
+                    <div class="form-group">
+                        <label for="chart-title">Título del gráfico:</label>
+                        <input type="text" id="chart-title" placeholder="Ingrese el título">
+                    </div>
+                    <div class="form-group">
+                        <label for="data-range">Rango de datos:</label>
+                        <input type="text" id="data-range" placeholder="Ejemplo: A1:B5">
+                    </div>
+                    <div class="preview-container">
+                        <label>Vista previa:</label>
+                        <canvas id="preview-canvas"></canvas>
+                    </div>
+                </div>
+                <div class="chart-modal-footer">
+                    <button id="create-chart">Crear</button>
+                    <button id="cancel-chart">Cancelar</button>
+                </div>
+            </div>
+        </div>
+      
+              <button class="insert-btn">
+                  <img src="images/mapa.png" alt="Mapas">
+                  <span>Mapas</span>
+              </button>
+      
+              <button class="insert-btn">
+                  <img src="images/segmento_datos.png" alt="Segmentación de datos">
+                  <span>Segmentación de datos</span>
+              </button>
+      
+              <!-- Botón desplegable de Texto -->
+              <div class="menu-container">
+                <button class="insert-btn" data-menu="dropdown-texto" aria-label="Texto">
+                    <img src="images/texto.png" alt="Texto">
+                    <span>Texto</span>
+                </button>
+                <div class="menu" id="dropdown-texto">
+                    <button class="menu-item">
+                        <img src="images/cuadroTexto.png" alt="Cuadro de texto">
+                        <span>Cuadro de texto</span>
+                    </button>
+                    <button class="menu-item">
+                        <img src="images/wordart.png" alt="WordArt">
+                        <span>WordArt</span>
+                    </button>
+                </div>
+            </div>
+            
+            
+            <!-- Botón desplegable de Texto -->
+            <div class="menu-container">
+              <button class="insert-btn" data-menu="dropdown-simbolos" aria-label="Simbolos">
+                  <img src="images/simbolo.png" alt="simbolos">
+                  <span>simbolos</span>
+              </button>
+              <div class="menu" id="dropdown-simbolos">
+                  <button class="menu-item">
+                      <img src="images/pi.png" alt="Ecuaciones">
+                      <span>Ecuaciones</span>
+                  </button>
+              </div>
+          </div>
+          
     </div>
 
     <div id="submenu-formulas" class="submenu">
       <!-- Opciones de Fórmulas -->
       <div class="toolbar">
           <button class="button">FX<br>
-                            Insertar función</br></button>
-        <button class="button">
+            Insertar función</br>
+          </button>
+
+          <button class="button">
             <span>∑ Autosuma ▼</span>
             <div class="dropdown">
                 <a href="#">Suma</a>
@@ -333,6 +497,7 @@
                 <a href="#">Máx</a>
                 <a href="#">Mín</a>
             </div>
+          </button>
              <!-- Botón Funciones Lógicas con Menú Desplegable -->
              <button class="dropbtn">
               <span>Lógicas ▼</span>
@@ -358,63 +523,58 @@
                     <a href="#">MINUTO</a>
                     <a href="#">SEGUNDO</a>
                 </div>
+              </button>
           </div>
+          </button>
     </div>
     </div>
 
     <div id="submenu-datos" class="submenu">
       <!-- Menú de Datos -->
-      <div class="menu-container">
+      <div class="menu-wrapper">
         <div class="container">
-          <div class="menu">
             <ul>
               <li>
-                <a href="">
+                <button class="menu-btn-nivel1">
                   <img src="images/obtenerdatos.ico" alt="Icono Principal" class="icono"> 
                   Obtener Datos
-                  <span class="flecha"></span>
-                </a>
+                </button>
                 <ul>
                   <li>
-                    <a href="">
-                      <img src="images/archivos.png" alt="Carpeta" class="icono"> 
-                      De un Archivos
-                      <span class="flecha"></span>
-                    </a>
+                    <button class="menu-btn-nivel2">
+                      <img src="images/archivo (1).png" alt="Carpeta" class="icono"> 
+                      De Archivos
+                    </button>
                     <ul>
                       <li>
-                        <a href="#" onclick="document.getElementById('archivoPDF').click(); return false;">
-                          <img src="images/pdf.ico" alt="PDF" class="icono"> Archivo PDF
-                          <span class="flecha"></span>
-                        </a>
-                        <form action="procesar_pdf.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center px-3">
+                        <button class="menu-btn-nivel3" id="btn-pdf">
+                          <img src="images/pdf.png" alt="PDF" class="icono"> Archivo PDF
+                        </button>
+                        <form action="procesar_pdf.php" method="post" enctype="multipart/form-data">
                           <input type="file" name="archivoPDF" id="archivoPDF" accept=".pdf" style="display: none;">
                         </form>
                       </li>
                       <li>
-                        <a href="#" onclick="document.getElementById('archivoExcel').click(); return false;">
+                        <button class="menu-btn-nivel3" id="btn-excel">
                           <img src="images/excel.ico" alt="Excel" class="icono"> Archivo EXCEL
-                          <span class="flecha"></span>
-                        </a>
-                        <form action="procesar_excel.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center px-3">
+                        </button>
+                        <form action="procesar_excel.php" method="post" enctype="multipart/form-data">
                           <input type="file" name="archivoExcel" id="archivoExcel" accept=".xls,.xlsx" style="display: none;">
                         </form>
                       </li>
                     </ul>
                   </li>
                   <li>
-                    <a href="">
+                    <button class="menu-btn-nivel2">
                       <img src="images/basedatos.ico" alt="Base de datos" class="icono"> 
                       De una base de datos
-                      <span class="flecha">&#9658;</span>
-                    </a>
+                    </button>
                   </li>
                 </ul>
               </li>
             </ul>
-          </div>
         </div>
-      </div>
+
         <!-- Botones de Ordenación -->
         <div class="BotonesOrdenar">
           <button id="OrdenarAZ">
@@ -425,9 +585,8 @@
               <img src="images/ordenarZA.ico" alt="Ordenar Z-A" class="icono">
               Ordenar Z-A
           </button>
-          
         </div>
-
+      </div>
     </div>
   
   </section>

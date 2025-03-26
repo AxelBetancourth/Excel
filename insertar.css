@@ -1,3 +1,250 @@
 /* ================================
-// Sección insertar (Escribe tu nombre aqui)
-// ================================*/
+   Sección insertar 
+   ================================ */
+
+/* Ocultar los botones de insertar por defecto */
+.insert-btn,
+.menu-container {
+    display: none;
+}
+
+/* Mostrar los botones de insertar solo cuando el submenú insertar está activo */
+#submenu-insertar.submenu.active .insert-btn,
+#submenu-insertar.submenu.active .menu-container {
+    display: flex;
+}
+
+/* Estilos generales para los botones dentro del submenu de insertar */
+#submenu-insertar.submenu {
+    display: none;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    height: 102px;
+    align-items: flex-start;
+}
+
+#submenu-insertar.submenu.active {
+    display: flex;
+}
+
+/* Estilo para los botones de insertar */
+#submenu-insertar .insert-btn {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+    padding: 8px 5px;
+    min-width: 80px;
+    min-height: 70px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+#submenu-insertar .insert-btn:hover {
+    background-color: #e5e5e5;
+    border-color: #b1b1b1;
+}
+
+#submenu-insertar .insert-btn img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 5px;
+}
+
+#submenu-insertar .insert-btn span {
+    font-size: 12px;
+    text-align: center;
+    color: #333;
+}
+
+/* Estilos para los contenedores de menú */
+#submenu-insertar .menu-container {
+    position: relative;
+}
+
+#submenu-insertar .menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #ffffff;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 150px;
+}
+
+/* Solo mostrar menú desplegable al pasar el mouse cuando el submenú insertar está activo */
+#submenu-insertar.active .menu-container:hover .menu {
+    display: block;
+}
+
+/* Estilos para los ítems del menú */
+#submenu-insertar .menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    width: 100%;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    text-align: left;
+}
+
+#submenu-insertar .menu-item:hover {
+    background-color: #f0f0f0;
+}
+
+#submenu-insertar .menu-item img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+/* Estilos para submenús de insertar */
+#submenu-insertar .submenu-item {
+    position: relative;
+}
+
+/* Específicamente para los submenús dentro de submenu-item en el contexto de insertar */
+#submenu-insertar .submenu-item .submenu {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background-color: #ffffff;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    min-width: 150px;
+}
+
+/* Solo mostrar submenú al pasar el mouse cuando el submenú insertar está activo */
+#submenu-insertar.active .submenu-item:hover .submenu {
+    display: block;
+}
+
+/* Estilos para el modal de configuración de gráficos */
+.chart-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.chart-modal-content {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    width: 500px;
+    max-width: 90%;
+}
+
+.chart-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.chart-modal-header h2 {
+    margin: 0;
+    color: #217346;
+    font-size: 18px;
+}
+
+.chart-modal .close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #777;
+}
+
+.chart-modal-body {
+    padding: 20px;
+}
+
+.chart-modal .form-group {
+    margin-bottom: 15px;
+}
+
+.chart-modal .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #555;
+}
+
+.chart-modal .form-group input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+}
+
+.chart-modal .preview-container {
+    margin-top: 20px;
+    border: 1px solid #e0e0e0;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.chart-modal .preview-container label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+#preview-canvas {
+    width: 100%;
+    height: 200px;
+    background-color: #f9f9f9;
+}
+
+.chart-modal-footer {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.chart-modal-footer button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+#create-chart {
+    background-color: #217346;
+    color: white;
+    border: none;
+}
+
+#create-chart:hover {
+    background-color: #3a9e6e;
+}
+
+#cancel-chart {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #d4d4d4;
+}
+
+#cancel-chart:hover {
+    background-color: #e0e0e0;
+}

@@ -211,8 +211,8 @@ th.row-header.selected-header {
     background-color: #ffffff;
     border: 1px solid #ccc;
     border-radius: 50%;
-    width: 20px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     cursor: pointer;
     display: flex;
     align-items: center;

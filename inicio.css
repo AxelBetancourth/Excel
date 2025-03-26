@@ -1,174 +1,156 @@
 /* ================================
 // Sección inicio (Maynor Martinez)
 // ================================*/
-.submenu {
-    display: none;
-  }
-  
-  #submenu-inicio.active {
-    display: flex;
-    gap: 10px;
-    background-color: #f3f3f3;
-    padding: 10px;
-    border-bottom: 1px solid #d4d4d4;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    flex-wrap: nowrap;
-    overflow-x: auto;
-  }
-  
-  .ribbon-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    background-color: #ffffff;
-    border: 1px solid #d4d4d4;
-    border-radius: 4px;
-    padding: 8px;
-    flex-grow: 1;
-    min-width: 150px;
-  }
-  
-  .ribbon-group h3 {
-    font-size: 12px;
-    font-weight: normal;
-    color: #333;
-    margin: 0 0 5px 0;
-    padding: 0;
-    text-align: center;
-    width: 100%;
-  }
-  
-  .ribbon-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    width: 100%;
-  }
-  
-  .ribbon-buttons .fila {
-    display: flex;
-    gap: 5px;
-    width: 100%;
-  }
-  
-  .ribbon-buttons .fila.selectores {
-    display: flex;
-    gap: 5px;
-    width: 100%;
-  }
-  
-  .ribbon-buttons .fila.selectores select {
-    flex-grow: 1;
-  }
-  
-  .ribbon-buttons .fila.selectores select.numero {
-    width: auto;
-  }
-  
-  .ribbon-buttons button {
-    background-color: #ffffff;
-    border: 1px solid #d4d4d4;
-    border-radius: 4px;
-    padding: 6px 8px;
-    font-size: 12px;
-    color: #333;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s, border-color 0.2s;
-    min-width: 30px;
-    height: 30px;
-    position: relative; /* Para posicionar el input de color */
-  }
-  
-  .ribbon-buttons button:hover {
-    background-color: #e5e5e5;
-    border-color: #b1b1b1;
-  }
-  
-  .ribbon-buttons button:active {
-    background-color: #d5d5d5;
-    border-color: #a1a1a1;
-  }
-  
-  .ribbon-buttons button i {
-    font-size: 14px;
-    color: #333;
-  }
-  
-  .ribbon-buttons select {
-    background-color: #ffffff;
-    border: 1px solid #d4d4d4;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 12px;
-    color: #333;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
-    height: 30px;
-  }
-  
-  .ribbon-buttons select.fuente {
-    width: 80px;
-  }
-  
-  .ribbon-buttons select.numero {
-    width: 60px;
-  }
-  
-  .ribbon-buttons select:hover {
-    background-color: #e5e5e5;
-    border-color: #b1b1b1;
-  }
-  
-  .ribbon-group:not(:last-child) {
-    border-right: 1px solid #d4d4d4;
-    padding-right: 10px;
-  }
-  
-  button[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    background-color: #333;
-    color: #fff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    margin-top: 30px;
-    white-space: nowrap;
-    z-index: 1000;
-  }
-  
-  .ribbon-buttons.tres-botones {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 5px;
-  }
-  
-  .ribbon-buttons.cuatro-botones {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 5px;
-  }
-  
-  .ribbon-buttons.alineacion-botones {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 5px;
-  }
-  
-  /* Estilos para los inputs de color (nuevo) */
-  .ribbon-buttons button .color-picker {
-    width: 0;
-    height: 0;
-    padding: 0;
-    border: none;
-    position: absolute;
-    opacity: 0; /* Oculto pero clickable */
-    cursor: pointer;
-  }
+#submenu-inicio.active{
+  display: flex;
+  align-items: flex-start;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.ribbon-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
+  padding: 8px;
+  flex-grow: 1;
+  min-width: 150px;
+}
+
+.ribbon-group h3 {
+  font-size: 12px;
+  font-weight: normal;
+  color: #333;
+  margin: 0 0 5px 0;
+  padding: 0;
+  text-align: center;
+  width: 100%;
+}
+
+.ribbon-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.ribbon-buttons .fila {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+}
+
+.ribbon-buttons .fila.selectores {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+}
+
+.ribbon-buttons .fila.selectores select {
+  flex-grow: 1;
+}
+
+.ribbon-buttons .fila.selectores select.numero {
+  width: auto;
+}
+
+.ribbon-buttons button {
+  background-color: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, border-color 0.2s;
+  min-width: 30px;
+  height: 30px;
+  width: 43px;
+  position: relative;
+  /* Para posicionar el input de color */
+}
+
+.ribbon-buttons button:hover {
+  background-color: #e5e5e5;
+  border-color: #b1b1b1;
+}
+
+.ribbon-buttons button:active {
+  background-color: #d5d5d5;
+  border-color: #a1a1a1;
+}
+
+.ribbon-buttons button i {
+  font-size: 14px;
+  color: #333;
+}
+
+.ribbon-buttons select {
+  background-color: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  height: 30px;
+}
+
+.ribbon-buttons select.fuente {
+  width: 80px;
+}
+
+.ribbon-buttons select.numero {
+  width: 60px;
+}
+
+.ribbon-buttons select:hover {
+  background-color: #e5e5e5;
+  border-color: #b1b1b1;
+}
+
+.ribbon-group:not(:last-child) {
+  border-right: 1px solid #d4d4d4;
+  padding-right: 10px;
+}
+
+.ribbon-buttons.tres-botones {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 5px;
+}
+
+.ribbon-buttons.cuatro-botones {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 5px;
+}
+
+.ribbon-buttons.alineacion-botones {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 5px;
+}
+
+/* Estilos para los inputs de color (nuevo) */
+.ribbon-buttons button .color-picker {
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: none;
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
