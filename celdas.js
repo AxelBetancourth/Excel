@@ -1144,3 +1144,4 @@ document.querySelector('.formula-prefix').addEventListener('click', () => {
 
 renderSpreadsheet();
 
+// Función para ordenar la tabla
