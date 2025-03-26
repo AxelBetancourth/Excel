@@ -248,3 +248,149 @@
 #cancel-chart:hover {
     background-color: #e0e0e0;
 }
+
+/* Estilos para el modal de tabla */
+#table-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+/* Estilos para tablas en la hoja de cálculo */
+.excel-table {
+    border-collapse: collapse;
+}
+
+.excel-table input,
+.excel-table span {
+    border: 1px solid #b8b8b8;
+}
+
+/* Estilos específicos para los bordes de las tablas */
+.table-left input,
+.table-left span {
+    border-left: 2px solid #a0a0a0;
+}
+
+.table-right input,
+.table-right span {
+    border-right: 2px solid #a0a0a0;
+}
+
+.table-header input,
+.table-header span {
+    border-top: 2px solid #a0a0a0;
+}
+
+.table-footer input,
+.table-footer span {
+    border-bottom: 2px solid #a0a0a0;
+}
+
+/* Estilos para la selección de estilo en el modal */
+.table-style-option {
+    transition: all 0.2s ease;
+}
+
+.table-style-option:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.05);
+}
+
+.table-style-option.selected {
+    box-shadow: 0 0 5px rgba(33, 115, 70, 0.5);
+}
+
+/* Estilos para menús desplegables */
+#submenu-insertar .menu.open {
+    display: block !important;
+}
+
+/* Estilos para hover de menús más accesible en dispositivos táctiles */
+@media (hover: hover) {
+    #submenu-insertar.active .menu-container:hover .menu {
+        display: block;
+    }
+}
+
+/* Estilos para menús touchscreen */
+@media (hover: none) {
+    #submenu-insertar .menu {
+        display: none;
+    }
+    
+    #submenu-insertar .menu.open {
+        display: block;
+    }
+}
+
+/* Estilos mejorados para cuadro de texto */
+.excel-text-box {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    word-break: normal;
+    line-height: 1.5;
+    user-select: text;
+    min-width: 250px !important;
+    min-height: 120px !important;
+    padding: 8px !important;
+    border-radius: 2px;
+    background-color: white;
+    overflow: auto !important;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.excel-text-box br {
+    display: block;
+    content: "";
+    margin-top: 0.5em;
+}
+
+.excel-text-box div, 
+.excel-text-box p {
+    margin: 0;
+    padding: 0;
+    white-space: pre-wrap !important;
+}
+
+.active-text-box {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border: 2px solid #217346 !important;
+    z-index: 101;
+}
+
+/* Estilos para los redimensionadores */
+.resizer {
+    position: absolute;
+    width: 12px !important;
+    height: 12px !important;
+    background-color: #217346;
+    border: 1px solid white;
+    border-radius: 50%;
+    z-index: 1001 !important;
+    transition: transform 0.1s;
+}
+
+.resizer:hover {
+    transform: scale(1.2);
+}
+
+.resizer-nw { top: -6px; left: -6px; cursor: nw-resize; }
+.resizer-n { top: -6px; left: calc(50% - 6px); cursor: n-resize; }
+.resizer-ne { top: -6px; right: -6px; cursor: ne-resize; }
+.resizer-e { top: calc(50% - 6px); right: -6px; cursor: e-resize; }
+.resizer-se { bottom: -6px; right: -6px; cursor: se-resize; }
+.resizer-s { bottom: -6px; left: calc(50% - 6px); cursor: s-resize; }
+.resizer-sw { bottom: -6px; left: -6px; cursor: sw-resize; }
+.resizer-w { top: calc(50% - 6px); left: -6px; cursor: w-resize; }
