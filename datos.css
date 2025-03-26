@@ -6,15 +6,34 @@
 
 #submenu-datos.active{
     display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 10px;
+    flex-wrap: nowrap;
+    gap: 0;
+}
+
+/* Estilos para el conjunto de contenedores */
+#submenu-datos .menu-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    border-radius: 4px;
+    overflow: hidden;
 }
 
 /* Estilos básicos para el contenedor */
 #submenu-datos .container {
     position: relative;
     background-color: #ffffff;
+    padding: 10px;
+    width: auto;
     border: 1px solid #d4d4d4;
-    border-radius: 4px;
-    margin-right: 10px;
+    display: inline-block;
+    order: 1;
+    margin-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 /* Estilos para listas y elementos del menú */
@@ -25,21 +44,33 @@
     min-width: 200px;
 }
 
+#submenu-datos > .container > ul {
+    width: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+#submenu-datos > .container > ul > li {
+    position: relative;
+    width: auto;
+}
+
 /* Estilo para los botones del menú */
 #submenu-datos button {
     display: flex;
     align-items: center;
     width: 100%;
     padding: 10px;
-    border: none;
+    border: 1px solid #d4d4d4;
     background: white;
     text-align: left;
     cursor: pointer;
     transition: background-color 0.2s;
+    white-space: nowrap;
 }
 
 #submenu-datos button:hover {
-    background-color: #f0f0f0;
+    background-color: #F0F0F0;
 }
 
 /* Estilos específicos para los botones de nivel 1 */
@@ -58,6 +89,7 @@
     border: 1px solid #ccc;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
     z-index: 1000;
+    min-width: 200px;
 }
 
 /* Clase para mostrar submenús al hacer clic */
@@ -79,6 +111,11 @@
     background-color: #ffffff;
     border: 1px solid #d4d4d4;
     border-radius: 4px;
+    margin-left: 0;
+    order: 2;
+    border-left: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 .BotonesOrdenar button {
@@ -90,6 +127,7 @@
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
+    white-space: nowrap;
 }
 
 .BotonesOrdenar button:hover {

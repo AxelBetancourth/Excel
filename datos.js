@@ -1,6 +1,46 @@
 // Script para manejar la funcionalidad del menú de Datos
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Función para posicionar todos los elementos a la izquierda
+    function moverElementosIzquierda() {
+        // Mover el menú principal a la izquierda
+        const submenuDatos = document.getElementById('submenu-datos');
+        if (submenuDatos) {
+            submenuDatos.style.flexDirection = 'row';
+            submenuDatos.style.justifyContent = 'flex-start';
+            submenuDatos.style.flexWrap = 'nowrap';
+            submenuDatos.style.gap = '0';
+            
+            // Configurar el wrapper
+            const menuWrapper = submenuDatos.querySelector('.menu-wrapper');
+            if (menuWrapper) {
+                menuWrapper.style.display = 'flex';
+                menuWrapper.style.flexDirection = 'row';
+                menuWrapper.style.marginLeft = '10px';
+            }
+            
+            // Mover el contenedor a la izquierda de la página
+            const container = submenuDatos.querySelector('.container');
+            if (container) {
+                container.style.marginRight = '0';
+                container.style.borderTopRightRadius = '0';
+                container.style.borderBottomRightRadius = '0';
+            }
+            
+            // Mover los botones de ordenar junto al contenedor principal
+            const botonesOrdenar = submenuDatos.querySelector('.BotonesOrdenar');
+            if (botonesOrdenar) {
+                botonesOrdenar.style.marginLeft = '0';
+                botonesOrdenar.style.borderLeft = 'none';
+                botonesOrdenar.style.borderTopLeftRadius = '0';
+                botonesOrdenar.style.borderBottomLeftRadius = '0';
+            }
+        }
+    }
+    
+    // Llamar a la función al cargar la página
+    moverElementosIzquierda();
+    
     // Obtener todos los botones del primer nivel
     const botonesNivel1 = document.querySelectorAll('#submenu-datos .menu-btn-nivel1');
     
@@ -25,6 +65,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Mostrar este submenú
                     submenu.classList.add('show');
+                    
+                    // Posicionar a la derecha del botón
+                    submenu.style.left = '100%';
+                    submenu.style.right = 'auto';
                 }
             }
         });
@@ -54,10 +98,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Mostrar este submenú
                     submenu.classList.add('show');
+                    
+                    // Posicionar a la derecha del botón
+                    submenu.style.left = '100%';
+                    submenu.style.right = 'auto';
                 }
             }
         });
     });
+    
+    // Función para ajustar la posición del submenú si se sale de la pantalla
+    function ajustarPosicionSubmenu(submenu) {
+        // Esta función ya no se usa, pero la mantenemos por si se necesita en el futuro
+    }
     
     // Manejar los botones PDF y Excel
     const btnPDF = document.getElementById('btn-pdf');
