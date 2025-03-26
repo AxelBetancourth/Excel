@@ -314,6 +314,9 @@
     </div>
     </div>
 
+
+    
+
     <div id="submenu-insertar" class="submenu">
       <button class="insert-btn" aria-label="Tabla dinámica">
           <img src="images/tabla_dinamica.png" alt="Tabla dinámica">
@@ -482,8 +485,10 @@
       <!-- Opciones de Fórmulas -->
       <div class="toolbar">
           <button class="button">FX<br>
-                            Insertar función</br></button>
-        <button class="button">
+            Insertar función</br>
+          </button>
+
+          <button class="button">
             <span>∑ Autosuma ▼</span>
             <div class="dropdown">
                 <a href="#">Suma</a>
@@ -492,6 +497,7 @@
                 <a href="#">Máx</a>
                 <a href="#">Mín</a>
             </div>
+          </button>
              <!-- Botón Funciones Lógicas con Menú Desplegable -->
              <button class="dropbtn">
               <span>Lógicas ▼</span>
@@ -517,63 +523,58 @@
                     <a href="#">MINUTO</a>
                     <a href="#">SEGUNDO</a>
                 </div>
+              </button>
           </div>
+          </button>
     </div>
     </div>
 
     <div id="submenu-datos" class="submenu">
       <!-- Menú de Datos -->
-      <div class="menu-container">
         <div class="container">
-          <div class="menu">
             <ul>
               <li>
-                <a href="">
+                <button class="menu-btn-nivel1">
                   <img src="images/obtenerdatos.ico" alt="Icono Principal" class="icono"> 
                   Obtener Datos
-                  <span class="flecha"></span>
-                </a>
+                </button>
                 <ul>
                   <li>
-                    <a href="">
-                      <img src="images/archivos.png" alt="Carpeta" class="icono"> 
-                      De un Archivos
-                      <span class="flecha"></span>
-                    </a>
+                    <button class="menu-btn-nivel2">
+                      <img src="images/archivo (1).png" alt="Carpeta" class="icono"> 
+                      De Archivos
+                    </button>
                     <ul>
                       <li>
-                        <a href="#" onclick="document.getElementById('archivoPDF').click(); return false;">
-                          <img src="images/pdf.ico" alt="PDF" class="icono"> Archivo PDF
-                          <span class="flecha"></span>
-                        </a>
-                        <form action="procesar_pdf.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center px-3">
+                        <button class="menu-btn-nivel3" id="btn-pdf">
+                          <img src="images/pdf.png" alt="PDF" class="icono"> Archivo PDF
+                        </button>
+                        <form action="procesar_pdf.php" method="post" enctype="multipart/form-data">
                           <input type="file" name="archivoPDF" id="archivoPDF" accept=".pdf" style="display: none;">
                         </form>
                       </li>
                       <li>
-                        <a href="#" onclick="document.getElementById('archivoExcel').click(); return false;">
+                        <button class="menu-btn-nivel3" id="btn-excel">
                           <img src="images/excel.ico" alt="Excel" class="icono"> Archivo EXCEL
-                          <span class="flecha"></span>
-                        </a>
-                        <form action="procesar_excel.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center px-3">
+                        </button>
+                        <form action="procesar_excel.php" method="post" enctype="multipart/form-data">
                           <input type="file" name="archivoExcel" id="archivoExcel" accept=".xls,.xlsx" style="display: none;">
                         </form>
                       </li>
                     </ul>
                   </li>
                   <li>
-                    <a href="">
+                    <button class="menu-btn-nivel2">
                       <img src="images/basedatos.ico" alt="Base de datos" class="icono"> 
                       De una base de datos
-                      <span class="flecha">&#9658;</span>
-                    </a>
+                    </button>
                   </li>
                 </ul>
               </li>
             </ul>
-          </div>
         </div>
-      </div>
+
+
         <!-- Botones de Ordenación -->
         <div class="BotonesOrdenar">
           <button id="OrdenarAZ">

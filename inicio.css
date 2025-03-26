@@ -1,9 +1,9 @@
 /* ================================
 // Sección inicio (Maynor Martinez)
 // ================================*/
-
-
-#submenu-inicio.active {
+#submenu-inicio.active{
+  display: flex;
+  align-items: flex-start;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   flex-wrap: nowrap;
   overflow-x: auto;
