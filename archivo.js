@@ -51,98 +51,81 @@ document.getElementById('saveFile').addEventListener('click', function() {
   }
   
   const nombreArchivo = nombreInput;
-  const tabla = document.getElementById('spreadsheet');
-// Crear array de datos con formato correcto para Excel
-const datos = [];
-const formulas = {}; // Objeto para almacenar las fórmulas con sus coordenadas en Excel
+  
+  // Crear el libro de trabajo de Excel
+  const wb = XLSX.utils.book_new();
 
-// Extraer los datos de la tabla
-for (let y = 0; y < rows; y++) {
-  const filaDatos = [];
-  for (let x = 0; x < cols; x++) {
-      const celda = state[x][y];
-
-      if (celda.value.startsWith('=')) { // Si es una fórmula
-          filaDatos.push(null); // Insertar una celda vacía
-          const cellRef = XLSX.utils.encode_cell({ c: x, r: y });
-          formulas[cellRef] = celda.value.substring(1); // Quitar '=' y guardar la fórmula
-      } else {
-          filaDatos.push(celda.computedValue);
-      }
-  }
-  datos.push(filaDatos);
-}
-// Crear el libro de trabajo de Excel
-const wb = XLSX.utils.book_new();
-
-// Extraer correctamente los nombres de las hojas desde el DOM
-document.querySelectorAll(".sheet").forEach((sheetElement, index) => {
-  sheets[index].name = sheetElement.textContent.trim(); // Guardamos el nombre correcto en sheets
-});
-
-sheets.forEach((sheet, sheetIndex) => {
-  const datos = [];
-  const sheetName = sheet.name || `Hoja${sheetIndex + 1}`;
-  const formulas = {}; // Objeto para almacenar las fórmulas
-
-  // Limpiar caracteres inválidos en nombres de hojas de Excel
-  const nombreValido = sheetName.replace(/[\[\]:\*\?\/\\]/g, "").trim();
-  if (nombreValido.length > 31) nombreValido = nombreValido.substring(0, 31);
-
-  // Asegurar que la hoja tiene datos válidos
-  if (!sheet.data || !Array.isArray(sheet.data)) return;
-
-  for (let y = 0; y < rows; y++) {
-      const filaDatos = [];
-      for (let x = 0; x < cols; x++) {
-          const celda = sheet.data[x]?.[y] || { value: "", computedValue: "" };
-
-          if (typeof celda.value === "string" && celda.value.startsWith('=')) {
-              filaDatos.push(null); // Dejar la celda vacía
-              const cellRef = XLSX.utils.encode_cell({ c: x, r: y }); 
-              formulas[cellRef] = celda.value.substring(1); // Guardar la fórmula sin '='
-          } else {
-              filaDatos.push(celda.computedValue || "");
-          }
-      }
-      datos.push(filaDatos);
-  }
-
-  // Crear hoja de Excel con los datos
-  const ws = XLSX.utils.aoa_to_sheet(datos);
-
-  // Aplicar manualmente las fórmulas en las celdas correctas
-  Object.keys(formulas).forEach(cellRef => {
-      if (!ws[cellRef]) ws[cellRef] = {}; // Asegurar que la celda existe
-      ws[cellRef].f = formulas[cellRef];  // Asignar la fórmula correctamente
+  // Extraer correctamente los nombres de las hojas desde el DOM
+  document.querySelectorAll(".sheet").forEach((sheetElement, index) => {
+    sheets[index].name = sheetElement.textContent.trim(); // Guardamos el nombre correcto en sheets
   });
 
-  // Añadir la hoja al libro de trabajo con su nombre correcto
-  XLSX.utils.book_append_sheet(wb, ws, nombreValido);
-});
+  // Guardar primero la hoja actual en la estructura de datos
+  sheets[currentSheetIndex].data = state;
 
-// Convertir el libro en binario
-const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: false, type: 'binary' });
+  // Procesar cada hoja
+  sheets.forEach((sheet, sheetIndex) => {
+    const datos = [];
+    const sheetName = sheet.name || `Hoja${sheetIndex + 1}`;
+    const formulas = {}; // Objeto para almacenar las fórmulas
 
-// Convertir el binario a Blob
-const blob = new Blob([stringToArrayBuffer(wbout)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    // Limpiar caracteres inválidos en nombres de hojas de Excel
+    let nombreValido = sheetName.replace(/[\[\]:\*\?\/\\]/g, "").trim();
+    if (nombreValido.length > 31) nombreValido = nombreValido.substring(0, 31);
 
-// Crear un enlace invisible para la descarga
-const enlace = document.createElement('a');
-enlace.href = URL.createObjectURL(blob);
-enlace.download = nombreArchivo + ".xlsx";
+    // Asegurar que la hoja tiene datos válidos
+    if (!sheet.data || !Array.isArray(sheet.data)) return;
 
-// Simular un clic en el enlace para descargar el archivo
-document.body.appendChild(enlace);
-enlace.click();
-document.body.removeChild(enlace);
+    for (let y = 0; y < rows; y++) {
+      const filaDatos = [];
+      for (let x = 0; x < cols; x++) {
+        const celda = sheet.data[x]?.[y] || { value: "", computedValue: "" };
 
+        if (typeof celda.value === "string" && celda.value.startsWith('=')) {
+          filaDatos.push(null); // Dejar la celda vacía para Excel
+          const cellRef = XLSX.utils.encode_cell({ c: x, r: y }); 
+          formulas[cellRef] = celda.value.substring(1); // Guardar la fórmula sin '='
+        } else {
+          filaDatos.push(celda.computedValue || "");
+        }
+      }
+      datos.push(filaDatos);
+    }
+
+    // Crear hoja de Excel con los datos
+    const ws = XLSX.utils.aoa_to_sheet(datos);
+
+    // Aplicar manualmente las fórmulas en las celdas correctas
+    Object.keys(formulas).forEach(cellRef => {
+      if (!ws[cellRef]) ws[cellRef] = {}; // Asegurar que la celda existe
+      ws[cellRef].f = formulas[cellRef]; // Asignar la fórmula correctamente
+    });
+
+    // Añadir la hoja al libro de trabajo con su nombre correcto
+    XLSX.utils.book_append_sheet(wb, ws, nombreValido);
+  });
+
+  // Convertir el libro en binario
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', bookSST: false, type: 'binary' });
+
+  // Convertir el binario a Blob
+  const blob = new Blob([stringToArrayBuffer(wbout)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+  // Crear un enlace invisible para la descarga
+  const enlace = document.createElement('a');
+  enlace.href = URL.createObjectURL(blob);
+  enlace.download = nombreArchivo + ".xlsx";
+
+  // Simular un clic en el enlace para descargar el archivo
+  document.body.appendChild(enlace);
+  enlace.click();
+  document.body.removeChild(enlace);
   
-    // Guardar en archivos recientes
-    agregarArchivoReciente(nombreArchivo + ".xlsx");
-  
-    // Cerrar la ventana modal
-    document.getElementById('saveModal').style.display = 'none';
+  // Guardar en archivos recientes
+  agregarArchivoReciente(nombreArchivo + ".xlsx");
+
+  // Cerrar la ventana modal
+  document.getElementById('saveModal').style.display = 'none';
 });
 
 // Función para convertir string binario a ArrayBuffer
@@ -373,12 +356,18 @@ function exportarHojaCalculo(formato) {
 function exportarTXT(nombreArchivo) {
   let contenidoTXT = [];
   
+  // Garantizar que la hoja actual está guardada en la estructura de datos
+  sheets[currentSheetIndex].data = state;
+  
+  // Obtener los datos de la hoja actual
+  const hojaActual = sheets[currentSheetIndex].data;
+  
   // Recorrer las filas y columnas de la hoja actual
   for (let y = 0; y < rows; y++) {
     let fila = [];
     for (let x = 0; x < cols; x++) {
       // Agregar el valor computado o un texto vacío
-      fila.push(state[x][y].computedValue || "");
+      fila.push(hojaActual[x][y].computedValue || "");
     }
     contenidoTXT.push(fila.join('\t'));  // Usar tabulación como separador
   }
@@ -401,6 +390,12 @@ function exportarTXT(nombreArchivo) {
 
 // Función para exportar a PDF
 function exportarPDF(nombreArchivo) {
+  // Garantizar que la hoja actual está guardada en la estructura de datos
+  sheets[currentSheetIndex].data = state;
+  
+  // Obtener los datos de la hoja actual
+  const hojaActual = sheets[currentSheetIndex].data;
+  
   // Crear un elemento HTML temporal para generar el PDF
   const elemento = document.createElement('div');
   elemento.style.width = '100%';
@@ -445,9 +440,9 @@ function exportarPDF(nombreArchivo) {
     
     // Agregar celdas
     for (let x = 0; x < cols; x++) {
-      if (state[x][y].computedValue !== "") {  // Solo agregar celdas con contenido
+      if (hojaActual[x][y].computedValue !== "") {  // Solo agregar celdas con contenido
         const td = document.createElement('td');
-        td.textContent = state[x][y].computedValue;
+        td.textContent = hojaActual[x][y].computedValue;
         td.style.border = '1px solid #ccc';
         td.style.padding = '8px';
         tr.appendChild(td);
