@@ -121,98 +121,102 @@ function insertarAhora() {
     formulaInput.value = '=AHORA()';
 }
 
-
-
-// Función para insertar el año actual o de una fecha
 function insertarAño() {
     const selectedCells = document.querySelectorAll('.selected');
+   
+    const añoActual = new Date().getFullYear(); // Obtener solo el año actual
     
-    if (selectedCells.length === 1) {
-        // Si hay una celda seleccionada, intentamos extraer una fecha de ella
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = `=AÑO(${selectedCells[0].id})`;
-    } else {
-        // Si no hay celdas seleccionadas o hay más de una
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = '=AÑO(AHORA())';
-    }
+    selectedCells.forEach(celda => {
+        celda.textContent = añoActual; // Insertar el valor visible en la celda
+    });
+
+    // Mostrar la función en la barra de fórmulas
+    const formulaInput = document.getElementById('formula-input');
+    formulaInput.value = '=AÑO(AHORA())';
 }
 
-// Función para insertar el día del mes
 function insertarDia() {
     const selectedCells = document.querySelectorAll('.selected');
+    const diaActual = new Date().getDate();
     
-    if (selectedCells.length === 1) {
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = `=DÍA(${selectedCells[0].id})`;
-    } else {
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = '=DÍA(AHORA())';
-    }
-}
+    selectedCells.forEach(celda => {
+        celda.textContent = diaActual;
+    });
 
-// Función para insertar una fecha específica
-function insertarFecha() {
     const formulaInput = document.getElementById('formula-input');
-    formulaInput.value = '=FECHA(AÑO,MES,DÍA)';
+    formulaInput.value = '=DIA(AHORA())';
 }
 
-// Función para insertar la hora actual
+function insertarFecha() {
+    const selectedCells = document.querySelectorAll('.selected');
+    const fecha = new Date().toLocaleDateString();
+    
+    selectedCells.forEach(celda => {
+        celda.textContent = fecha;
+    });
+
+    const formulaInput = document.getElementById('formula-input');
+    formulaInput.value = '=FECHA(AHORA())';
+}
+
 function insertarHora() {
     const selectedCells = document.querySelectorAll('.selected');
+    const hora = new Date().getHours();
     
-    if (selectedCells.length === 1) {
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = `=HORA(${selectedCells[0].id})`;
-    } else {
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = '=HORA(AHORA())';
-    }
+    selectedCells.forEach(celda => {
+        celda.textContent = hora;
+    });
+
+    const formulaInput = document.getElementById('formula-input');
+    formulaInput.value = '=HORA(AHORA())';
 }
 
-// Función para insertar la fecha actual
 function insertarHoy() {
+    const selectedCells = document.querySelectorAll('.selected');
+    const hoy = new Date().toLocaleDateString();
+    
+    selectedCells.forEach(celda => {
+        celda.textContent = hoy;
+    });
+
     const formulaInput = document.getElementById('formula-input');
     formulaInput.value = '=HOY()';
 }
 
-// Función para insertar el mes
 function insertarMes() {
     const selectedCells = document.querySelectorAll('.selected');
+    const mesActual = new Date().getMonth() + 1; // getMonth() devuelve 0-11
     
-    if (selectedCells.length === 1) {
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = `=MES(${selectedCells[0].id})`;
-    } else {
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = '=MES(AHORA())';
-    }
+    selectedCells.forEach(celda => {
+        celda.textContent = mesActual;
+    });
+
+    const formulaInput = document.getElementById('formula-input');
+    formulaInput.value = '=MES(AHORA())';
 }
 
-// Función para insertar el minuto
 function insertarMinuto() {
     const selectedCells = document.querySelectorAll('.selected');
+    const minutoActual = new Date().getMinutes();
     
-    if (selectedCells.length === 1) {
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = `=MINUTO(${selectedCells[0].id})`;
-    } else {
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = '=MINUTO(AHORA())';
-    }
+    selectedCells.forEach(celda => {
+        celda.textContent = minutoActual;
+    });
+
+    const formulaInput = document.getElementById('formula-input');
+    formulaInput.value = '=MINUTO(AHORA())';
 }
 
-// Función para insertar el segundo
 function insertarSegundo() {
     const selectedCells = document.querySelectorAll('.selected');
+    const segundoActual = new Date().getSeconds();
     
-    if (selectedCells.length === 1) {
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = `=SEGUNDO(${selectedCells[0].id})`;
-    } else {
-        const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = '=SEGUNDO(AHORA())';
-    }
+    selectedCells.forEach(celda => {
+        celda.textContent = segundoActual;
+    });
+
+    const formulaInput = document.getElementById('formula-input');
+    formulaInput.value = '=SEGUNDO(AHORA())';
 }
 
 // Evento para el dropdown de fecha y hora
@@ -259,18 +263,20 @@ function insertarCambiar() {
     const selectedCells = document.querySelectorAll('.selected');
     
     if (selectedCells.length >= 1) {
-        // Si hay al menos una celda seleccionada
         const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = `=CAMBIAR(${selectedCells[0].id},valor_si_verdadero,valor_si_falso)`;
+        formulaInput.value = `=CAMBIAR(${selectedCells[0].id},"valor_si_verdadero","valor_si_falso")`;
     } else {
-        // Si no hay celdas seleccionadas
         const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = '=CAMBIAR(expresión_lógica,valor_si_verdadero,valor_si_falso)';
+        formulaInput.value = '=CAMBIAR(expresión_lógica,"valor_si_verdadero","valor_si_falso")';
     }
 }
 
 // Función para insertar el valor lógico FALSO
 function insertarFalso() {
+    const selectedCells = document.querySelectorAll('.selected');
+    selectedCells.forEach(celda => {
+        celda.textContent = "FALSO";
+    });
     const formulaInput = document.getElementById('formula-input');
     formulaInput.value = '=FALSO()';
 }
@@ -279,12 +285,10 @@ function insertarFalso() {
 function insertarNo() {
     const selectedCells = document.querySelectorAll('.selected');
     
-    if (selectedCells.length === 1) {
-        // Si hay una celda seleccionada
+    if (selectedCells.length >= 1) {
         const formulaInput = document.getElementById('formula-input');
         formulaInput.value = `=NO(${selectedCells[0].id})`;
     } else {
-        // Si no hay celdas seleccionadas o hay más de una
         const formulaInput = document.getElementById('formula-input');
         formulaInput.value = '=NO(valor_lógico)';
     }
@@ -295,15 +299,12 @@ function insertarO() {
     const selectedCells = document.querySelectorAll('.selected');
     
     if (selectedCells.length >= 2) {
-        // Si hay al menos dos celdas seleccionadas
         const celdasIds = Array.from(selectedCells)
             .map(celda => celda.id)
             .join(',');
-            
         const formulaInput = document.getElementById('formula-input');
         formulaInput.value = `=O(${celdasIds})`;
     } else {
-        // Si no hay suficientes celdas seleccionadas
         const formulaInput = document.getElementById('formula-input');
         formulaInput.value = '=O(valor_lógico1,valor_lógico2,...)';
     }
@@ -314,18 +315,20 @@ function insertarSi() {
     const selectedCells = document.querySelectorAll('.selected');
     
     if (selectedCells.length >= 1) {
-        // Si hay al menos una celda seleccionada
         const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = `=SI(${selectedCells[0].id}=condición,valor_si_verdadero,valor_si_falso)`;
+        formulaInput.value = `=SI(${selectedCells[0].id},"valor_si_verdadero","valor_si_falso")`;
     } else {
-        // Si no hay celdas seleccionadas
         const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = '=SI(prueba_lógica,valor_si_verdadero,valor_si_falso)';
+        formulaInput.value = '=SI(prueba_lógica,"valor_si_verdadero","valor_si_falso")';
     }
 }
 
 // Función para insertar el valor lógico VERDADERO
 function insertarVerdadero() {
+    const selectedCells = document.querySelectorAll('.selected');
+    selectedCells.forEach(celda => {
+        celda.textContent = "VERDADERO";
+    });
     const formulaInput = document.getElementById('formula-input');
     formulaInput.value = '=VERDADERO()';
 }
