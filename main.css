@@ -138,3 +138,22 @@ header {
     font-size: 1.2rem;
     color: #217346;
 }
+
+.spreadsheet-container {
+    position: relative;
+    overflow: auto;
+    flex: 1;
+    background: white;
+    z-index: 1;
+}
+
+/* Asegurar que las celdas no interfieran con los cuadros de texto */
+#spreadsheet td {
+    position: relative;
+    z-index: 1;
+}
+
+/* Asegurar que los cuadros de texto estén por encima de las celdas */
+.excel-text-box {
+    z-index: 100;
+}

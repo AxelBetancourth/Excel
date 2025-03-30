@@ -494,313 +494,319 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Funcionalidad para Cuadros de Texto
 document.addEventListener('DOMContentLoaded', function() {
-    // Ahora usamos el ID específico para una selección más precisa
     const textBoxBtn = document.getElementById('text-box-btn');
     const spreadsheetContainer = document.querySelector('.spreadsheet-container');
     
-    // Variable para seguir cuadros de texto activos
     let activeTextBox = null;
-    let isCreatingTextBox = false;
-    let textBoxDragStart = null;
-    let textBoxes = [];
     let nextTextBoxId = 1;
-    
-    // Si existe el botón de cuadro de texto, añadir evento
-    if (textBoxBtn) {
-        console.log('Botón de cuadro de texto encontrado', textBoxBtn);
-        textBoxBtn.addEventListener('click', () => {
-            console.log('Clic en botón de cuadro de texto');
-            // Cambiar cursor para indicar modo de inserción de cuadro de texto
-            spreadsheetContainer.style.cursor = 'crosshair';
-            isCreatingTextBox = true;
+    let isMoving = false;
+    let moveOffset = { x: 0, y: 0 };
+
+    // Función para guardar el estado de un cuadro de texto
+    function getTextBoxState(textBoxContainer) {
+        return {
+            id: textBoxContainer.querySelector('.excel-text-box').id,
+            text: textBoxContainer.querySelector('.excel-text-box').value,
+            left: textBoxContainer.style.left,
+            top: textBoxContainer.style.top,
+            width: textBoxContainer.querySelector('.excel-text-box').style.width || '250px',
+            height: textBoxContainer.querySelector('.excel-text-box').style.height || '120px'
+        };
+    }
+
+    // Función para crear un cuadro de texto desde un estado guardado
+    function createTextBoxFromState(state) {
+        const textBoxContainer = document.createElement('div');
+        textBoxContainer.className = 'text-box-container';
+        textBoxContainer.style.left = state.left;
+        textBoxContainer.style.top = state.top;
+        textBoxContainer.style.position = 'absolute';
+        textBoxContainer.dataset.sheetIndex = currentSheetIndex;
+        
+        // Crear el contenedor del textarea y el botón X
+        const textBoxWrapper = document.createElement('div');
+        textBoxWrapper.className = 'text-box-wrapper';
+        
+        // Añadir botón X interno
+        const closeButton = document.createElement('button');
+        closeButton.className = 'text-box-close-btn';
+        closeButton.innerHTML = 'x';
+        closeButton.title = 'Cerrar cuadro de texto';
+        
+        closeButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            textBoxContainer.remove();
+            if (activeTextBox === textBox) {
+                activeTextBox = null;
+            }
+            // Actualizar los cuadros de texto en la hoja actual
+            saveTextBoxesToSheet();
         });
-    } else {
-        console.error('Botón de cuadro de texto no encontrado');
+        
+        const textBox = document.createElement('textarea');
+        textBox.className = 'excel-text-box';
+        textBox.id = state.id;
+        textBox.value = state.text;
+        textBox.style.width = state.width;
+        textBox.style.height = state.height;
+        textBox.placeholder = 'Escriba su texto aquí...';
+
+        // Agregar los mismos event listeners que en createNewTextBox
+        addTextBoxEventListeners(textBox, textBoxContainer);
+
+        const deleteButton = createDeleteButton(textBoxContainer, textBox);
+        
+        textBoxWrapper.appendChild(closeButton);
+        textBoxWrapper.appendChild(textBox);
+        textBoxContainer.appendChild(textBoxWrapper);
+        textBoxContainer.appendChild(deleteButton);
+        spreadsheetContainer.appendChild(textBoxContainer);
+    }
+
+    // Función para crear el botón de eliminar
+    function createDeleteButton(container, textBox) {
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-text-box';
+        deleteButton.title = 'Eliminar cuadro de texto';
+        
+        deleteButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            container.remove();
+            if (activeTextBox === textBox) {
+                activeTextBox = null;
+            }
+            // Actualizar los cuadros de texto en la hoja actual
+            saveTextBoxesToSheet();
+        });
+
+        return deleteButton;
+    }
+
+    // Función para agregar event listeners a un cuadro de texto
+    function addTextBoxEventListeners(textBox, container) {
+        let isDragging = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+
+        textBox.addEventListener('copy', function(e) {
+            e.stopPropagation();
+        });
+        
+        textBox.addEventListener('paste', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text');
+            const startPos = this.selectionStart;
+            const endPos = this.selectionEnd;
+            this.value = this.value.substring(0, startPos) + text + this.value.substring(endPos);
+            this.selectionStart = this.selectionEnd = startPos + text.length;
+            // Guardar el estado después de pegar
+            saveTextBoxesToSheet();
+        });
+
+        textBox.addEventListener('keydown', function(e) {
+            e.stopPropagation();
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                e.stopPropagation();
+            }
+        });
+
+        textBox.addEventListener('input', function() {
+            // Guardar el estado cuando se modifica el texto
+            saveTextBoxesToSheet();
+        });
+
+        function handleDragStart(e) {
+            if (e.target === textBox && e.target.selectionStart === 0) {
+                isDragging = true;
+                container.classList.add('moving');
+                initialX = e.clientX - container.offsetLeft;
+                initialY = e.clientY - container.offsetTop;
+                setActiveTextBox(textBox);
+            }
+        }
+
+        function handleDragEnd() {
+            if (isDragging) {
+                isDragging = false;
+                container.classList.remove('moving');
+                // Guardar el estado después de mover
+                saveTextBoxesToSheet();
+            }
+        }
+
+        function handleDrag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+
+                const rect = spreadsheetContainer.getBoundingClientRect();
+                const maxX = rect.width - container.offsetWidth;
+                const maxY = rect.height - container.offsetHeight;
+
+                currentX = Math.min(Math.max(0, currentX), maxX);
+                currentY = Math.min(Math.max(0, currentY), maxY);
+
+                container.style.left = `${currentX}px`;
+                container.style.top = `${currentY}px`;
+            }
+        }
+
+        textBox.addEventListener('mousedown', handleDragStart);
+        document.addEventListener('mousemove', handleDrag);
+        document.addEventListener('mouseup', handleDragEnd);
+        
+        textBox.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
     }
     
-    // Evento para crear cuadro de texto al hacer clic en la hoja
-    spreadsheetContainer.addEventListener('mousedown', (e) => {
-        if (!isCreatingTextBox) return;
+    // Función para guardar los cuadros de texto en la hoja actual
+    function saveTextBoxesToSheet() {
+        if (!sheets[currentSheetIndex].textBoxes) {
+            sheets[currentSheetIndex].textBoxes = [];
+        }
         
-        // Obtener posición del clic
-        const rect = spreadsheetContainer.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const textBoxes = document.querySelectorAll(`.text-box-container[data-sheet-index="${currentSheetIndex}"]`);
+        sheets[currentSheetIndex].textBoxes = Array.from(textBoxes).map(getTextBoxState);
+    }
+
+    // Función para cargar los cuadros de texto de una hoja
+    function loadTextBoxesFromSheet() {
+        // Ocultar todos los cuadros de texto existentes
+        document.querySelectorAll('.text-box-container').forEach(container => {
+            if (parseInt(container.dataset.sheetIndex) === currentSheetIndex) {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        });
         
-        // Marcar posición inicial
-        textBoxDragStart = { x, y };
-        
-        // Prevenir selección de celdas durante creación de cuadro de texto
+        // Si la hoja actual no tiene cuadros de texto cargados pero tiene datos guardados, cargarlos
+        if (sheets[currentSheetIndex].textBoxes && 
+            !document.querySelector(`.text-box-container[data-sheet-index="${currentSheetIndex}"]`)) {
+            sheets[currentSheetIndex].textBoxes.forEach(createTextBoxFromState);
+        }
+    }
+
+    // Función para crear un nuevo cuadro de texto
+    function createNewTextBox(e) {
         e.preventDefault();
-    });
-    
-    // Evento para finalizar creación del cuadro de texto
-    spreadsheetContainer.addEventListener('mouseup', (e) => {
-        if (!isCreatingTextBox || !textBoxDragStart) return;
+        e.stopPropagation();
         
-        // Obtener posición final
         const rect = spreadsheetContainer.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2 - 125;
+        const centerY = rect.height / 2 - 60;
         
-        // Calcular dimensiones (asegurar tamaño mínimo)
-        const width = Math.max(Math.abs(x - textBoxDragStart.x), 100);
-        const height = Math.max(Math.abs(y - textBoxDragStart.y), 50);
+        const textBoxContainer = document.createElement('div');
+        textBoxContainer.className = 'text-box-container';
+        textBoxContainer.style.left = `${centerX}px`;
+        textBoxContainer.style.top = `${centerY}px`;
+        textBoxContainer.style.position = 'absolute';
+        textBoxContainer.dataset.sheetIndex = currentSheetIndex;
         
-        // Determinar posición superior izquierda
-        const left = Math.min(textBoxDragStart.x, x);
-        const top = Math.min(textBoxDragStart.y, y);
+        // Crear el contenedor del textarea y el botón X
+        const textBoxWrapper = document.createElement('div');
+        textBoxWrapper.className = 'text-box-wrapper';
         
-        // Crear el cuadro de texto
-        createTextBox(left, top, width, height);
+        // Añadir botón X interno
+        const closeButton = document.createElement('button');
+        closeButton.className = 'text-box-close-btn';
+        closeButton.innerHTML = 'x';
+        closeButton.title = 'Cerrar cuadro de texto';
         
-        // Restablecer estado
-        isCreatingTextBox = false;
-        textBoxDragStart = null;
-        spreadsheetContainer.style.cursor = 'default';
-    });
-    
-    // Crear un cuadro de texto
-    function createTextBox(left, top, width, height) {
-        // Crear elemento
-        const textBox = document.createElement('div');
+        closeButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            textBoxContainer.remove();
+            if (activeTextBox === textBox) {
+                activeTextBox = null;
+            }
+            // Actualizar los cuadros de texto en la hoja actual
+            saveTextBoxesToSheet();
+        });
+        
+        const textBox = document.createElement('textarea');
         const textBoxId = `text-box-${nextTextBoxId++}`;
         
         textBox.className = 'excel-text-box';
         textBox.id = textBoxId;
-        textBox.style.position = 'absolute';
-        textBox.style.left = `${left}px`;
-        textBox.style.top = `${top}px`;
-        // Hacemos el cuadro de texto más grande inicialmente
-        textBox.style.width = `${Math.max(width, 250)}px`;
-        textBox.style.height = `${Math.max(height, 120)}px`;
-        textBox.setAttribute('contenteditable', 'true');
-        textBox.dataset.type = 'textbox';
+        textBox.placeholder = 'Escriba su texto aquí...';
+
+        addTextBoxEventListeners(textBox, textBoxContainer);
         
-        // Prevenir comportamiento no deseado al editar el texto
-        textBox.addEventListener('keydown', function(e) {
-            // Detener la propagación para evitar que otros manejadores interfieran
-            e.stopPropagation();
-        });
+        const deleteButton = createDeleteButton(textBoxContainer, textBox);
         
-        // Prevenir que el evento input cause comportamientos no deseados
-        textBox.addEventListener('input', function(e) {
-            e.stopPropagation();
-        });
+        textBoxWrapper.appendChild(closeButton);
+        textBoxWrapper.appendChild(textBox);
+        textBoxContainer.appendChild(textBoxWrapper);
+        textBoxContainer.appendChild(deleteButton);
+        spreadsheetContainer.appendChild(textBoxContainer);
         
-        // Manejar clics dentro del cuadro para evitar propagación no deseada
-        textBox.addEventListener('click', function(e) {
-            e.stopPropagation();
-            // Asegurar que el cuadro esté activo cuando hacemos clic dentro
-            if (activeTextBox !== textBox) {
-                setActiveTextBox(textBox);
-            }
-        });
-        
-        // Añadir el cuadro de texto al contenedor
-        spreadsheetContainer.appendChild(textBox);
-        
-        // Añadir a la lista de cuadros de texto
-        textBoxes.push(textBox);
-        
-        // Establecer como activo y darle foco
         setActiveTextBox(textBox);
         textBox.focus();
+        
+        // Guardar el nuevo cuadro de texto en la hoja actual
+        saveTextBoxesToSheet();
+        
+        document.querySelectorAll('.menu.open').forEach(menu => {
+            menu.classList.remove('open');
+        });
+    }
+
+    // Configurar el botón de texto
+    if (textBoxBtn) {
+        textBoxBtn.addEventListener('click', createNewTextBox);
     }
     
-    // Eventos para la selección y movimiento de cuadros de texto
-    document.addEventListener('mousedown', (e) => {
-        // Verificar si el clic fue en un cuadro de texto o en un redimensionador
-        const textBox = e.target.closest('.excel-text-box');
-        const resizer = e.target.closest('.resizer');
-        
-        // Si se hizo clic en el redimensionador, no hacer nada aquí
-        if (resizer) {
-            e.preventDefault();
-            e.stopPropagation();
-            return;
-        }
-        
-        // Si se hizo clic en el cuadro de texto
-        if (textBox) {
-            // Verificar si el clic fue cerca del borde para selección
-            const rect = textBox.getBoundingClientRect();
-            const borderWidth = 10; // Ancho sensible del borde para selección
-            
-            const isNearBorder = 
-                e.clientX - rect.left < borderWidth || 
-                rect.right - e.clientX < borderWidth ||
-                e.clientY - rect.top < borderWidth ||
-                rect.bottom - e.clientY < borderWidth;
-            
-            if (isNearBorder) {
-                e.preventDefault();
-                setActiveTextBox(textBox);
-                
-                // Permitir mover el cuadro de texto
-                const startPos = {
-                    x: e.clientX,
-                    y: e.clientY,
-                    left: textBox.offsetLeft,
-                    top: textBox.offsetTop
-                };
-                
-                function onMouseMove(moveEvent) {
-                    moveEvent.preventDefault();
-                    textBox.style.left = `${startPos.left + (moveEvent.clientX - startPos.x)}px`;
-                    textBox.style.top = `${startPos.top + (moveEvent.clientY - startPos.y)}px`;
-                }
-                
-                function onMouseUp() {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-                }
-                
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
-            } else {
-                // Clic en el interior del cuadro para editar
-                setActiveTextBox(textBox);
-                // No hacer nada más, dejar que el comportamiento de edición predeterminado ocurra
-            }
-            return;
-        }
-        
-        // Si se hizo clic fuera de cualquier cuadro de texto
-        if (!textBox && !resizer) {
-            setActiveTextBox(null);
-        }
-    });
-    
-    // Función para establecer un cuadro de texto como activo
     function setActiveTextBox(textBox) {
-        // Desactivar el cuadro activo anterior
         if (activeTextBox) {
             activeTextBox.classList.remove('active-text-box');
-            
-            // Quitar los manejadores de redimensión
-            const resizers = activeTextBox.querySelectorAll('.resizer');
-            resizers.forEach(resizer => {
-                resizer.remove();
-            });
         }
         
-        // Establecer nuevo activo
         activeTextBox = textBox;
         
         if (textBox) {
             textBox.classList.add('active-text-box');
-            
-            // Añadir controles de redimensión
-            setTimeout(() => {
-                addResizers(textBox);
-            }, 10);
         }
     }
     
-    // Añadir manejadores de redimensión a un cuadro de texto
-    function addResizers(textBox) {
-        // Primero eliminamos cualquier redimensionador existente
-        const existingResizers = textBox.querySelectorAll('.resizer');
-        existingResizers.forEach(resizer => resizer.remove());
-        
-        // Posiciones de los redimensionadores
-        const positions = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
-        
-        // Crear y añadir cada redimensionador
-        positions.forEach(pos => {
-            const resizer = document.createElement('div');
-            resizer.className = `resizer resizer-${pos}`;
-            resizer.dataset.position = pos;
-            textBox.appendChild(resizer);
-            
-            // Añadir evento de mousedown específico para cada redimensionador
-            resizer.addEventListener('mousedown', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Asegurar que el evento no se propague a otros elementos
-                const event = e || window.event;
-                event.cancelBubble = true;
-                
-                // Capturar estado inicial de redimensionamiento
-                const startResize = {
-                    x: e.clientX,
-                    y: e.clientY,
-                    width: textBox.offsetWidth,
-                    height: textBox.offsetHeight,
-                    left: textBox.offsetLeft,
-                    top: textBox.offsetTop
-                };
-                
-                // Variables para el seguimiento del ratón
-                let isDragging = true;
-                
-                function onMouseMove(moveEvent) {
-                    if (!isDragging) return;
-                    
-                    moveEvent.preventDefault();
-                    const dx = moveEvent.clientX - startResize.x;
-                    const dy = moveEvent.clientY - startResize.y;
-                    
-                    // Aplicar cambios según la posición del redimensionador
-                    if (pos.includes('e')) {
-                        textBox.style.width = `${Math.max(startResize.width + dx, 120)}px`;
-                    }
-                    if (pos.includes('s')) {
-                        textBox.style.height = `${Math.max(startResize.height + dy, 80)}px`;
-                    }
-                    if (pos.includes('w')) {
-                        const newWidth = Math.max(startResize.width - dx, 120);
-                        textBox.style.width = `${newWidth}px`;
-                        textBox.style.left = `${startResize.left + (startResize.width - newWidth)}px`;
-                    }
-                    if (pos.includes('n')) {
-                        const newHeight = Math.max(startResize.height - dy, 80);
-                        textBox.style.height = `${newHeight}px`;
-                        textBox.style.top = `${startResize.top + (startResize.height - newHeight)}px`;
-                    }
-                }
-                
-                function onMouseUp() {
-                    isDragging = false;
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-                    document.body.style.cursor = ''; // Restaurar cursor
-                }
-                
-                // Cambiar cursor durante el redimensionamiento
-                document.body.style.cursor = window.getComputedStyle(resizer).cursor;
-                
-                // Agregar oyentes a nivel de documento para capturar el movimiento incluso si el mouse se mueve fuera del resizador
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
-            });
-        });
-    }
-    
-    // Eliminar cuadro de texto con Delete
-    document.addEventListener('keydown', (e) => {
-        // Verificar si hay un cuadro de texto activo y que no está en modo edición
-        // (es decir, no tiene el foco de entrada de texto)
+    // Manejar la eliminación de cuadros de texto con teclas
+    document.addEventListener('keydown', function(e) {
         if ((e.key === 'Delete' || e.key === 'Backspace') && 
             activeTextBox && 
             document.activeElement !== activeTextBox) {
-            
-            e.preventDefault();
-            console.log('Eliminando cuadro de texto:', activeTextBox.id);
-            
-            // Eliminar el cuadro de texto
-            activeTextBox.remove();
-            
-            // Actualizar referencia y lista
-            const removedId = activeTextBox.id;
+            const container = activeTextBox.parentElement;
+            container.remove();
             activeTextBox = null;
-            
-            // Actualizar lista de cuadros de texto
-            textBoxes = textBoxes.filter(box => box.id !== removedId);
+            // Actualizar los cuadros de texto en la hoja actual
+            saveTextBoxesToSheet();
         }
     });
+    
+    // Deseleccionar cuadro de texto al hacer clic fuera
+    document.addEventListener('mousedown', function(e) {
+        if (!e.target.closest('.text-box-container')) {
+            setActiveTextBox(null);
+        }
+    });
+
+    // Escuchar el evento de cambio de hoja
+    document.addEventListener('sheetChanged', function() {
+        loadTextBoxesFromSheet();
+    });
+
+    // También cargar cuadros de texto al inicio
+    // Verificamos si está definida la variable global sheets
+    if (typeof sheets !== 'undefined' && sheets.length > 0) {
+        // Asegurarse de que la hoja inicial tenga la propiedad textBoxes
+        if (!sheets[currentSheetIndex].textBoxes) {
+            sheets[currentSheetIndex].textBoxes = [];
+        }
+        loadTextBoxesFromSheet();
+    }
 });
 
 

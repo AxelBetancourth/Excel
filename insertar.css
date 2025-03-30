@@ -333,7 +333,7 @@
 
 /* Estilos mejorados para cuadro de texto */
 .excel-text-box {
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
     word-break: normal;
@@ -341,14 +341,85 @@
     user-select: text;
     min-width: 250px !important;
     min-height: 120px !important;
-    padding: 8px !important;
-    border-radius: 2px;
-    background-color: white;
+    padding: 12px !important;
+    padding-top: 25px !important; /* Espacio para el botón de cierre */
+    border-radius: 4px;
+    background-color: #ffffff;
     overflow: auto !important;
     font-family: Arial, sans-serif;
     font-size: 14px;
-    border: 1px solid #ccc;
+    border: 1px solid #d1d1d1;
     box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    resize: both;
+    cursor: text;
+}
+
+/* Estilos para los cuadros de texto */
+.text-box-container {
+    position: absolute;
+    min-width: 250px;
+    min-height: 120px;
+    z-index: 1000;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.text-box-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+/* Botón de cierre dentro del cuadro de texto */
+.text-box-close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 22px;
+    height: 22px;
+    background-color: #ff4444;
+    color: white;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    transition: all 0.2s ease;
+    opacity: 0.8;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.text-box-close-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    background-color: #ff0000;
+}
+
+.text-box-wrapper:hover .text-box-close-btn {
+    opacity: 1;
+}
+
+.excel-text-box:empty:before {
+    content: attr(placeholder);
+    color: #999;
+    font-style: italic;
+}
+
+.excel-text-box:focus {
+    outline: none;
+    border-color: #217346;
+    box-shadow: 0 0 6px rgba(33, 115, 70, 0.3);
 }
 
 .excel-text-box br {
@@ -365,7 +436,7 @@
 }
 
 .active-text-box {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     border: 2px solid #217346 !important;
     z-index: 101;
 }
@@ -373,8 +444,8 @@
 /* Estilos para los redimensionadores */
 .resizer {
     position: absolute;
-    width: 12px !important;
-    height: 12px !important;
+    width: 8px !important;
+    height: 8px !important;
     background-color: #217346;
     border: 1px solid white;
     border-radius: 50%;
@@ -384,13 +455,15 @@
 
 .resizer:hover {
     transform: scale(1.2);
+    background-color: #1a5c38;
+    cursor: pointer;
 }
 
-.resizer-nw { top: -6px; left: -6px; cursor: nw-resize; }
-.resizer-n { top: -6px; left: calc(50% - 6px); cursor: n-resize; }
-.resizer-ne { top: -6px; right: -6px; cursor: ne-resize; }
-.resizer-e { top: calc(50% - 6px); right: -6px; cursor: e-resize; }
-.resizer-se { bottom: -6px; right: -6px; cursor: se-resize; }
-.resizer-s { bottom: -6px; left: calc(50% - 6px); cursor: s-resize; }
-.resizer-sw { bottom: -6px; left: -6px; cursor: sw-resize; }
-.resizer-w { top: calc(50% - 6px); left: -6px; cursor: w-resize; }
+.resizer-nw { top: -4px; left: -4px; cursor: nw-resize; }
+.resizer-n { top: -4px; left: calc(50% - 4px); cursor: n-resize; }
+.resizer-ne { top: -4px; right: -4px; cursor: ne-resize; }
+.resizer-e { top: calc(50% - 4px); right: -4px; cursor: e-resize; }
+.resizer-se { bottom: -4px; right: -4px; cursor: se-resize; }
+.resizer-s { bottom: -4px; left: calc(50% - 4px); cursor: s-resize; }
+.resizer-sw { bottom: -4px; left: -4px; cursor: sw-resize; }
+.resizer-w { top: calc(50% - 4px); left: -4px; cursor: w-resize; }

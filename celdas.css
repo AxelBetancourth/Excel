@@ -33,6 +33,7 @@
     border: none;
     outline: none;
     font-family: inherit;
+    width: 800px;
 }
 
 /* Área principal (celdas) */
