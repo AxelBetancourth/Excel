@@ -393,5 +393,3 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnOrdenarZA = document.getElementById("OrdenarZA");
 });
 
-
-
