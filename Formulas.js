@@ -106,6 +106,7 @@ document.querySelector('.dropdown').addEventListener('click', function(e) {
 
 // Funciones para fecha y hora
 
+
 // Función para insertar la fecha y hora actual (AHORA)
 function insertarAhora() {
     const selectedCells = document.querySelectorAll('.selected');
@@ -360,4 +361,3 @@ document.querySelector('.dropdown-content').addEventListener('click', function(e
             break;
     }
 });
-

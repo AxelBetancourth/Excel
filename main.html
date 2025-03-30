@@ -23,7 +23,6 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
       }
     </script>
-
 </head>
 <body>
 
@@ -437,19 +436,11 @@
         </div>
       
       
-              <!-- Botón desplegable de Texto -->
-              <div class="menu-container">
-                <button class="insert-btn" data-menu="dropdown-texto" aria-label="Texto">
-                    <img src="images/Texto.png" alt="Texto">
-                    <span>Texto</span>
-                </button>
-                <div class="menu" id="dropdown-texto">
-                    <button class="menu-item" id="text-box-btn">
-                        <img src="images/area-de-texto.png" alt="Cuadro de texto">
-                        <span>Cuadro de texto</span>
-                    </button>
-                </div>
-            </div>
+              <!-- Botón de Texto -->
+              <button class="insert-btn" id="text-box-btn" type="button">
+                  <img src="images/area-de-texto.png" alt="Cuadro de texto">
+                  <span>Cuadro de texto</span>
+              </button>
             
             
             <!-- Botón desplegable de Texto -->
@@ -546,12 +537,6 @@
                         </form>
                       </li>
                     </ul>
-                  </li>
-                  <li>
-                    <button class="menu-btn-nivel2">
-                      <img src="images/basedatos.ico" alt="Base de datos" class="icono"> 
-                      De una base de datos
-                    </button>
                   </li>
                 </ul>
               </li>
