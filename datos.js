@@ -393,3 +393,80 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnOrdenarZA = document.getElementById("OrdenarZA");
 });
 
+
+
+
+
+// Función para mostrar un mensaje de error
+function mostrarMensajeError(mensaje) {
+    alert(mensaje);
+}
+
+// Función para ordenar los datos en el rango seleccionado
+function ordenarRango(orden) {
+    const selectedRangeCells = document.querySelectorAll('td.selected-range');
+
+    if (selectedRangeCells.length === 0) {
+        mostrarMensajeError("Esto no se puede aplicar al rango seleccionado. Seleccione una sola celda de un rango y vuelva a intentarlo.");
+        return;
+    }
+
+    // Obtener las coordenadas del rango seleccionado
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    selectedRangeCells.forEach(cell => {
+        const x = parseInt(cell.dataset.x);
+        const y = parseInt(cell.dataset.y);
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+    });
+
+    // Extraer los valores del rango seleccionado
+    const valores = [];
+    for (let y = minY; y <= maxY; y++) {
+        for (let x = minX; x <= maxX; x++) {
+            const valor = state[x][y].value.trim();
+            if (valor) valores.push({ x, y, valor });
+        }
+    }
+
+    if (valores.length === 0) {
+        mostrarMensajeError("Esto no se puede aplicar al rango seleccionado. Seleccione un rango de celdas con datos y vuelva a intentarlo.");
+        return;
+    }
+
+    // Ordenar los valores alfabéticamente
+    valores.sort((a, b) => {
+        if (orden === 'AZ') {
+            return a.valor.localeCompare(b.valor, 'es', { sensitivity: 'base' });
+        } else if (orden === 'ZA') {
+            return b.valor.localeCompare(a.valor, 'es', { sensitivity: 'base' });
+        }
+    });
+
+    // Actualizar los valores en las celdas del rango seleccionado
+    let index = 0;
+    for (let y = minY; y <= maxY; y++) {
+        for (let x = minX; x <= maxX; x++) {
+            if (index < valores.length) {
+                updateCell(x, y, valores[index].valor);
+                index++;
+            } else {
+                updateCell(x, y, ''); // Limpiar celdas restantes
+            }
+        }
+    }
+}
+
+// Agregar eventos a los botones de ordenación
+const btnOrdenarAZ = document.getElementById("OrdenarAZ");
+const btnOrdenarZA = document.getElementById("OrdenarZA");
+
+if (btnOrdenarAZ) {
+    btnOrdenarAZ.addEventListener("click", () => ordenarRango('AZ'));
+}
+
+if (btnOrdenarZA) {
+    btnOrdenarZA.addEventListener("click", () => ordenarRango('ZA'));
+}
