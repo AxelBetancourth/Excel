@@ -394,3 +394,24 @@
 .resizer-s { bottom: -6px; left: calc(50% - 6px); cursor: s-resize; }
 .resizer-sw { bottom: -6px; left: -6px; cursor: sw-resize; }
 .resizer-w { top: calc(50% - 6px); left: -6px; cursor: w-resize; }
+
+//css adicional para formas
+
+/* Estilos para la forma (cuadrado, círculo, triángulo) */
+.shape {
+  position: relative;
+  cursor: move;
+  border: 2px solid #000;
+  z-index: 1000;
+}
+
+.resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: black;
+  cursor: se-resize;
+}
+
