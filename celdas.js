@@ -14,7 +14,11 @@ let selectedRow = null;
 let activeCell = { x: 0, y: 0 };
 let currentSheetIndex = 0;
 let sheets = [
-	{ name: 'Hoja1', data: [] }
+	{ 
+		name: 'Hoja1', 
+		data: [],
+		textBoxes: [] // Inicializar array de cuadros de texto para la primera hoja
+	}
 ];
 
 let isSelectingRange = false;
@@ -1491,20 +1495,29 @@ document.addEventListener('keydown', (e) => {
   
 
 //Cambia a la hoja especificada por índice.
-
 function switchSheet(index) {
-	sheets[currentSheetIndex].data = state;
+    // Guardar los datos de la hoja actual
+    sheets[currentSheetIndex].data = state;
 
-	// Cambiar a nueva hoja
-	currentSheetIndex = index;
-	state = sheets[currentSheetIndex].data;
+    // Cambiar a nueva hoja
+    currentSheetIndex = index;
+    state = sheets[currentSheetIndex].data;
 
-	// Actualizar clases active
-	document.querySelectorAll('.sheet').forEach((sheet, i) => {
-		sheet.classList.toggle('active', i === index);
-	});
+    // Actualizar clases active
+    document.querySelectorAll('.sheet').forEach((sheet, i) => {
+        sheet.classList.toggle('active', i === index);
+    });
 
-	renderSpreadsheet();
+    // Disparar un evento personalizado para notificar el cambio de hoja
+    const event = new CustomEvent('sheetChanged', { 
+        detail: { 
+            previousIndex: currentSheetIndex,
+            newIndex: index 
+        } 
+    });
+    document.dispatchEvent(event);
+
+    renderSpreadsheet();
 }
 
 // Eventos para cambiar de hoja
@@ -1530,7 +1543,8 @@ document.addEventListener("DOMContentLoaded", function () {
 			name: `Hoja${sheetCount}`,
 			data: range(cols).map(() =>
 				range(rows).map(() => ({ computedValue: "", value: "" }))
-			)
+			),
+			textBoxes: [] // Inicializar el array de cuadros de texto
 		};
 		sheets.push(newSheetData);
 
