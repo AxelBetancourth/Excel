@@ -411,21 +411,43 @@ function initChartFunctionality() {
         }
 
         function drag(e) {
-            if (!isDragging) return;
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
 
-            e.preventDefault();
-            currentX = e.clientX - initialX;
-            currentY = e.clientY - initialY;
+                // Obtener la celda A1 y Z100 para definir los límites
+                const cellA1 = document.querySelector('td[data-x="0"][data-y="0"]');
+                const cellZ100 = document.querySelector(`td[data-x="${cols-1}"][data-y="${rows-1}"]`);
 
-            const container = document.querySelector('.spreadsheet-container');
-            const rect = container.getBoundingClientRect();
-            
-            // Limitar el movimiento dentro del contenedor
-            currentX = Math.max(0, Math.min(currentX, rect.width - element.offsetWidth));
-            currentY = Math.max(0, Math.min(currentY, rect.height - element.offsetHeight));
+                if (!cellA1 || !cellZ100) return;
 
-            element.style.left = currentX + 'px';
-            element.style.top = currentY + 'px';
+                // Obtener los límites exactos del rango de celdas
+                const tableLimits = {
+                    left: cellA1.getBoundingClientRect().left,
+                    top: cellA1.getBoundingClientRect().top,
+                    right: cellZ100.getBoundingClientRect().right,
+                    bottom: cellZ100.getBoundingClientRect().bottom
+                };
+
+                // Obtener el contenedor de la hoja de cálculo
+                const spreadsheetContainer = document.querySelector('.spreadsheet-container');
+                const containerRect = spreadsheetContainer.getBoundingClientRect();
+
+                // Calcular los límites relativos al contenedor
+                const minX = tableLimits.left - containerRect.left + spreadsheetContainer.scrollLeft;
+                const minY = tableLimits.top - containerRect.top + spreadsheetContainer.scrollTop;
+                const maxX = tableLimits.right - containerRect.left + spreadsheetContainer.scrollLeft - element.offsetWidth;
+                const maxY = tableLimits.bottom - containerRect.top + spreadsheetContainer.scrollTop - element.offsetHeight;
+
+                // Restringir el movimiento dentro del rango A1-Z100
+                currentX = Math.max(minX, Math.min(currentX, maxX));
+                currentY = Math.max(minY, Math.min(currentY, maxY));
+
+                // Aplicar las nuevas posiciones
+                element.style.left = `${currentX}px`;
+                element.style.top = `${currentY}px`;
+            }
         }
 
         function dragEnd() {
@@ -1020,13 +1042,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentX = e.clientX - initialX;
                 currentY = e.clientY - initialY;
 
-                const rect = spreadsheetContainer.getBoundingClientRect();
-                const maxX = rect.width - container.offsetWidth;
-                const maxY = rect.height - container.offsetHeight;
+                // Obtener la celda A1 y Z100 para definir los límites
+                const cellA1 = document.querySelector('td[data-x="0"][data-y="0"]');
+                const cellZ100 = document.querySelector(`td[data-x="${cols-1}"][data-y="${rows-1}"]`);
 
-                currentX = Math.min(Math.max(0, currentX), maxX);
-                currentY = Math.min(Math.max(0, currentY), maxY);
+                if (!cellA1 || !cellZ100) return;
 
+                // Obtener los límites exactos del rango de celdas
+                const tableLimits = {
+                    left: cellA1.getBoundingClientRect().left,
+                    top: cellA1.getBoundingClientRect().top,
+                    right: cellZ100.getBoundingClientRect().right,
+                    bottom: cellZ100.getBoundingClientRect().bottom
+                };
+
+                // Obtener el contenedor de la hoja de cálculo
+                const spreadsheetContainer = document.querySelector('.spreadsheet-container');
+                const containerRect = spreadsheetContainer.getBoundingClientRect();
+
+                // Calcular los límites relativos al contenedor
+                const minX = tableLimits.left - containerRect.left + spreadsheetContainer.scrollLeft;
+                const minY = tableLimits.top - containerRect.top + spreadsheetContainer.scrollTop;
+                const maxX = tableLimits.right - containerRect.left + spreadsheetContainer.scrollLeft - container.offsetWidth;
+                const maxY = tableLimits.bottom - containerRect.top + spreadsheetContainer.scrollTop - container.offsetHeight;
+
+                // Restringir el movimiento dentro del rango A1-Z100
+                currentX = Math.max(minX, Math.min(currentX, maxX));
+                currentY = Math.max(minY, Math.min(currentY, maxY));
+
+                // Aplicar las nuevas posiciones
                 container.style.left = `${currentX}px`;
                 container.style.top = `${currentY}px`;
             }
