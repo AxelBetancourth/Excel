@@ -151,6 +151,383 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Funcionalidad para gráficos
+function initChartFunctionality() {
+    const chartModal = document.getElementById('chart-modal');
+    const btnGraficoBarras = document.getElementById('btn-grafico-barras');
+    const btnGraficoLineas = document.getElementById('btn-grafico-lineas');
+    const btnGraficoCircular = document.getElementById('btn-grafico-circular');
+    const createChartBtn = document.getElementById('create-chart');
+    const previewCanvas = document.getElementById('preview-canvas');
+    let currentChartType = '';
+    let previewChart = null;
+
+    // Función para mostrar el modal y limpiar la vista previa
+    function showChartModal(type) {
+        currentChartType = type;
+        chartModal.style.display = 'flex';
+
+        // Limpiar campos y vista previa
+        document.getElementById('chart-title').value = '';
+        document.getElementById('data-range').value = '';
+        clearPreview();
+    }
+
+    // Función para limpiar la vista previa
+    function clearPreview() {
+        if (previewChart) {
+            previewChart.destroy();
+            previewChart = null;
+        }
+        const ctx = previewCanvas.getContext('2d');
+        ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+    }
+
+    // Función para actualizar la vista previa
+    function updatePreview() {
+        const range = document.getElementById('data-range').value;
+        const title = document.getElementById('chart-title').value;
+
+        if (!isValidRange(range)) {
+            console.error('Rango inválido. Asegúrate de ingresar un rango válido como A1:B5.');
+            return;
+        }
+
+        try {
+            const data = getDataFromRange(range);
+            const ctx = previewCanvas.getContext('2d');
+
+            // Limpiar el gráfico previo
+            clearPreview();
+
+            // Crear el nuevo gráfico
+            previewChart = new Chart(ctx, {
+                type: currentChartType,
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: title || 'Datos',
+                        data: data.values,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(255, 206, 86, 0.5)',
+                            'rgba(75, 192, 192, 0.5)',
+                            'rgba(153, 102, 255, 0.5)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: currentChartType === 'pie' ? {} : {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: data.yAxisLabel
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: data.xAxisLabel
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title || 'Vista previa del gráfico'
+                        },
+                        legend: {
+                            display: currentChartType === 'pie',
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error al actualizar la vista previa:', error);
+        }
+    }
+
+    // Función para crear el gráfico en la hoja
+    function createChart() {
+        const range = document.getElementById('data-range').value;
+        const title = document.getElementById('chart-title').value;
+
+        if (!isValidRange(range)) {
+            alert('Por favor, ingrese un rango válido como A1:B5.');
+            return;
+        }
+
+        try {
+            const data = getDataFromRange(range);
+            const chartContainer = document.createElement('div');
+            chartContainer.className = 'chart-container';
+            chartContainer.dataset.sheetIndex = currentSheetIndex; // Asociar con la hoja actual
+            chartContainer.style.position = 'absolute';
+            chartContainer.style.width = '400px';
+            chartContainer.style.height = '300px';
+            chartContainer.style.backgroundColor = 'white';
+            chartContainer.style.padding = '10px';
+            chartContainer.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+            chartContainer.style.cursor = 'move';
+            chartContainer.style.left = '50px';
+            chartContainer.style.top = '50px';
+            chartContainer.style.zIndex = '1000';
+
+            // Contenedor para el canvas
+            const canvasContainer = document.createElement('div');
+            canvasContainer.style.width = '100%';
+            canvasContainer.style.height = '100%';
+            chartContainer.appendChild(canvasContainer);
+
+            const canvas = document.createElement('canvas');
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvasContainer.appendChild(canvas);
+
+            // Botón de cerrar
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '×';
+            closeBtn.className = 'chart-close-btn';
+            closeBtn.style.position = 'absolute';
+            closeBtn.style.right = '5px';
+            closeBtn.style.top = '5px';
+            closeBtn.style.zIndex = '1001';
+            closeBtn.onclick = () => chartContainer.remove();
+            chartContainer.appendChild(closeBtn);
+
+            // Controladores de redimensionamiento
+            const resizers = document.createElement('div');
+            resizers.className = 'resizers';
+            ['nw', 'ne', 'sw', 'se'].forEach(pos => {
+                const handle = document.createElement('div');
+                handle.className = `resizer ${pos}`;
+                resizers.appendChild(handle);
+            });
+            chartContainer.appendChild(resizers);
+
+            document.querySelector('.spreadsheet-container').appendChild(chartContainer);
+
+            // Crear el gráfico
+            new Chart(canvas, {
+                type: currentChartType,
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: title || 'Datos',
+                        data: data.values,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(255, 206, 86, 0.5)',
+                            'rgba(75, 192, 192, 0.5)',
+                            'rgba(153, 102, 255, 0.5)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: currentChartType === 'pie' ? {} : {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: data.yAxisLabel
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: data.xAxisLabel
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title || 'Gráfico'
+                        },
+                        legend: {
+                            display: currentChartType === 'pie',
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Hacer el gráfico arrastrable
+            makeChartDraggable(chartContainer);
+            makeChartResizable(chartContainer);
+
+            // Cerrar el modal después de crear el gráfico
+            chartModal.style.display = 'none';
+        } catch (error) {
+            console.error('Error al crear el gráfico:', error);
+            alert('Error al crear el gráfico. Verifique el rango de datos.');
+        }
+    }
+
+    function makeChartDraggable(element) {
+        let isDragging = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+
+        element.onmousedown = dragStart;
+
+        function dragStart(e) {
+            if (e.target.classList.contains('resizer') || e.target.classList.contains('chart-close-btn')) {
+                return;
+            }
+
+            isDragging = true;
+            initialX = e.clientX - element.offsetLeft;
+            initialY = e.clientY - element.offsetTop;
+
+            document.onmousemove = drag;
+            document.onmouseup = dragEnd;
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+
+            e.preventDefault();
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+
+            const container = document.querySelector('.spreadsheet-container');
+            const rect = container.getBoundingClientRect();
+            
+            // Limitar el movimiento dentro del contenedor
+            currentX = Math.max(0, Math.min(currentX, rect.width - element.offsetWidth));
+            currentY = Math.max(0, Math.min(currentY, rect.height - element.offsetHeight));
+
+            element.style.left = currentX + 'px';
+            element.style.top = currentY + 'px';
+        }
+
+        function dragEnd() {
+            isDragging = false;
+            document.onmousemove = null;
+            document.onmouseup = null;
+        }
+    }
+
+    function makeChartResizable(element) {
+        const resizers = element.querySelectorAll('.resizer');
+        let currentResizer;
+        let isResizing = false;
+        let originalWidth;
+        let originalHeight;
+        let originalX;
+        let originalY;
+        let originalMouseX;
+        let originalMouseY;
+
+        resizers.forEach(resizer => {
+            resizer.addEventListener('mousedown', initResize);
+        });
+
+        function initResize(e) {
+            isResizing = true;
+            currentResizer = e.target;
+
+            originalWidth = parseFloat(element.style.width);
+            originalHeight = parseFloat(element.style.height);
+            originalX = element.offsetLeft;
+            originalY = element.offsetTop;
+            originalMouseX = e.pageX;
+            originalMouseY = e.pageY;
+
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('mouseup', stopResize);
+        }
+
+        function resize(e) {
+            if (!isResizing) return;
+
+            const minSize = 200; // Tamaño mínimo en píxeles
+            let newWidth = originalWidth;
+            let newHeight = originalHeight;
+            let newX = originalX;
+            let newY = originalY;
+
+            const dx = e.pageX - originalMouseX;
+            const dy = e.pageY - originalMouseY;
+
+            if (currentResizer.classList.contains('se')) {
+                newWidth = originalWidth + dx;
+                newHeight = originalHeight + dy;
+            } else if (currentResizer.classList.contains('sw')) {
+                newWidth = originalWidth - dx;
+                newHeight = originalHeight + dy;
+                newX = originalX + dx;
+            } else if (currentResizer.classList.contains('ne')) {
+                newWidth = originalWidth + dx;
+                newHeight = originalHeight - dy;
+                newY = originalY + dy;
+            } else if (currentResizer.classList.contains('nw')) {
+                newWidth = originalWidth - dx;
+                newHeight = originalHeight - dy;
+                newX = originalX + dx;
+                newY = originalY + dy;
+            }
+
+            // Aplicar límites mínimos
+            if (newWidth >= minSize) {
+                element.style.width = newWidth + 'px';
+                if (newX !== originalX) element.style.left = newX + 'px';
+            }
+            if (newHeight >= minSize) {
+                element.style.height = newHeight + 'px';
+                if (newY !== originalY) element.style.top = newY + 'px';
+            }
+        }
+
+        function stopResize() {
+            isResizing = false;
+            document.removeEventListener('mousemove', resize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+    }
+
+    // Event listeners para los botones de gráficos
+    btnGraficoBarras?.addEventListener('click', () => showChartModal('bar'));
+    btnGraficoLineas?.addEventListener('click', () => showChartModal('line'));
+    btnGraficoCircular?.addEventListener('click', () => showChartModal('pie'));
+
+    // Event listener para el rango de datos
+    document.getElementById('data-range')?.addEventListener('input', updatePreview);
+
+    // Event listener para crear el gráfico
+    createChartBtn?.addEventListener('click', createChart);
+}
+
+// Inicializar la funcionalidad de gráficos
+document.addEventListener('DOMContentLoaded', initChartFunctionality);
+
 // Funcionalidad para insertar tablas
 document.addEventListener('DOMContentLoaded', function() {
     const insertTableBtn = document.getElementById('insert-table-btn');
@@ -809,8 +1186,66 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+function getDataFromRange(range) {
+    const [start, end] = range.split(':').map(cell => getCellCoords(cell));
+    const labels = [];
+    const values = [];
+    let xAxisLabel = '';
+    let yAxisLabel = '';
 
-//Desde aqui
+    // Validar que las coordenadas sean válidas
+    if (!start || !end) {
+        throw new Error('Rango inválido. Asegúrate de ingresar un rango válido como A1:B5.');
+    }
+
+    // Determinar si el rango incluye encabezados
+    const hasHeaders = start[1] === 0; // Si la primera fila es un encabezado
+
+    if (hasHeaders) {
+        // Usar la primera fila como etiquetas de los ejes
+        xAxisLabel = state[start[0]][start[1]].computedValue; // Encabezado del eje X
+        yAxisLabel = state[end[0]][start[1]].computedValue; // Encabezado del eje Y
+
+        // Extraer datos desde la segunda fila
+        for (let i = start[1] + 1; i <= end[1]; i++) {
+            const label = state[start[0]][i].computedValue; // Etiqueta del eje X
+            const value = state[end[0]][i].computedValue; // Valor del eje Y
+            if (!isNaN(value)) {
+                labels.push(label);
+                values.push(parseFloat(value));
+            }
+        }
+    } else {
+        // Si no hay encabezados, usar índices como etiquetas
+        for (let i = start[1]; i <= end[1]; i++) {
+            const label = state[start[0]][i].computedValue; // Etiqueta del eje X
+            const value = state[end[0]][i].computedValue; // Valor del eje Y
+            if (!isNaN(value)) {
+                labels.push(label);
+                values.push(parseFloat(value));
+            }
+        }
+        xAxisLabel = 'Eje X';
+        yAxisLabel = 'Eje Y';
+    }
+
+    return { labels, values, xAxisLabel, yAxisLabel };
+}
+
+function isValidRange(range) {
+    return /^[A-Z]+\d+:[A-Z]+\d+$/.test(range);
+}
+
+// Agregar evento para mostrar/ocultar gráficos al cambiar de hoja
+document.addEventListener('sheetChanged', function() {
+    document.querySelectorAll('.chart-container').forEach(container => {
+        if (parseInt(container.dataset.sheetIndex) === currentSheetIndex) {
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    });
+});
 
 
 
