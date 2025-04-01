@@ -237,3 +237,70 @@
   opacity: 0;
   cursor: pointer;
 }
+
+.border-control {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.border-select {
+  background-color: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+  height: 30px;
+  width: 120px;
+}
+
+.border-select:hover {
+  background-color: #e5e5e5;
+}
+
+.border-color-input {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #d4d4d4;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Estilo para celdas con borde */
+.cell-with-border {
+  outline: 2px solid #008000;
+  position: relative;
+  z-index: 1;
+}
+
+.shape {
+    cursor: move;
+    position: absolute;
+    user-select: none;
+}
+
+.shape.moving {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.resize-handle {
+    display: none;
+    z-index: 1002;
+}
+
+.shape:hover .resize-handle {
+    display: block;
+}
+
+.shape-close-btn {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.shape:hover .shape-close-btn {
+    opacity: 1;
+}
