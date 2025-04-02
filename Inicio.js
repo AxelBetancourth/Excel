@@ -54,10 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!value && value !== 0) return 0;
         
         if (typeof value === 'string') {
-            if (/[a-zA-Z]/.test(value)) {
-                return 0;
-            }
+            // Detectamos si es un valor con formato de moneda (comienza con L)
+            const isMoneda = value.trim().startsWith('L');
             
+            // Limpiamos el valor de cualquier formato
             let cleanValue = String(value)
                 .replace(/[L$]/g, '')
                 .replace(/%/g, '')
@@ -225,10 +225,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let rawValue = input.value !== "" ? input.value : span.textContent;
         rawValue = rawValue || '0';
         
-        const containsText = /[a-zA-Z]/.test(rawValue);
         const baseValue = getBaseNumber(rawValue);
-        let originalValue = containsText ? rawValue : baseValue;
+        let originalValue = baseValue;
         let formattedValue = '';
+        
+        const previousFormat = cell.dataset.format || 'General';
         
         switch (format) {
             case 'General':
@@ -253,11 +254,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 break;
             case 'Porcentaje':
-                if (cell.dataset.format === 'Porcentaje') {
-                    formattedValue = formatNumber(originalValue * 100, decimals) + '%';
-                } else {
-                    formattedValue = formatNumber(originalValue, decimals) + '%';
-                    originalValue = originalValue / 100;
+                // Si venimos de un formato moneda o número, mantenemos el valor tal cual
+                if (previousFormat === 'Moneda' || previousFormat === 'Número' || previousFormat === 'General') {
+                    formattedValue = formatNumber(baseValue, decimals) + '%';
+                    originalValue = baseValue / 100; // Guardamos el valor original como decimal
+                } 
+                // Si ya estaba en porcentaje, multiplicamos por 100 para mostrar
+                else if (previousFormat === 'Porcentaje') {
+                    formattedValue = formatNumber(baseValue * 100, decimals) + '%';
+                    originalValue = baseValue;
+                } 
+                // Para cualquier otro formato, comportamiento estándar
+                else {
+                    formattedValue = formatNumber(baseValue, decimals) + '%';
+                    originalValue = baseValue / 100;
                 }
                 break;
             case 'SeparadorMiles':
@@ -581,18 +591,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btnFormatoMoneda.addEventListener('click', () => {
             document.querySelectorAll('.selected-range, .celdailumida').forEach(cell => {
                 applyNumberFormat(cell, 'Moneda');
-                
-                const input = cell.querySelector('input');
-                const span = cell.querySelector('span');
-                if (input && span) {
-                    const baseValue = getBaseNumber(input.value);
-                    const newValue = `L${formatNumber(baseValue, 2)}`;
-                    
-                    input.value = newValue;
-                    span.textContent = newValue;
-                    
-                    cell.style.textAlign = 'right';
-                }
             });
         });
     }
