@@ -284,17 +284,22 @@ document.getElementById("btnNuevo").addEventListener("click", function () {
   // Crear un nombre de archivo único
   let nombreArchivo = "Archivo_" + new Date().toISOString().replace(/[:.-]/g, "_") + ".xlsx";
 
+  // Crear un estado vacío para el nuevo archivo
+  const estadoVacio = range(cols).map(() =>
+    range(rows).map(() => ({ computedValue: "", value: "" }))
+  );
+
+  // Guardar el estado vacío para este archivo
+  localStorage.setItem('file_' + nombreArchivo, JSON.stringify(estadoVacio));
+  
   // Almacenar en archivos recientes
   agregarArchivoReciente(nombreArchivo);
 
-  // Abrir nueva pestaña con main.html pasando el nombre del archivo como parámetro
-  window.open(`main.html?archivo=${encodeURIComponent(nombreArchivo)}`, "_blank");
+  // Abrir nueva pestaña con main.html sin parámetros
+  window.open('main.html', "_blank");
 });
 
 //anadido por CLAUDIO para --> archivo
-
-//AÑADIR MAS HOJAS DE CALCULO, aqui debe de ir el codigo que te eh pedido
-
 
 // Eventos en los botones de la cinta
 tabs.forEach(btn => {
