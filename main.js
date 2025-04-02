@@ -45,6 +45,18 @@ tabs.forEach(btn => {
 	submenuContainer.style.display = 'block';
   });
   
+  // Evento para confirmar antes de recargar o cerrar la página
+  window.addEventListener('beforeunload', function(e) {
+    // Mensaje para mostrar al usuario
+    const mensajeConfirmacion = '¿Estás seguro que deseas salir? Los cambios no guardados se perderán.';
+    
+    // Configurar el mensaje de retorno (requerido para la mayoría de navegadores)
+    e.returnValue = mensajeConfirmacion;
+    
+    // Para compatibilidad con navegadores antiguos
+    return mensajeConfirmacion;
+  });
+  
   // Al cargar la página, se activa la pestaña guardada (o "inicio" por defecto)
   document.addEventListener('DOMContentLoaded', () => {
 	const activeTab = localStorage.getItem('activeTab') || 'inicio';
