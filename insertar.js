@@ -95,42 +95,377 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Manejo de subida de imágenes
-    if (uploadImageBtn && imageInput) {
-        uploadImageBtn.addEventListener('click', () => {
-            imageInput.click();
-        });
-        
-        imageInput.addEventListener('change', handleImageUpload);
+  //Manejo de insertar imagenes
+
+  const spreadsheetContainer = document.querySelector(".spreadsheet-container");
+  const imageInputInsertarImg = document.createElement("input");
+
+  imageInputInsertarImg.type = "file";
+  imageInputInsertarImg.accept = "image/*";
+  imageInputInsertarImg.style.display = "none";
+  document.body.appendChild(imageInputInsertarImg);
+
+  // Evento para abrir el selector de imágenes
+  if (uploadImageBtn && imageInputInsertarImg) {
+    uploadImageBtn.addEventListener("click", () => {
+      imageInputInsertarImg.click();
+    });
+
+    imageInputInsertarImg.addEventListener(
+      "change",
+      handleImageUploadInsertarImg
+    );
+  }
+
+  // Función para insertar la imagen dentro de la hoja de cálculo
+  function insertImageInsideSpreadsheet(imageSrc) {
+    if (!spreadsheetContainer) {
+      alert("No se encontró la hoja de cálculo.");
+      return;
     }
+
+    const imgContainer = document.createElement("div");
+    imgContainer.classList.add('image-container');
+    imgContainer.style.position = "absolute";
+    imgContainer.style.width = "150px";
+    imgContainer.style.height = "150px";
+    imgContainer.style.top = "50px";
+    imgContainer.style.left = "50px";
+    imgContainer.style.border = "2px solid black";
+    imgContainer.style.borderRadius = "5px";
+    imgContainer.style.cursor = "move";
+    imgContainer.style.zIndex = "1000";
+    imgContainer.style.overflow = "hidden";
+    imgContainer.dataset.sheetIndex = currentSheetIndex;
+
+    // Agregar botón de cerrar
+    const closeButton = document.createElement('button');
+    closeButton.className = 'image-close-btn';
+    closeButton.innerHTML = 'x';
+    closeButton.title = 'Eliminar imagen';
     
-    // Función para insertar imágenes
-    function handleImageUpload(event) {
-        const file = event.target.files[0];
-        if (file && file.type.match('image.*')) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                insertImageAtCursor(e.target.result);
-            };
-            
-            reader.readAsDataURL(file);
+    closeButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        imgContainer.remove();
+        saveImagesToSheet();
+    });
+
+    const img = document.createElement("img");
+    img.src = imageSrc;
+    img.style.width = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "cover";
+
+    imgContainer.appendChild(closeButton);
+    imgContainer.appendChild(img);
+    spreadsheetContainer.appendChild(imgContainer);
+
+    makeImageInteractiveInsertarImg(imgContainer);
+    saveImagesToSheet();
+
+    // Ocultar otras imágenes que no sean de esta hoja
+    document.querySelectorAll('.image-container').forEach(container => {
+        if (parseInt(container.dataset.sheetIndex) !== currentSheetIndex) {
+            container.style.display = 'none';
         }
+    });
+  }
+
+  // Función para guardar el estado de la imagen
+  function saveImageToSheet(imgContainer) {
+    if (!sheets[currentSheetIndex].images) {
+        sheets[currentSheetIndex].images = [];
     }
     
-    // Insertar imagen en la celda seleccionada
-    function insertImageAtCursor(imageSrc) {
-        // Aquí se debe implementar la lógica para insertar la imagen en la celda activa
-        console.log('Insertando imagen:', imageSrc);
-        // Esta parte se integrará con la funcionalidad principal de la hoja de cálculo
+    sheets[currentSheetIndex].images.push({
+        src: imgContainer.querySelector('img').src,
+        left: imgContainer.style.left,
+        top: imgContainer.style.top,
+        width: imgContainer.style.width,
+        height: imgContainer.style.height
+    });
+  }
+
+  // Función para cargar las imágenes de una hoja
+  function loadImagesFromSheet() {
+    // Ocultar todas las imágenes existentes
+    document.querySelectorAll('.text-box-container[data-sheet-index]').forEach(container => {
+        if (parseInt(container.dataset.sheetIndex) === currentSheetIndex) {
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    });
+    
+    // Si la hoja actual tiene imágenes guardadas, cargarlas
+    if (sheets[currentSheetIndex].images) {
+        sheets[currentSheetIndex].images.forEach(imageData => {
+            insertImageInsideSpreadsheet(imageData.src);
+        });
+    }
+  }
+
+  // Función para procesar la imagen cargada
+  function handleImageUploadInsertarImg(event) {
+    const file = event.target.files[0];
+    if (file && file.type.match("image.*")) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        insertImageInsideSpreadsheet(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // Función para hacer la imagen interactiva dentro de la hoja de cálculo
+  function makeImageInteractiveInsertarImg(imgContainer) {
+    let offsetX,
+      offsetY,
+      isDragging = false;
+
+    // Permitir mover la imagen
+    imgContainer.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      offsetX = e.clientX - imgContainer.getBoundingClientRect().left;
+      offsetY = e.clientY - imgContainer.getBoundingClientRect().top;
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (isDragging) {
+        const containerRect = spreadsheetContainer.getBoundingClientRect();
+        let newX = e.clientX - containerRect.left - offsetX;
+        let newY = e.clientY - containerRect.top - offsetY;
+
+        // Restringir el movimiento dentro de la hoja de cálculo
+        newX = Math.max(
+          0,
+          Math.min(containerRect.width - imgContainer.clientWidth, newX)
+        );
+        newY = Math.max(
+          0,
+          Math.min(containerRect.height - imgContainer.clientHeight, newY)
+        );
+
+        imgContainer.style.left = `${newX}px`;
+        imgContainer.style.top = `${newY}px`;
+      }
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+
+    // Agregar manejadores de redimensionamiento en las esquinas
+    ["bottom-right", "bottom-left", "top-right", "top-left"].forEach(
+      (corner) => {
+        const resizeHandle = document.createElement("div");
+        resizeHandle.className = `resize-handle ${corner}`;
+        resizeHandle.style.position = "absolute";
+        resizeHandle.style.width = "10px";
+        resizeHandle.style.height = "10px";
+        resizeHandle.style.background = "blue";
+        resizeHandle.style.cursor = `${
+          corner.includes("bottom") ? "ns" : "ew"
+        }-resize`;
+
+        if (corner === "bottom-right") {
+          resizeHandle.style.right = "0";
+          resizeHandle.style.bottom = "0";
+          resizeHandle.style.cursor = "nwse-resize";
+        } else if (corner === "bottom-left") {
+          resizeHandle.style.left = "0";
+          resizeHandle.style.bottom = "0";
+          resizeHandle.style.cursor = "nesw-resize";
+        } else if (corner === "top-right") {
+          resizeHandle.style.right = "0";
+          resizeHandle.style.top = "0";
+          resizeHandle.style.cursor = "nesw-resize";
+        } else if (corner === "top-left") {
+          resizeHandle.style.left = "0";
+          resizeHandle.style.top = "0";
+          resizeHandle.style.cursor = "nwse-resize";
+        }
+
+        imgContainer.appendChild(resizeHandle);
+
+        // Hacer que funcione el redimensionamiento
+        resizeHandle.addEventListener("mousedown", (e) => {
+          e.stopPropagation();
+          let isResizing = true;
+
+          document.addEventListener("mousemove", (e) => {
+            if (isResizing) {
+              let newWidth =
+                e.clientX - imgContainer.getBoundingClientRect().left;
+              let newHeight =
+                e.clientY - imgContainer.getBoundingClientRect().top;
+
+              // Evitar tamaños negativos
+              newWidth = Math.max(50, newWidth);
+              newHeight = Math.max(50, newHeight);
+
+              imgContainer.style.width = `${newWidth}px`;
+              imgContainer.style.height = `${newHeight}px`;
+            }
+          });
+
+          document.addEventListener(
+            "mouseup",
+            () => {
+              isResizing = false;
+            },
+            { once: true }
+          );
+        });
+      }
+    );
+
+    // Agregar menú contextual con opción de cortar
+    imgContainer.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+
+      // Crear cuadro contextual
+      const contextMenu = document.createElement("div");
+      contextMenu.style.position = "absolute";
+      contextMenu.style.top = `${e.clientY}px`;
+      contextMenu.style.left = `${e.clientX}px`;
+      contextMenu.style.background = "#fff";
+      contextMenu.style.border = "1px solid #ccc";
+      contextMenu.style.padding = "5px 10px";
+      contextMenu.style.cursor = "pointer";
+      contextMenu.style.boxShadow = "0px 0px 5px rgba(0,0,0,0.2)";
+      contextMenu.style.zIndex = "2000";
+
+      // Crear icono de tijeras
+      const scissorsIcon = document.createElement("i");
+      scissorsIcon.classList.add("fas", "fa-scissors"); // Font Awesome scissors icon
+      scissorsIcon.style.marginRight = "10px"; // Espacio entre el icono y el texto
+
+      // Crear texto para el contexto
+      const contextText = document.createElement("span");
+      contextText.textContent = "Cortar";
+
+      // Agregar el ícono y el texto al menú
+      contextMenu.appendChild(scissorsIcon);
+      contextMenu.appendChild(contextText);
+
+      document.body.appendChild(contextMenu);
+
+      // Eliminar imagen al hacer clic en "Cortar"
+      contextMenu.addEventListener("click", () => {
+        imgContainer.remove();
+        contextMenu.remove();
+      });
+
+      // Cerrar el menú si se hace clic fuera de él
+      document.addEventListener(
+        "click",
+        () => {
+          contextMenu.remove();
+        },
+        { once: true }
+      );
+    });
+  }
+
+  //fin imagenes
+
+  //Funcion de formas
+  window.insertShape = function (shapeType) {
+    console.log("Insertando forma:", shapeType);
+
+    const insertarForma = document.createElement("div");
+    insertarForma.classList.add("shape");
+    insertarForma.style.position = "absolute"; // Asegura que las formas se posicionen dentro del contenedor
+    insertarForma.style.zIndex = "1000"; // Asegura que las formas estén por encima de las celdas de la tabla
+    insertarForma.dataset.sheetIndex = currentSheetIndex;
+
+    // Agregar botón de cerrar
+    const closeButton = document.createElement('button');
+    closeButton.className = 'shape-close-btn';
+    closeButton.innerHTML = 'x';
+    closeButton.title = 'Eliminar forma';
+    
+    closeButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        insertarForma.remove();
+        saveShapesToSheet();
+    });
+
+    // Definir el tipo de forma
+    if (shapeType === "rect") {
+      insertarForma.style.width = "100px";
+      insertarForma.style.height = "100px";
+      insertarForma.style.backgroundColor = "lightblue";
+    } else if (shapeType === "circle") {
+      insertarForma.style.width = "100px";
+      insertarForma.style.height = "100px";
+      insertarForma.style.borderRadius = "50%";
+      insertarForma.style.backgroundColor = "lightblue";
+    } else if (shapeType === "triangle") {
+      insertarForma.style.width = "0";
+      insertarForma.style.height = "0";
+      insertarForma.style.borderLeft = "50px solid transparent";
+      insertarForma.style.borderRight = "50px solid transparent";
+      insertarForma.style.borderBottom = "100px solid lightblue";
+    }
+
+    insertarForma.appendChild(closeButton);
+    spreadsheetContainer.appendChild(insertarForma);
+
+    // Configurar la posición inicial dentro del contenedor
+    insertarForma.style.top = "50px";
+    insertarForma.style.left = "50px";
+
+    // Hacer la forma interactiva
+    hacerFormaInteractiva(insertarForma, spreadsheetContainer);
+    saveShapesToSheet();
+
+    // Ocultar otras formas que no sean de esta hoja
+    document.querySelectorAll('.shape').forEach(shape => {
+        if (parseInt(shape.dataset.sheetIndex) !== currentSheetIndex) {
+            shape.style.display = 'none';
+        }
+    });
+  };
+
+  // Función para guardar el estado de las formas
+  function saveShapeToSheet(shape, shapeType) {
+    if (!sheets[currentSheetIndex].shapes) {
+        sheets[currentSheetIndex].shapes = [];
     }
     
-    // Función para insertar formas
-    window.insertShape = function(shapeType) {
-        // Aquí se debe implementar la lógica para insertar la forma seleccionada
-        console.log('Insertando forma:', shapeType);
-        // Esta parte se integrará con la funcionalidad principal de la hoja de cálculo
-    };
+    sheets[currentSheetIndex].shapes.push({
+        type: shapeType,
+        left: shape.style.left,
+        top: shape.style.top,
+        width: shape.style.width,
+        height: shape.style.height,
+        backgroundColor: shape.style.backgroundColor
+    });
+  }
+
+  // Función para cargar las formas de una hoja
+  function loadShapesFromSheet() {
+    // Ocultar todas las formas existentes
+    document.querySelectorAll('.shape[data-sheet-index]').forEach(shape => {
+        if (parseInt(shape.dataset.sheetIndex) === currentSheetIndex) {
+            shape.style.display = 'block';
+        } else {
+            shape.style.display = 'none';
+        }
+    });
+    
+    // Si la hoja actual tiene formas guardadas, cargarlas
+    if (sheets[currentSheetIndex].shapes) {
+        sheets[currentSheetIndex].shapes.forEach(shapeData => {
+            insertShape(shapeData.type);
+        });
+    }
+  }
+
+  //fin forma
+
     
     // Crear gráfico con los datos seleccionados
     if (createChart) {
@@ -411,21 +746,43 @@ function initChartFunctionality() {
         }
 
         function drag(e) {
-            if (!isDragging) return;
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
 
-            e.preventDefault();
-            currentX = e.clientX - initialX;
-            currentY = e.clientY - initialY;
+                // Obtener la celda A1 y Z100 para definir los límites
+                const cellA1 = document.querySelector('td[data-x="0"][data-y="0"]');
+                const cellZ100 = document.querySelector(`td[data-x="${cols-1}"][data-y="${rows-1}"]`);
 
-            const container = document.querySelector('.spreadsheet-container');
-            const rect = container.getBoundingClientRect();
-            
-            // Limitar el movimiento dentro del contenedor
-            currentX = Math.max(0, Math.min(currentX, rect.width - element.offsetWidth));
-            currentY = Math.max(0, Math.min(currentY, rect.height - element.offsetHeight));
+                if (!cellA1 || !cellZ100) return;
 
-            element.style.left = currentX + 'px';
-            element.style.top = currentY + 'px';
+                // Obtener los límites exactos del rango de celdas
+                const tableLimits = {
+                    left: cellA1.getBoundingClientRect().left,
+                    top: cellA1.getBoundingClientRect().top,
+                    right: cellZ100.getBoundingClientRect().right,
+                    bottom: cellZ100.getBoundingClientRect().bottom
+                };
+
+                // Obtener el contenedor de la hoja de cálculo
+                const spreadsheetContainer = document.querySelector('.spreadsheet-container');
+                const containerRect = spreadsheetContainer.getBoundingClientRect();
+
+                // Calcular los límites relativos al contenedor
+                const minX = tableLimits.left - containerRect.left + spreadsheetContainer.scrollLeft;
+                const minY = tableLimits.top - containerRect.top + spreadsheetContainer.scrollTop;
+                const maxX = tableLimits.right - containerRect.left + spreadsheetContainer.scrollLeft - element.offsetWidth;
+                const maxY = tableLimits.bottom - containerRect.top + spreadsheetContainer.scrollTop - element.offsetHeight;
+
+                // Restringir el movimiento dentro del rango A1-Z100
+                currentX = Math.max(minX, Math.min(currentX, maxX));
+                currentY = Math.max(minY, Math.min(currentY, maxY));
+
+                // Aplicar las nuevas posiciones
+                element.style.left = `${currentX}px`;
+                element.style.top = `${currentY}px`;
+            }
         }
 
         function dragEnd() {
@@ -1020,13 +1377,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentX = e.clientX - initialX;
                 currentY = e.clientY - initialY;
 
-                const rect = spreadsheetContainer.getBoundingClientRect();
-                const maxX = rect.width - container.offsetWidth;
-                const maxY = rect.height - container.offsetHeight;
+                // Obtener la celda A1 y Z100 para definir los límites
+                const cellA1 = document.querySelector('td[data-x="0"][data-y="0"]');
+                const cellZ100 = document.querySelector(`td[data-x="${cols-1}"][data-y="${rows-1}"]`);
 
-                currentX = Math.min(Math.max(0, currentX), maxX);
-                currentY = Math.min(Math.max(0, currentY), maxY);
+                if (!cellA1 || !cellZ100) return;
 
+                // Obtener los límites exactos del rango de celdas
+                const tableLimits = {
+                    left: cellA1.getBoundingClientRect().left,
+                    top: cellA1.getBoundingClientRect().top,
+                    right: cellZ100.getBoundingClientRect().right,
+                    bottom: cellZ100.getBoundingClientRect().bottom
+                };
+
+                // Obtener el contenedor de la hoja de cálculo
+                const spreadsheetContainer = document.querySelector('.spreadsheet-container');
+                const containerRect = spreadsheetContainer.getBoundingClientRect();
+
+                // Calcular los límites relativos al contenedor
+                const minX = tableLimits.left - containerRect.left + spreadsheetContainer.scrollLeft;
+                const minY = tableLimits.top - containerRect.top + spreadsheetContainer.scrollTop;
+                const maxX = tableLimits.right - containerRect.left + spreadsheetContainer.scrollLeft - container.offsetWidth;
+                const maxY = tableLimits.bottom - containerRect.top + spreadsheetContainer.scrollTop - container.offsetHeight;
+
+                // Restringir el movimiento dentro del rango A1-Z100
+                currentX = Math.max(minX, Math.min(currentX, maxX));
+                currentY = Math.max(minY, Math.min(currentY, maxY));
+
+                // Aplicar las nuevas posiciones
                 container.style.left = `${currentX}px`;
                 container.style.top = `${currentY}px`;
             }
@@ -1245,7 +1624,200 @@ document.addEventListener('sheetChanged', function() {
             container.style.display = 'none';
         }
     });
+    loadImagesFromSheet();
+    loadShapesFromSheet();
 });
+
+// Agregar estos estilos CSS
+const style = document.createElement('style');
+style.textContent = `
+    .image-close-btn, .shape-close-btn {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        width: 20px;
+        height: 20px;
+        background: #fff;
+        border: 1px solid #999;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+    }
+
+    .image-container:hover .image-close-btn,
+    .shape:hover .shape-close-btn {
+        display: flex;
+    }
+
+    .image-container.moving,
+    .shape.moving {
+        opacity: 0.7;
+    }
+`;
+document.head.appendChild(style);
+
+// Agregar evento para el cambio de hojas
+document.addEventListener('sheetChanged', function() {
+    // Manejar visibilidad de imágenes
+    document.querySelectorAll('.image-container').forEach(container => {
+        container.style.display = parseInt(container.dataset.sheetIndex) === currentSheetIndex ? 'block' : 'none';
+    });
+
+    // Manejar visibilidad de formas
+    document.querySelectorAll('.shape').forEach(shape => {
+        shape.style.display = parseInt(shape.dataset.sheetIndex) === currentSheetIndex ? 'block' : 'none';
+    });
+});
+
+// Función para guardar el estado de las imágenes
+function saveImagesToSheet() {
+    if (!sheets[currentSheetIndex].images) {
+        sheets[currentSheetIndex].images = [];
+    }
+    
+    const images = document.querySelectorAll(`.image-container[data-sheet-index="${currentSheetIndex}"]`);
+    sheets[currentSheetIndex].images = Array.from(images).map(container => ({
+        src: container.querySelector('img').src,
+        left: container.style.left,
+        top: container.style.top,
+        width: container.style.width,
+        height: container.style.height
+    }));
+}
+
+// Función para guardar el estado de las formas
+function saveShapesToSheet() {
+    if (!sheets[currentSheetIndex].shapes) {
+        sheets[currentSheetIndex].shapes = [];
+    }
+    
+    const shapes = document.querySelectorAll(`.shape[data-sheet-index="${currentSheetIndex}"]`);
+    sheets[currentSheetIndex].shapes = Array.from(shapes).map(shape => ({
+        type: getShapeType(shape),
+        left: shape.style.left,
+        top: shape.style.top,
+        width: shape.style.width,
+        height: shape.style.height,
+        backgroundColor: shape.style.backgroundColor
+    }));
+}
+
+function getShapeType(shape) {
+    if (shape.style.borderRadius === '50%') return 'circle';
+    if (shape.style.borderLeft) return 'triangle';
+    return 'rect';
+}
+
+function hacerFormaInteractiva(forma, spreadsheetContainer) {
+    let isDragging = false;
+    let currentX;
+    let currentY;
+    let initialX;
+    let initialY;
+
+    forma.addEventListener("mousedown", (e) => {
+        if (e.target.classList.contains('shape-close-btn')) return;
+        
+        isDragging = true;
+        forma.classList.add('moving');
+        initialX = e.clientX - forma.offsetLeft;
+        initialY = e.clientY - forma.offsetTop;
+    });
+
+    document.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+            e.preventDefault();
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+
+            // Obtener la celda A1 y Z100 para definir los límites
+            const cellA1 = document.querySelector('td[data-x="0"][data-y="0"]');
+            const cellZ100 = document.querySelector(`td[data-x="${cols-1}"][data-y="${rows-1}"]`);
+
+            if (!cellA1 || !cellZ100) return;
+
+            // Obtener los límites exactos del rango de celdas
+            const tableLimits = {
+                left: cellA1.getBoundingClientRect().left,
+                top: cellA1.getBoundingClientRect().top,
+                right: cellZ100.getBoundingClientRect().right,
+                bottom: cellZ100.getBoundingClientRect().bottom
+            };
+
+            // Obtener el contenedor de la hoja de cálculo
+            const spreadsheetContainer = document.querySelector('.spreadsheet-container');
+            const containerRect = spreadsheetContainer.getBoundingClientRect();
+
+            // Calcular los límites relativos al contenedor
+            const minX = tableLimits.left - containerRect.left + spreadsheetContainer.scrollLeft;
+            const minY = tableLimits.top - containerRect.top + spreadsheetContainer.scrollTop;
+            const maxX = tableLimits.right - containerRect.left + spreadsheetContainer.scrollLeft - forma.offsetWidth;
+            const maxY = tableLimits.bottom - containerRect.top + spreadsheetContainer.scrollTop - forma.offsetHeight;
+
+            // Restringir el movimiento dentro del rango A1-Z100
+            currentX = Math.max(minX, Math.min(currentX, maxX));
+            currentY = Math.max(minY, Math.min(currentY, maxY));
+
+            // Aplicar las nuevas posiciones
+            forma.style.left = `${currentX}px`;
+            forma.style.top = `${currentY}px`;
+        }
+    });
+
+    document.addEventListener("mouseup", () => {
+        if (isDragging) {
+            isDragging = false;
+            forma.classList.remove('moving');
+            saveShapesToSheet(); // Guardar la nueva posición
+        }
+    });
+
+    // Agregar manejadores de redimensionamiento
+    const resizeHandles = ['se', 'sw', 'ne', 'nw'].map(pos => {
+        const handle = document.createElement('div');
+        handle.className = `resize-handle ${pos}`;
+        handle.style.position = 'absolute';
+        handle.style.width = '10px';
+        handle.style.height = '10px';
+        handle.style.background = '#fff';
+        handle.style.border = '1px solid #999';
+        handle.style.borderRadius = '50%';
+        
+        // Posicionar las manijas de redimensionamiento
+        switch(pos) {
+            case 'se': 
+                handle.style.bottom = '-5px';
+                handle.style.right = '-5px';
+                handle.style.cursor = 'se-resize';
+                break;
+            case 'sw': 
+                handle.style.bottom = '-5px';
+                handle.style.left = '-5px';
+                handle.style.cursor = 'sw-resize';
+                break;
+            case 'ne': 
+                handle.style.top = '-5px';
+                handle.style.right = '-5px';
+                handle.style.cursor = 'ne-resize';
+                break;
+            case 'nw': 
+                handle.style.top = '-5px';
+                handle.style.left = '-5px';
+                handle.style.cursor = 'nw-resize';
+                break;
+        }
+
+        forma.appendChild(handle);
+        return handle;
+    });
+}
+
+
+
 
 
 

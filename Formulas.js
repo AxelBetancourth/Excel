@@ -220,6 +220,18 @@ function insertarSegundo() {
     formulaInput.value = '=SEGUNDO(AHORA())';
 }
 
+function insertarTiempoTranscurrido() {
+    const selectedCells = document.querySelectorAll('.selected');
+    
+    if (selectedCells.length >= 2) {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = `=TIEMPO_TRANSCURRIDO(${selectedCells[0].id},${selectedCells[1].id})`;
+    } else {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = '=TIEMPO_TRANSCURRIDO(A1,B1)';
+    }
+}
+
 // Evento para el dropdown de fecha y hora
 document.querySelector('.dropdown-content-fecha').addEventListener('click', function(e) {
     e.preventDefault(); // Prevenir el comportamiento predeterminado del enlace
@@ -253,6 +265,9 @@ document.querySelector('.dropdown-content-fecha').addEventListener('click', func
             break;
         case 'SEGUNDO':
             insertarSegundo();
+            break;
+        case 'TIEMPO TRANSCURRIDO':
+            insertarTiempoTranscurrido();
             break;
     }
 });
@@ -358,6 +373,92 @@ document.querySelector('.dropdown-content').addEventListener('click', function(e
             break;
         case 'VERDADERO':
             insertarVerdadero();
+            break;
+    }
+});
+
+// Funciones para operaciones de texto
+function insertarConcatenar() {
+    const selectedCells = document.querySelectorAll('.selected');
+    
+    if (selectedCells.length >= 2) {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = `=CONCATENAR(${Array.from(selectedCells).map(celda => celda.id).join(',')})`;
+    } else {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = '=CONCATENAR(texto1,texto2,...)';
+    }
+}
+
+function insertarMayusculas() {
+    const selectedCells = document.querySelectorAll('.selected');
+    
+    if (selectedCells.length >= 1) {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = `=MAYUSCULAS(${selectedCells[0].id})`;
+    } else {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = '=MAYUSCULAS(texto)';
+    }
+}
+
+function insertarMinusculas() {
+    const selectedCells = document.querySelectorAll('.selected');
+    
+    if (selectedCells.length >= 1) {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = `=MINUSCULAS(${selectedCells[0].id})`;
+    } else {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = '=MINUSCULAS(texto)';
+    }
+}
+
+function insertarLargo() {
+    const selectedCells = document.querySelectorAll('.selected');
+    
+    if (selectedCells.length >= 1) {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = `=LARGO(${selectedCells[0].id})`;
+    } else {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = '=LARGO(texto)';
+    }
+}
+
+function insertarReemplazar() {
+    const selectedCells = document.querySelectorAll('.selected');
+    
+    if (selectedCells.length >= 1) {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = `=REEMPLAZAR(${selectedCells[0].id},posición_inicial,número_caracteres,"texto_nuevo")`;
+    } else {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = '=REEMPLAZAR(texto,posición_inicial,número_caracteres,"texto_nuevo")';
+    }
+}
+
+// Evento para el dropdown de texto
+document.querySelector('.dropdown-content-texto').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    const texto = e.target.textContent;
+    
+    switch(texto) {
+        case 'CONCATENAR':
+            insertarConcatenar();
+            break;
+        case 'MAYUSCULAS':
+            insertarMayusculas();
+            break;
+        case 'MINUSCULAS':
+            insertarMinusculas();
+            break;
+        case 'LARGO':
+            insertarLargo();
+            break;
+        case 'REEMPLAZAR':
+            insertarReemplazar();
             break;
     }
 });

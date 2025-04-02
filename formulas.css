@@ -162,3 +162,54 @@
 .dropdown-fecha:hover .dropdown-content-fecha {
     display: block;
 }
+
+.dropdown-texto {
+    background: #f9f9f9;
+    border: 1px solid #d4d4d4;
+    padding: 5px 15px;
+    color: black;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+    position: relative;
+    font-weight: bold;
+    width: auto;
+}
+
+.dropdown-texto:hover {
+    background: #e5e5e5;
+}
+
+.dropdown-content-texto {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #ffffff;
+    border-radius: 5px;
+    width: 160px;
+    border: 1px solid #d4d4d4;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.dropdown-content-texto a {
+    display: block;
+    padding: 8px 12px;
+    color: black;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.dropdown-content-texto a:hover {
+    background: #e5e5e5;
+}
+
+.dropdown-texto:hover .dropdown-content-texto {
+    display: block;
+}
