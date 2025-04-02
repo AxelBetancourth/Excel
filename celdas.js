@@ -745,12 +745,43 @@ function replaceEXTRAE(formula) {
 
 // Función AHORA
 function replaceAHORA(formula) {
+    // Buscar tanto "AHORA()" como "AHORA("
     let index = formula.indexOf("AHORA()");
-    while (index !== -1) {
-        let fechaHora = new Date().toLocaleString();
-        formula = formula.substring(0, index) + `"${fechaHora}"` + formula.substring(index + 7);
-        index = formula.indexOf("AHORA()", index + 1);
+    if (index === -1) {
+        index = formula.indexOf("AHORA(");
     }
+    
+    while (index !== -1) {
+        // Obtener la fecha y hora actual
+        const fechaHora = new Date().toLocaleString();
+        
+        if (formula.substring(index, index + 7) === "AHORA()") {
+            // Si es AHORA() sin argumentos, reemplazar directamente
+            formula = formula.substring(0, index) + `"${fechaHora}"` + formula.substring(index + 7);
+            
+            // Buscar la siguiente ocurrencia
+            index = formula.indexOf("AHORA()", index + 1);
+            if (index === -1) {
+                index = formula.indexOf("AHORA(", index + 1);
+            }
+        } else {
+            // Si es AHORA( con posibles argumentos, encontrar el paréntesis coincidente
+            let startParenIndex = index + 5;
+            let end = findMatchingParen(formula, startParenIndex);
+            
+            if (end === -1) break;
+            
+            // AHORA no toma argumentos, así que ignoramos lo que pueda haber dentro
+            formula = formula.substring(0, index) + `"${fechaHora}"` + formula.substring(end + 1);
+            
+            // Buscar la siguiente ocurrencia
+            index = formula.indexOf("AHORA()", index + 1);
+            if (index === -1) {
+                index = formula.indexOf("AHORA(", index + 1);
+            }
+        }
+    }
+    
     return formula;
 }
 
@@ -762,6 +793,16 @@ function parseDateString(dateStr) {
         dateStr = dateStr.replace(/^"|"$/g, '');
     }
 
+    // Formato específico para la salida de AHORA(): "d/m/yyyy, HH:MM:SS"
+    const ahoraFormat = /(\d{1,2})\/(\d{1,2})\/(\d{4}),\s*(\d{1,2}):(\d{2}):(\d{2})/;
+    const ahoraMatch = dateStr.match(ahoraFormat);
+    if (ahoraMatch) {
+        const [_, day, month, year, hour, minute, second] = ahoraMatch;
+        const date = new Date(year, month - 1, day, hour, minute, second);
+        return date;
+    }
+
+    // Otros formatos...
     const formats = [
         /(\d{1,2})\/(\d{1,2})\/(\d{4}),\s*(\d{1,2}):(\d{2}):(\d{2})\s*(A|P)\.M\./i,
         /(\d{1,2})\/(\d{1,2})\/(\d{4}),\s*(\d{1,2}):(\d{2}):(\d{2})\s*(A|P)M/i,
@@ -777,16 +818,20 @@ function parseDateString(dateStr) {
                 let h = parseInt(hour);
                 if (ampm.toUpperCase() === 'P' && h !== 12) h += 12;
                 if (ampm.toUpperCase() === 'A' && h === 12) h = 0;
-                return new Date(year, month - 1, day, h, minute, second);
+                let result = new Date(year, month - 1, day, h, minute, second);
+                return result;
             } else if (match.length === 4) {
                 const [_, day, month, year] = match;
-                return new Date(year, month - 1, day);
+                let result = new Date(year, month - 1, day);
+                return result;
             }
         }
     }
 
     const date = new Date(dateStr);
-    if (!isNaN(date.getTime())) return date;
+    if (!isNaN(date.getTime())) {
+        return date;
+    }
 
     return null;
 }
@@ -802,7 +847,8 @@ function replaceAÑO(formula) {
         let argumento = inside.trim();
         let fecha;
         
-        if (argumento.toUpperCase() === "AHORA()") {
+        // Comprobar si el argumento es AHORA() de varias formas posibles
+        if (argumento.toUpperCase() === "AHORA()" || argumento.startsWith('"') && argumento.includes("AHORA()")) {
             fecha = new Date();
         } else if (/^[A-Za-z]+\d+$/.test(argumento)) {
             let valor = getCellValue(argumento);
@@ -825,7 +871,7 @@ function replaceAÑO(formula) {
         }
         
         formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-        index = formula.indexOf("AÑO(");
+        index = formula.indexOf("AÑO(", index + 1);
     }
     return formula;
 }
@@ -841,7 +887,8 @@ function replaceMES(formula) {
         let argumento = inside.trim();
         let fecha;
         
-        if (argumento.toUpperCase() === "AHORA()") {
+        // Comprobar si el argumento es AHORA() de varias formas posibles
+        if (argumento.toUpperCase() === "AHORA()" || argumento.startsWith('"') && argumento.includes("AHORA()")) {
             fecha = new Date();
         } else if (/^[A-Za-z]+\d+$/.test(argumento)) {
             let valor = getCellValue(argumento);
@@ -864,7 +911,7 @@ function replaceMES(formula) {
         }
         
         formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-        index = formula.indexOf("MES(");
+        index = formula.indexOf("MES(", index + 1);
     }
     return formula;
 }
@@ -880,7 +927,8 @@ function replaceDIA(formula) {
         let argumento = inside.trim();
         let fecha;
         
-        if (argumento.toUpperCase() === "AHORA()") {
+        // Comprobar si el argumento es AHORA() de varias formas posibles
+        if (argumento.toUpperCase() === "AHORA()" || argumento.startsWith('"') && argumento.includes("AHORA()")) {
             fecha = new Date();
         } else if (/^[A-Za-z]+\d+$/.test(argumento)) {
             let valor = getCellValue(argumento);
@@ -903,7 +951,7 @@ function replaceDIA(formula) {
         }
         
         formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-        index = formula.indexOf("DIA(");
+        index = formula.indexOf("DIA(", index + 1);
     }
     return formula;
 }
@@ -919,7 +967,8 @@ function replaceHORA(formula) {
         let argumento = inside.trim();
         let fecha;
         
-        if (argumento.toUpperCase() === "AHORA()") {
+        // Comprobar si el argumento es AHORA() de varias formas posibles
+        if (argumento.toUpperCase() === "AHORA()" || argumento.startsWith('"') && argumento.includes("AHORA()")) {
             fecha = new Date();
         } else if (/^[A-Za-z]+\d+$/.test(argumento)) {
             let valor = getCellValue(argumento);
@@ -944,7 +993,7 @@ function replaceHORA(formula) {
         }
         
         formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-        index = formula.indexOf("HORA(");
+        index = formula.indexOf("HORA(", index + 1);
     }
     return formula;
 }
@@ -958,11 +1007,37 @@ function replaceMINUTO(formula) {
         
         let inside = formula.substring(index + 7, end);
         let argumento = inside.trim();
-        let fecha;
         
+        let fecha;
+        let replacement;
+        
+        // Caso especial: AHORA() directamente como argumento
         if (argumento.toUpperCase() === "AHORA()") {
-            fecha = new Date();
-        } else if (/^[A-Za-z]+\d+$/.test(argumento)) {
+            // Obtener directamente los minutos actuales
+            let minutos = new Date().getMinutes();
+            replacement = minutos;
+        }
+        // Caso donde AHORA() ya fue reemplazado por su valor en string
+        else if (argumento.startsWith('"') && argumento.includes("/")) {
+            try {
+                // Limpiar comillas si existen
+                if (argumento.startsWith('"') && argumento.endsWith('"')) {
+                    argumento = argumento.substring(1, argumento.length - 1);
+                }
+                
+                fecha = parseDateString(argumento);
+                if (fecha && !isNaN(fecha.getTime())) {
+                    let minutos = fecha.getMinutes();
+                    replacement = minutos;
+                } else {
+                    replacement = "#¡ERROR!";
+                }
+            } catch (e) {
+                replacement = "#¡ERROR!";
+            }
+        }
+        // Caso de referencia a celda
+        else if (/^[A-Za-z]+\d+$/.test(argumento)) {
             let valor = getCellValue(argumento);
             if (valor) {
                 fecha = parseDateString(valor);
@@ -970,23 +1045,33 @@ function replaceMINUTO(formula) {
                     let computedVal = state[letras.indexOf(argumento.match(/[A-Za-z]+/)[0])][parseInt(argumento.match(/\d+/)[0]) - 1].computedValue;
                     fecha = parseDateString(computedVal);
                 }
+                
+                if (fecha && !isNaN(fecha.getTime())) {
+                    let minutos = fecha.getMinutes();
+                    replacement = minutos;
+                } else {
+                    replacement = "#¡ERROR!";
+                }
+            } else {
+                replacement = "#¡ERROR!";
             }
-        } else {
-            fecha = parseDateString(argumento);
         }
-        
-        let replacement;
-        if (fecha && !isNaN(fecha.getTime())) {
-            let minutos = fecha.getMinutes();
-            if (minutos < 10) minutos = "0" + minutos;
-            replacement = minutos;
-        } else {
-            replacement = "#¡ERROR!";
+        // Otros casos
+        else {
+            fecha = parseDateString(argumento);
+            
+            if (fecha && !isNaN(fecha.getTime())) {
+                let minutos = fecha.getMinutes();
+                replacement = minutos;
+            } else {
+                replacement = "#¡ERROR!";
+            }
         }
         
         formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-        index = formula.indexOf("MINUTO(");
+        index = formula.indexOf("MINUTO(", index + 1);
     }
+    
     return formula;
 }
 
@@ -999,11 +1084,37 @@ function replaceSEGUNDO(formula) {
         
         let inside = formula.substring(index + 8, end);
         let argumento = inside.trim();
-        let fecha;
         
+        let fecha;
+        let replacement;
+        
+        // Caso especial: AHORA() directamente como argumento
         if (argumento.toUpperCase() === "AHORA()") {
-            fecha = new Date();
-        } else if (/^[A-Za-z]+\d+$/.test(argumento)) {
+            // Obtener directamente los segundos actuales
+            let segundos = new Date().getSeconds();
+            replacement = segundos;
+        }
+        // Caso donde AHORA() ya fue reemplazado por su valor en string
+        else if (argumento.startsWith('"') && argumento.includes("/")) {
+            try {
+                // Limpiar comillas si existen
+                if (argumento.startsWith('"') && argumento.endsWith('"')) {
+                    argumento = argumento.substring(1, argumento.length - 1);
+                }
+                
+                fecha = parseDateString(argumento);
+                if (fecha && !isNaN(fecha.getTime())) {
+                    let segundos = fecha.getSeconds();
+                    replacement = segundos;
+                } else {
+                    replacement = "#¡ERROR!";
+                }
+            } catch (e) {
+                replacement = "#¡ERROR!";
+            }
+        }
+        // Caso de referencia a celda
+        else if (/^[A-Za-z]+\d+$/.test(argumento)) {
             let valor = getCellValue(argumento);
             if (valor) {
                 fecha = parseDateString(valor);
@@ -1011,23 +1122,33 @@ function replaceSEGUNDO(formula) {
                     let computedVal = state[letras.indexOf(argumento.match(/[A-Za-z]+/)[0])][parseInt(argumento.match(/\d+/)[0]) - 1].computedValue;
                     fecha = parseDateString(computedVal);
                 }
+                
+                if (fecha && !isNaN(fecha.getTime())) {
+                    let segundos = fecha.getSeconds();
+                    replacement = segundos;
+                } else {
+                    replacement = "#¡ERROR!";
+                }
+            } else {
+                replacement = "#¡ERROR!";
             }
-        } else {
-            fecha = parseDateString(argumento);
         }
-        
-        let replacement;
-        if (fecha && !isNaN(fecha.getTime())) {
-            let segundos = fecha.getSeconds();
-            if (segundos < 10) segundos = "0" + segundos;
-            replacement = segundos;
-        } else {
-            replacement = "#¡ERROR!";
+        // Otros casos
+        else {
+            fecha = parseDateString(argumento);
+            
+            if (fecha && !isNaN(fecha.getTime())) {
+                let segundos = fecha.getSeconds();
+                replacement = segundos;
+            } else {
+                replacement = "#¡ERROR!";
+            }
         }
         
         formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-        index = formula.indexOf("SEGUNDO(");
+        index = formula.indexOf("SEGUNDO(", index + 1);
     }
+    
     return formula;
 }
 
@@ -1042,7 +1163,8 @@ function replaceFECHA(formula) {
         let argumento = inside.trim();
         let fecha;
         
-        if (argumento.toUpperCase() === "AHORA()") {
+        // Comprobar si el argumento es AHORA() de varias formas posibles
+        if (argumento.toUpperCase() === "AHORA()" || argumento.startsWith('"') && argumento.includes("AHORA()")) {
             fecha = new Date().toLocaleDateString();
         } else if (/^[A-Za-z]+\d+$/.test(argumento)) {
             let valor = getCellValue(argumento);
@@ -1071,19 +1193,51 @@ function replaceFECHA(formula) {
         }
         
         formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-        index = formula.indexOf("FECHA(");
+        index = formula.indexOf("FECHA(", index + 1);
     }
     return formula;
 }
 
 // Función HOY
 function replaceHOY(formula) {
+    // Buscar tanto "HOY()" como "HOY("
     let index = formula.indexOf("HOY()");
-    while (index !== -1) {
-        let fecha = new Date().toLocaleDateString();
-        formula = formula.substring(0, index) + `"${fecha}"` + formula.substring(index + 5);
-        index = formula.indexOf("HOY()", index + 1);
+    if (index === -1) {
+        index = formula.indexOf("HOY(");
     }
+    
+    while (index !== -1) {
+        // Obtener la fecha actual en formato local
+        const fechaHoy = new Date();
+        const fechaStr = `${fechaHoy.getDate()}/${fechaHoy.getMonth()+1}/${fechaHoy.getFullYear()}`;
+        
+        if (formula.substring(index, index + 5) === "HOY()") {
+            // Si es HOY() sin argumentos, reemplazar directamente
+            formula = formula.substring(0, index) + `"${fechaStr}"` + formula.substring(index + 5);
+            
+            // Buscar la siguiente ocurrencia
+            index = formula.indexOf("HOY()", index + 1);
+            if (index === -1) {
+                index = formula.indexOf("HOY(", index + 1);
+            }
+        } else {
+            // Si es HOY( con posibles argumentos, encontrar el paréntesis coincidente
+            let startParenIndex = index + 3;
+            let end = findMatchingParen(formula, startParenIndex);
+            
+            if (end === -1) break;
+            
+            // HOY no toma argumentos, así que ignoramos lo que pueda haber dentro
+            formula = formula.substring(0, index) + `"${fechaStr}"` + formula.substring(end + 1);
+            
+            // Buscar la siguiente ocurrencia
+            index = formula.indexOf("HOY()", index + 1);
+            if (index === -1) {
+                index = formula.indexOf("HOY(", index + 1);
+            }
+        }
+    }
+    
     return formula;
 }
 
@@ -1225,19 +1379,19 @@ function replaceREEMPLAZAR(formula) {
 
 // Reemplazar funciones reconocidas en la fórmula
 function replaceFunctions(formula) {
-	// Manejar primero RESIDUO antes de que pueda ser alterado por otras funciones
-	if (formula.includes("RESIDUO(") || formula.includes("RESIDU(") || formula.includes("MOD(")) {
-		formula = replaceMOD(formula);
-	}
-	
 	let prev;
 	do {
 		prev = formula;
-		// Primero evaluamos las funciones de fecha y hora
-		formula = replaceAHORA(formula);
-		formula = replaceHOY(formula);
-
-		// Luego las funciones que dependen de fechas
+		
+		// Primero las funciones matemáticas
+		formula = replaceMOD(formula);
+		formula = replaceSUMA(formula);
+		formula = replacePROMEDIO(formula);
+		formula = replaceMAX(formula);
+		formula = replaceMIN(formula);
+		formula = replaceCONTAR(formula);
+		
+		// Luego las funciones de fecha y hora (AHORA ya fue procesado en calculateComputedValue)
 		formula = replaceAÑO(formula);
 		formula = replaceMES(formula);
 		formula = replaceDIA(formula);
@@ -1245,7 +1399,8 @@ function replaceFunctions(formula) {
 		formula = replaceMINUTO(formula);
 		formula = replaceSEGUNDO(formula);
 		formula = replaceFECHA(formula);
-		// formula = replaceTIEMPO_TRANSCURRIDO(formula);
+		formula = replaceHOY(formula);
+		formula = replaceTIEMPO_TRANSCURRIDO(formula);
 
 		// Luego las funciones lógicas básicas
 		formula = replaceVERDADERO(formula);
@@ -1258,68 +1413,65 @@ function replaceFunctions(formula) {
 		formula = replaceSI(formula);
 		formula = replaceCAMBIAR(formula);
 
-		// Finalmente las demás funciones
-		formula = replaceSUMA(formula);
-		formula = replacePROMEDIO(formula);
-		formula = replaceMAX(formula);
-		formula = replaceMIN(formula);
-		formula = replaceEXTRAE(formula);
-		formula = replaceCONTAR(formula);
-
 		// Funciones de texto
-        formula = replaceMAYUSCULAS(formula);
-        formula = replaceMINUSCULAS(formula);
-        formula = replaceLARGO(formula);
-        formula = replaceREEMPLAZAR(formula);
+		formula = replaceMAYUSCULAS(formula);
+		formula = replaceMINUSCULAS(formula);
+		formula = replaceLARGO(formula);
+		formula = replaceREEMPLAZAR(formula);
+		formula = replaceEXTRAE(formula);
+		
+		// Si la fórmula contiene CONCATENAR, procesarla
+		if (formula.includes("CONCATENAR(")) {
+			formula = replaceCONCATENAR(formula);
+		}
 	} while (formula !== prev);
 	
 	return formula;
 }
 
-// Calcular el valor computado a partir de una fórmula
+// Calcular el valor computado de una fórmula
 function calculateComputedValue(value) {
-	const strValue = String(value).trim();
-	if (!strValue) return "";
-
-	if (!strValue.startsWith('=')) {
-		return isNaN(strValue) ? strValue : Number(strValue);
-	}
-
-	let formula = strValue.slice(1).trim();
-	formula = formula.replace(/([A-Za-z]+)\s+\(/g, "$1(");
-	formula = transformFunctionNames(formula);
-
-	const concatRegex = /CONCATENAR\(([^)]+)\)/gi;
-	formula = formula.replace(concatRegex, (match, args) => {
-		const values = args.split(',').map(arg => {
-			if (/^[A-Za-z]+\d+$/.test(arg.trim())) {
-				return `"${getCellValue(arg.trim())}"`;
-			} else if (/^".*"$/.test(arg.trim())) {
-				return arg.trim();
-			} else {
-				return `"${arg.trim()}"`;
+	if (!value) return "";
+	if (typeof value !== "string") return value;
+	
+	if (value.startsWith("=")) {
+		try {
+			let formula = value.substring(1);
+			formula = transformFunctionNames(formula);
+			
+			// Primero reemplazar AHORA() para que esté disponible para otras funciones
+			if (formula.includes("AHORA")) {
+				formula = replaceAHORA(formula);
 			}
-		});
-		return values.join(' + ');
-	});
-
-	formula = replaceFunctions(formula);
-
-	// Reemplazar referencias de celdas
-	formula = formula.replace(/([A-Za-z]+\d+)/gi, match => {
-		const val = getCellValue(match);
-		if (val === "") return 0;
-		if (isNaN(val)) return `"${val}"`;
-		return val;
-	});
-
-	try {
-		const result = eval(formula);
-		if (result === Infinity || result === -Infinity) return "#!DiV/0!";
-		return result === 0 ? "" : result;
-	} catch (error) {
-		return `!ERROR: ${error.message}`;
+			
+			// Luego procesar el resto de las funciones
+			formula = replaceFunctions(formula);
+			
+			// Reemplazar referencias de celda
+			while (formula.match(/[A-Za-z]+\d+/)) {
+				let cellRef = formula.match(/[A-Za-z]+\d+/)[0];
+				let cellValue = getCellValue(cellRef);
+				formula = formula.replace(cellRef, isNaN(cellValue) ? `"${cellValue}"` : cellValue);
+			}
+			
+			// Evaluar la expresión
+			try {
+				let result = eval(formula);
+				
+				if (typeof result === "number") {
+					return Math.round(result * 1000000) / 1000000; // Redondear a 6 decimales
+				}
+				
+				return result;
+			} catch (error) {
+				return formula; // Si no se puede evaluar, devolver la fórmula procesada
+			}
+		} catch (error) {
+			return value; // En caso de error, devolver el valor original
+		}
 	}
+	
+	return value;
 }
 
 // ===== ACTUALIZACIÓN DE CELDAS =====
@@ -1798,3 +1950,88 @@ document.querySelector('.formula-prefix').addEventListener('click', () => {
 
 // Inicializar la hoja de cálculo
 renderSpreadsheet();
+
+function replaceTIEMPO_TRANSCURRIDO(formula) {
+	let index = formula.indexOf("TIEMPO_TRANSCURRIDO(");
+	
+	while (index !== -1) {
+		let startParenIndex = index + 19; // Longitud de "TIEMPO_TRANSCURRIDO("
+		let end = findMatchingParen(formula, startParenIndex);
+		
+		if (end === -1) break;
+		
+		let inside = formula.substring(startParenIndex + 1, end);
+		let args = extractFunctionArguments(inside);
+		
+		if (args.length !== 2) {
+			formula = formula.substring(0, index) + "#¡ERROR: Se requieren dos fechas!" + formula.substring(end + 1);
+			index = formula.indexOf("TIEMPO_TRANSCURRIDO(", index + 1);
+			continue;
+		}
+		
+		let fecha1 = args[0].trim();
+		let fecha2 = args[1].trim();
+		
+		// Verificar si son referencias de celda
+		if (/^[A-Za-z]+\d+$/.test(fecha1)) {
+			fecha1 = getCellValue(fecha1);
+			if (fecha1 === "") {
+				formula = formula.substring(0, index) + "#¡ERROR: Fecha vacía!" + formula.substring(end + 1);
+				index = formula.indexOf("TIEMPO_TRANSCURRIDO(", index + 1);
+				continue;
+			}
+		}
+		
+		if (/^[A-Za-z]+\d+$/.test(fecha2)) {
+			fecha2 = getCellValue(fecha2);
+			if (fecha2 === "") {
+				formula = formula.substring(0, index) + "#¡ERROR: Fecha vacía!" + formula.substring(end + 1);
+				index = formula.indexOf("TIEMPO_TRANSCURRIDO(", index + 1);
+				continue;
+			}
+		}
+		
+		// Eliminar comillas si las hay
+		if (typeof fecha1 === "string" && fecha1.startsWith('"') && fecha1.endsWith('"')) {
+			fecha1 = fecha1.substring(1, fecha1.length - 1);
+		}
+		
+		if (typeof fecha2 === "string" && fecha2.startsWith('"') && fecha2.endsWith('"')) {
+			fecha2 = fecha2.substring(1, fecha2.length - 1);
+		}
+		
+		try {
+			// Convertir a objetos Date
+			let date1 = parseDateString(fecha1);
+			let date2 = parseDateString(fecha2);
+			
+			// Calcular la diferencia en milisegundos
+			let diffMs = Math.abs(date2 - date1);
+			
+			// Convertir a días, meses y años
+			let dias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+			let meses = Math.floor(dias / 30);
+			let años = Math.floor(dias / 365);
+			
+			// Formatear el resultado
+			let resultado = "";
+			if (años > 0) {
+				resultado += `${años} año(s), `;
+				dias = dias % 365;
+			}
+			if (meses > 0) {
+				resultado += `${meses % 12} mes(es), `;
+				dias = dias % 30;
+			}
+			resultado += `${dias} día(s)`;
+			
+			formula = formula.substring(0, index) + `"${resultado}"` + formula.substring(end + 1);
+		} catch (error) {
+			formula = formula.substring(0, index) + `#¡ERROR: ${error.message}` + formula.substring(end + 1);
+		}
+		
+		index = formula.indexOf("TIEMPO_TRANSCURRIDO(", index + 1);
+	}
+	
+	return formula;
+}

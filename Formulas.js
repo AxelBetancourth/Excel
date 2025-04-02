@@ -228,7 +228,7 @@ function insertarTiempoTranscurrido() {
         formulaInput.value = `=TIEMPO_TRANSCURRIDO(${selectedCells[0].id},${selectedCells[1].id})`;
     } else {
         const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = '=TIEMPO_TRANSCURRIDO(A1,B1)';
+        formulaInput.value = '=TIEMPO_TRANSCURRIDO(Tiempo_inicial,Tiempo_final)';
     }
 }
 
