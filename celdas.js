@@ -1,3 +1,4 @@
+// ===== CONSTANTES Y SELECTORES =====
 const $ = el => document.querySelector(el);
 const $$ = el => document.querySelectorAll(el);
 
@@ -9,6 +10,7 @@ const rows = 100;
 const cols = 26;
 const letras = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
+// ===== VARIABLES DE ESTADO =====
 let selectedColumn = null;
 let selectedRow = null;
 let activeCell = { x: 0, y: 0 };
@@ -17,7 +19,7 @@ let sheets = [
 	{ 
 		name: 'Hoja1', 
 		data: [],
-		textBoxes: [] // Inicializar array de cuadros de texto para la primera hoja
+		textBoxes: []
 	}
 ];
 
@@ -25,6 +27,7 @@ let isSelectingRange = false;
 let selectionStart = null;
 let selectionEnd = null;
 
+// ===== FUNCIONES UTILITARIAS =====
 const range = length => Array.from({ length }, (_, i) => i);
 const rangeChar = length => letras.slice(0, length);
 
@@ -37,7 +40,7 @@ sheets.forEach(sheet => {
 
 let state = sheets[currentSheetIndex].data;
 
-//Renderiza la hoja de excel
+// ===== INICIALIZACIÓN DE LA HOJA =====
 document.addEventListener("DOMContentLoaded", function () {
 	const params = new URLSearchParams(window.location.search);
 	const archivo = params.get("archivo");
@@ -51,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 });
 
+// Renderización de la hoja de cálculo
 const renderSpreadsheet = () => {
 	const headerHTML = `<tr>
         <th></th>
@@ -76,7 +80,9 @@ const renderSpreadsheet = () => {
 	$table.appendChild($body);
 };
 
-//Convierte una referencia de celda en coordenadas [columna, fila]
+// ===== FUNCIONES DE REFERENCIA DE CELDAS =====
+
+// Convertir referencia a coordenadas
 function getCellCoords(ref) {
 	ref = ref.toUpperCase();
 	const letter = ref.match(/[A-Z]+/)[0];
@@ -84,7 +90,7 @@ function getCellCoords(ref) {
 	return [letras.indexOf(letter), parseInt(number) - 1];
 }
 
-//Obtiene el valor calculado de una celda mediante su referencia
+// Obtener valor de celda
 function getCellValue(ref) {
 	try {
 		const [x, y] = getCellCoords(ref);
@@ -94,7 +100,9 @@ function getCellValue(ref) {
 	}
 }
 
-//Transforma los nombres de las funciones a mayúsculas (solo fuera de comillas)
+// ===== FUNCIONES PARA ANÁLISIS DE FÓRMULAS =====
+
+// Transformar nombres a mayúsculas
 function transformFunctionNames(formula) {
 	const parts = formula.split(/(".*?")/);
 	for (let i = 0; i < parts.length; i++) {
@@ -105,9 +113,9 @@ function transformFunctionNames(formula) {
 	return parts.join('');
 }
 
-//Devuelve el índice de la llave de cierre que hace match con la apertura en startIndex
+// Encontrar paréntesis coincidente
 function findMatchingParen(str, startIndex) {
-	let count = 1; // Empezamos en 1 porque ya estamos después del primer paréntesis abierto
+	let count = 1;
 	for (let i = startIndex + 1; i < str.length; i++) {
 	  if (str[i] === '(') count++;
 	  else if (str[i] === ')') {
@@ -118,9 +126,8 @@ function findMatchingParen(str, startIndex) {
 	return -1;
 }
 
-//Extrae los argumentos de una función ignorando comas dentro de paréntesis o comillas
+// Extraer argumentos de función
 function extractFunctionArguments(str) {
-	// Determinar el delimitador (punto y coma o coma)
 	const delimiter = str.includes(";") ? ";" : ",";
 	let args = [];
 	let current = "";
@@ -130,19 +137,16 @@ function extractFunctionArguments(str) {
 	for (let i = 0; i < str.length; i++) {
 	  let char = str[i];
 	  
-	  // Manejar comillas (para cadenas de texto)
 	  if (char === '"' && (i === 0 || str[i - 1] !== '\\')) {
 		inQuote = !inQuote;
 	  }
 	  
-	  // Si encontramos un delimitador y no estamos dentro de comillas o paréntesis anidados
 	  if (!inQuote && char === delimiter && count === 0) {
 		args.push(current.trim());
 		current = "";
 		continue;
 	  }
 	  
-	  // Contar paréntesis para funciones anidadas
 	  if (!inQuote) {
 		if (char === '(') count++;
 		if (char === ')') count--;
@@ -151,7 +155,6 @@ function extractFunctionArguments(str) {
 	  current += char;
 	}
 	
-	// Añadir el último argumento
 	if (current.trim() !== "") {
 	  args.push(current.trim());
 	}
@@ -159,73 +162,75 @@ function extractFunctionArguments(str) {
 	return args;
 }
 
-//Funcion mod o residuo
+// ===== FUNCIONES MATEMÁTICAS =====
+
+// Función MOD/RESIDUO
 function replaceMOD(formula) {
 	let index = formula.indexOf("RESIDUO(");
+	
 	while (index !== -1) {
-		let end = findMatchingParen(formula, index + 7);
+		let funcName = "";
+		if (formula.substring(index, index + 8) === "RESIDUO(") {
+			funcName = "RESIDUO";
+		}
+		
+		let startParenIndex = index + funcName.length;
+		let end = findMatchingParen(formula, startParenIndex);
+		
 		if (end === -1) break;
-		let inside = formula.substring(index + 8, end);
+		
+		let inside = formula.substring(startParenIndex + 1, end);
 		let args = extractFunctionArguments(inside);
-		if (args.length !== 2) break;
-		args = args.map(arg => replaceFunctions(arg));
-		let replacement = `(${args[0]}) % (${args[1]})`;
-		formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-		index = formula.indexOf("RESIDUO(");
+		
+		if (args.length !== 2) {
+			formula = formula.substring(0, index) + "#¡ERROR!" + formula.substring(end + 1);
+			// Buscar la siguiente aparición
+			let nextIndex = Math.min(
+				formula.indexOf("RESIDUO(", index + 1) !== -1 ? formula.indexOf("RESIDUO(", index + 1) : Infinity,
+				formula.indexOf("RESIDU(", index + 1) !== -1 ? formula.indexOf("RESIDU(", index + 1) : Infinity,
+				formula.indexOf("MOD(", index + 1) !== -1 ? formula.indexOf("MOD(", index + 1) : Infinity
+			);
+			index = nextIndex === Infinity ? -1 : nextIndex;
+			continue;
+		}
+		
+		// Procesar argumentos
+		let arg1 = args[0].trim();
+		let arg2 = args[1].trim();
+		
+		// Manejar referencias de celda
+		if (/^[A-Za-z]+\d+$/.test(arg1)) {
+			arg1 = getCellValue(arg1);
+			if (arg1 === "") arg1 = 0;
+		}
+		
+		if (/^[A-Za-z]+\d+$/.test(arg2)) {
+			arg2 = getCellValue(arg2);
+			if (arg2 === "") arg2 = 0;
+		}
+		
+		// Verificar si el divisor es cero
+		if (arg2 == 0) {
+			formula = formula.substring(0, index) + "#¡DIV/0!" + formula.substring(end + 1);
+		} else {
+			// Usar el operador de módulo nativo de JavaScript
+			let replacement = `(Number(${arg1}) % Number(${arg2}))`;
+			formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
+		}
+		
+		// Buscar la siguiente aparición
+		let nextIndex = Math.min(
+			formula.indexOf("RESIDUO(", index + 1) !== -1 ? formula.indexOf("RESIDUO(", index + 1) : Infinity,
+			formula.indexOf("RESIDU(", index + 1) !== -1 ? formula.indexOf("RESIDU(", index + 1) : Infinity,
+			formula.indexOf("MOD(", index + 1) !== -1 ? formula.indexOf("MOD(", index + 1) : Infinity
+		);
+		index = nextIndex === Infinity ? -1 : nextIndex;
 	}
+	
 	return formula;
 }
 
-//Funcion SI
-function replaceSI(formula) {
-	let index = formula.indexOf("SI(");
-	while (index !== -1) {
-		let end = findMatchingParen(formula, index + 2);
-		if (end === -1) break;
-		let inside = formula.substring(index + 3, end);
-		let args = extractFunctionArguments(inside);
-		if (args.length !== 3) break;
-		args = args.map(arg => replaceFunctions(arg));
-		let replacement = `(${args[0]}) ? (${args[1]}) : (${args[2]})`;
-		formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-		index = formula.indexOf("SI(");
-	}
-	return formula;
-}
-
-//Funcio SI Y
-function replaceY(formula) {
-	let index = formula.indexOf("Y(");
-	while (index !== -1) {
-		let end = findMatchingParen(formula, index + 1);
-		if (end === -1) break;
-		let inside = formula.substring(index + 2, end);
-		let args = extractFunctionArguments(inside);
-		args = args.map(arg => replaceFunctions(arg));
-		let replacement = args.map(a => `(${a})`).join(' && ');
-		formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-		index = formula.indexOf("Y(");
-	}
-	return formula;
-}
-
-//Funcion SI O
-function replaceO(formula) {
-	let index = formula.indexOf("O(");
-	while (index !== -1) {
-		let end = findMatchingParen(formula, index + 1);
-		if (end === -1) break;
-		let inside = formula.substring(index + 2, end);
-		let args = extractFunctionArguments(inside);
-		args = args.map(arg => replaceFunctions(arg));
-		let replacement = args.map(a => `(${a})`).join(' || ');
-		formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-		index = formula.indexOf("O(");
-	}
-	return formula;
-}
-
-//Reemplaza las llamadas a SUMA()
+// Función SUMA
 function replaceSUMA(formula) {
 	let index = formula.indexOf("SUMA(");
 	while (index !== -1) {
@@ -236,7 +241,6 @@ function replaceSUMA(formula) {
 		let sumExpr = args.map(arg => {
 			arg = arg.trim();
 			if (arg.includes(":")) {
-				// Si es un rango (por ejemplo, A1:A10)
 				let parts = arg.split(":");
 				if (parts.length === 2) {
 					let startCoords = getCellCoords(parts[0].trim());
@@ -256,7 +260,6 @@ function replaceSUMA(formula) {
 					return cells.join(" + ");
 				}
 			} else {
-				// Si es una referencia simple o un número
 				if (/^[A-Za-z]+\d+$/.test(arg)) {
 					let val = getCellValue(arg);
 					if (val === "") val = 0;
@@ -272,7 +275,7 @@ function replaceSUMA(formula) {
 	return formula;
 }
 
-//Funcion Promedio
+// Función PROMEDIO
 function replacePROMEDIO(formula) {
 	let index = formula.indexOf("PROMEDIO(");
 	if (index === -1) {
@@ -288,22 +291,18 @@ function replacePROMEDIO(formula) {
 
 		let inside = formula.substring(startParenIndex + 1, end);
 		let args = extractFunctionArguments(inside);
-
 		let valores = [];
 
 		for (let arg of args) {
 			arg = arg.trim();
 
-			// Caso de rango con dos puntos
 			if (arg.includes(":")) {
 				let parts = arg.split(":");
 				if (parts.length === 2) {
 					if (/^\d+(\.\d+)?$/.test(parts[0]) && /^\d+(\.\d+)?$/.test(parts[1])) {
 						valores.push(Number(parts[0]));
 						valores.push(Number(parts[1]));
-					}
-
-					else {
+					} else {
 						try {
 							let startCoords = getCellCoords(parts[0]);
 							let endCoords = getCellCoords(parts[1]);
@@ -330,23 +329,18 @@ function replacePROMEDIO(formula) {
 						}
 					}
 				}
-			}
-
-			else if (/^[A-Za-z]+\d+$/.test(arg)) {
+			} else if (/^[A-Za-z]+\d+$/.test(arg)) {
 				let val = getCellValue(arg);
 				if (val !== "" && !isNaN(Number(val))) {
 					valores.push(Number(val));
 				} else if (val === "") {
 					valores.push(0);
 				}
-			}
-			// Si es un número literal
-			else if (!isNaN(Number(arg))) {
+			} else if (!isNaN(Number(arg))) {
 				valores.push(Number(arg));
 			}
 		}
 
-		// Calcular el promedio
 		let suma = 0;
 		let cantidad = valores.length;
 
@@ -358,14 +352,12 @@ function replacePROMEDIO(formula) {
 			formula = formula.substring(0, index) + "#¡DIV/0!" + formula.substring(end + 1);
 		}
 
-		// Buscar la siguiente ocurrencia
 		index = formula.indexOf("PROMEDIO(");
 	}
-
 	return formula;
 }
 
-// Funcion MAX
+// Función MAX
 function replaceMAX(formula) {
 	let index = formula.indexOf("MAX(");
 	while (index !== -1) {
@@ -424,7 +416,7 @@ function replaceMAX(formula) {
 	return formula;
 }
   
-  // Reemplaza las llamadas a MÍN()
+// Función MIN
 function replaceMIN(formula) {
 	let index = formula.indexOf("MIN(");
 	while (index !== -1) {
@@ -483,6 +475,210 @@ function replaceMIN(formula) {
 	return formula;
 }
 
+// Función CONTAR
+function replaceCONTAR(formula) {
+    let index = formula.indexOf("CONTAR(");
+    while (index !== -1) {
+        let end = findMatchingParen(formula, index + 6);
+        if (end === -1) break;
+        
+        let inside = formula.substring(index + 7, end);
+        let args = extractFunctionArguments(inside);
+        let conteo = 0;
+        
+        for (let arg of args) {
+            arg = arg.trim();
+            if (arg.includes(":")) {
+                let parts = arg.split(":");
+                if (parts.length === 2) {
+                    let startCoords = getCellCoords(parts[0].trim());
+                    let endCoords = getCellCoords(parts[1].trim());
+                    let startX = Math.min(startCoords[0], endCoords[0]);
+                    let endX = Math.max(startCoords[0], endCoords[0]);
+                    let startY = Math.min(startCoords[1], endCoords[1]);
+                    let endY = Math.max(startCoords[1], endCoords[1]);
+                    
+                    for (let x = startX; x <= endX; x++) {
+                        for (let y = startY; y <= endY; y++) {
+                            if (state[x] && state[x][y]) {
+                                let cellVal = state[x][y].computedValue;
+                                if (cellVal !== "" && !isNaN(Number(cellVal))) {
+                                    conteo++;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (/^[A-Za-z]+\d+$/.test(arg)) {
+                let val = getCellValue(arg);
+                if (val !== "" && !isNaN(Number(val))) {
+                    conteo++;
+                }
+            } else if (!isNaN(Number(arg))) {
+                conteo++;
+            }
+        }
+        
+        formula = formula.substring(0, index) + conteo + formula.substring(end + 1);
+        index = formula.indexOf("CONTAR(", index + 1);
+    }
+    return formula;
+}
+
+// ===== FUNCIONES LÓGICAS =====
+
+// Función SI
+function replaceSI(formula) {
+	let index = formula.indexOf("SI(");
+	while (index !== -1) {
+		let end = findMatchingParen(formula, index + 2);
+		if (end === -1) break;
+		let inside = formula.substring(index + 3, end);
+		let args = extractFunctionArguments(inside);
+		if (args.length !== 3) break;
+		args = args.map(arg => replaceFunctions(arg));
+		let replacement = `(${args[0]}) ? (${args[1]}) : (${args[2]})`;
+		formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
+		index = formula.indexOf("SI(");
+	}
+	return formula;
+}
+
+// Función Y
+function replaceY(formula) {
+	let index = formula.indexOf("Y(");
+	while (index !== -1) {
+		let end = findMatchingParen(formula, index + 1);
+		if (end === -1) break;
+		let inside = formula.substring(index + 2, end);
+		let args = extractFunctionArguments(inside);
+		args = args.map(arg => replaceFunctions(arg));
+		let replacement = args.map(a => `(${a})`).join(' && ');
+		formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
+		index = formula.indexOf("Y(");
+	}
+	return formula;
+}
+
+// Función O
+function replaceO(formula) {
+	let index = formula.indexOf("O(");
+	while (index !== -1) {
+		let end = findMatchingParen(formula, index + 1);
+		if (end === -1) break;
+		let inside = formula.substring(index + 2, end);
+		let args = extractFunctionArguments(inside);
+		args = args.map(arg => replaceFunctions(arg));
+		let replacement = args.map(a => `(${a})`).join(' || ');
+		formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
+		index = formula.indexOf("O(");
+	}
+	return formula;
+}
+
+// Función CAMBIAR
+function replaceCAMBIAR(formula) {
+	let index = formula.indexOf("CAMBIAR(");
+	while (index !== -1) {
+		let end = findMatchingParen(formula, index + 7);
+		if (end === -1) break;
+		
+		let inside = formula.substring(index + 8, end);
+		let args = extractFunctionArguments(inside);
+		
+		if (args.length !== 3) {
+			formula = formula.substring(0, index) + "#¡ERROR!" + formula.substring(end + 1);
+			index = formula.indexOf("CAMBIAR(", index + 1);
+			continue;
+		}
+		
+		let [condicion, valorVerdadero, valorFalso] = args.map(arg => arg.trim());
+		
+		let condicionValor;
+		if (condicion.toUpperCase() === "VERDADERO()") {
+			condicionValor = true;
+		} else if (condicion.toUpperCase() === "FALSO()") {
+			condicionValor = false;
+		} else if (/^[A-Za-z]+\d+$/.test(condicion)) {
+			let valor = getCellValue(condicion);
+			condicionValor = valor === "VERDADERO" || valor === "TRUE" || valor === "1";
+		} else {
+			try {
+				condicionValor = eval(replaceFunctions(condicion));
+			} catch (e) {
+				condicionValor = false;
+			}
+		}
+		
+		let replacement = condicionValor ? valorVerdadero : valorFalso;
+		formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
+		index = formula.indexOf("CAMBIAR(", index + 1);
+	}
+	return formula;
+}
+
+// Función FALSO
+function replaceFALSO(formula) {
+	let index = formula.indexOf("FALSO()");
+	while (index !== -1) {
+		formula = formula.substring(0, index) + "false" + formula.substring(index + 7);
+		index = formula.indexOf("FALSO()", index + 1);
+	}
+	return formula;
+}
+
+// Función NO
+function replaceNO(formula) {
+	let index = formula.indexOf("NO(");
+	while (index !== -1) {
+		let end = findMatchingParen(formula, index + 2);
+		if (end === -1) break;
+		
+		let inside = formula.substring(index + 3, end);
+		let argumento = inside.trim();
+		let valor;
+		
+		if (argumento.toUpperCase() === "VERDADERO()") {
+			valor = false;
+		} else if (argumento.toUpperCase() === "FALSO()") {
+			valor = true;
+		} else if (/^[A-Za-z]+\d+$/.test(argumento)) {
+			let celdaValor = getCellValue(argumento);
+			if (celdaValor === "VERDADERO" || celdaValor === "TRUE" || celdaValor === "1" || celdaValor === true) {
+				valor = false;
+			} else if (celdaValor === "FALSO" || celdaValor === "FALSE" || celdaValor === "0" || celdaValor === false) {
+				valor = true;
+			} else {
+				valor = true;
+			}
+		} else {
+			try {
+				let evalResult = eval(replaceFunctions(argumento));
+				valor = !evalResult;
+			} catch (e) {
+				valor = true;
+			}
+		}
+		
+		formula = formula.substring(0, index) + valor + formula.substring(end + 1);
+		index = formula.indexOf("NO(", index + 1);
+	}
+	return formula;
+}
+
+// Función VERDADERO
+function replaceVERDADERO(formula) {
+	let index = formula.indexOf("VERDADERO()");
+	while (index !== -1) {
+		formula = formula.substring(0, index) + "true" + formula.substring(index + 11);
+		index = formula.indexOf("VERDADERO()", index + 1);
+	}
+	return formula;
+}
+
+// ===== FUNCIONES DE TEXTO =====
+
+// Función EXTRAE
 function replaceEXTRAE(formula) {
 	let index = formula.indexOf("EXTRAE(");
 	while (index !== -1) {
@@ -549,62 +745,57 @@ function replaceEXTRAE(formula) {
 	return formula;
 }
 
-//Reemplaza la función AHORA() por la fecha y hora actuales
+// ===== FUNCIONES DE FECHA Y HORA =====
+
+// Función AHORA
 function replaceAHORA(formula) {
     let index = formula.indexOf("AHORA()");
     while (index !== -1) {
-        let fechaHora = new Date().toLocaleString(); // Obtener la fecha y hora actual
+        let fechaHora = new Date().toLocaleString();
         formula = formula.substring(0, index) + `"${fechaHora}"` + formula.substring(index + 7);
         index = formula.indexOf("AHORA()", index + 1);
     }
     return formula;
 }
 
-
+// Analizar cadena de fecha en diferentes formatos
 function parseDateString(dateStr) {
-    // Si es una cadena vacía, retornar null
     if (!dateStr) return null;
 
-    // Si el valor tiene comillas, quitarlas
     if (typeof dateStr === 'string') {
         dateStr = dateStr.replace(/^"|"$/g, '');
     }
 
-    // Intentar diferentes formatos de fecha
     const formats = [
-        // Formato "25/3/2025, 10:35:56 P.M."
         /(\d{1,2})\/(\d{1,2})\/(\d{4}),\s*(\d{1,2}):(\d{2}):(\d{2})\s*(A|P)\.M\./i,
-        // Formato "25/3/2025, 10:35:56 PM"
         /(\d{1,2})\/(\d{1,2})\/(\d{4}),\s*(\d{1,2}):(\d{2}):(\d{2})\s*(A|P)M/i,
-        // Formato "25/3/2025"
         /(\d{1,2})\/(\d{1,2})\/(\d{4})/,
-        // Formato ISO
         /(\d{4})-(\d{2})-(\d{2})/
     ];
 
     for (const format of formats) {
         const match = dateStr.match(format);
         if (match) {
-            if (match.length === 8) { // Formato con hora
+            if (match.length === 8) {
                 const [_, day, month, year, hour, minute, second, ampm] = match;
                 let h = parseInt(hour);
                 if (ampm.toUpperCase() === 'P' && h !== 12) h += 12;
                 if (ampm.toUpperCase() === 'A' && h === 12) h = 0;
                 return new Date(year, month - 1, day, h, minute, second);
-            } else if (match.length === 4) { // Formato solo fecha
+            } else if (match.length === 4) {
                 const [_, day, month, year] = match;
                 return new Date(year, month - 1, day);
             }
         }
     }
 
-    // Si no coincide con ningún formato, intentar Date.parse
     const date = new Date(dateStr);
     if (!isNaN(date.getTime())) return date;
 
     return null;
 }
 
+// Función AÑO
 function replaceAÑO(formula) { 
     let index = formula.indexOf("AÑO(");
     while (index !== -1) {
@@ -643,6 +834,7 @@ function replaceAÑO(formula) {
     return formula;
 }
 
+// Función MES
 function replaceMES(formula) {
     let index = formula.indexOf("MES(");
     while (index !== -1) {
@@ -681,6 +873,7 @@ function replaceMES(formula) {
     return formula;
 }
 
+// Función DIA
 function replaceDIA(formula) {
     let index = formula.indexOf("DIA(");
     while (index !== -1) {
@@ -719,6 +912,7 @@ function replaceDIA(formula) {
     return formula;
 }
 
+// Función HORA
 function replaceHORA(formula) {
     let index = formula.indexOf("HORA(");
     while (index !== -1) {
@@ -741,14 +935,12 @@ function replaceHORA(formula) {
                 }
             }
         } else {
-            // Si el argumento no es una referencia de celda, intentar parsearlo directamente
             fecha = parseDateString(argumento);
         }
         
         let replacement;
         if (fecha && !isNaN(fecha.getTime())) {
             let hora = fecha.getHours();
-            // Asegurarnos de que la hora esté en formato 24 horas
             if (hora === 0) hora = 24;
             replacement = hora;
         } else {
@@ -761,6 +953,7 @@ function replaceHORA(formula) {
     return formula;
 }
 
+// Función MINUTO
 function replaceMINUTO(formula) {
     let index = formula.indexOf("MINUTO(");
     while (index !== -1) {
@@ -783,14 +976,12 @@ function replaceMINUTO(formula) {
                 }
             }
         } else {
-            // Si el argumento no es una referencia de celda, intentar parsearlo directamente
             fecha = parseDateString(argumento);
         }
         
         let replacement;
         if (fecha && !isNaN(fecha.getTime())) {
             let minutos = fecha.getMinutes();
-            // Asegurarnos de que los minutos estén en formato de dos dígitos
             if (minutos < 10) minutos = "0" + minutos;
             replacement = minutos;
         } else {
@@ -803,6 +994,7 @@ function replaceMINUTO(formula) {
     return formula;
 }
 
+// Función SEGUNDO
 function replaceSEGUNDO(formula) {
     let index = formula.indexOf("SEGUNDO(");
     while (index !== -1) {
@@ -825,14 +1017,12 @@ function replaceSEGUNDO(formula) {
                 }
             }
         } else {
-            // Si el argumento no es una referencia de celda, intentar parsearlo directamente
             fecha = parseDateString(argumento);
         }
         
         let replacement;
         if (fecha && !isNaN(fecha.getTime())) {
             let segundos = fecha.getSeconds();
-            // Asegurarnos de que los segundos estén en formato de dos dígitos
             if (segundos < 10) segundos = "0" + segundos;
             replacement = segundos;
         } else {
@@ -845,6 +1035,7 @@ function replaceSEGUNDO(formula) {
     return formula;
 }
 
+// Función FECHA
 function replaceFECHA(formula) {
     let index = formula.indexOf("FECHA(");
     while (index !== -1) {
@@ -889,6 +1080,7 @@ function replaceFECHA(formula) {
     return formula;
 }
 
+// Función HOY
 function replaceHOY(formula) {
     let index = formula.indexOf("HOY()");
     while (index !== -1) {
@@ -899,156 +1091,15 @@ function replaceHOY(formula) {
     return formula;
 }
 
-function replaceCAMBIAR(formula) {
-    let index = formula.indexOf("CAMBIAR(");
-    while (index !== -1) {
-        let end = findMatchingParen(formula, index + 7);
-        if (end === -1) break;
-        
-        let inside = formula.substring(index + 8, end);
-        let args = extractFunctionArguments(inside);
-        
-        if (args.length !== 3) {
-            formula = formula.substring(0, index) + "#¡ERROR!" + formula.substring(end + 1);
-            index = formula.indexOf("CAMBIAR(", index + 1);
-            continue;
-        }
-        
-        let [condicion, valorVerdadero, valorFalso] = args.map(arg => arg.trim());
-        
-        // Evaluar la condición
-        let condicionValor;
-        if (condicion.toUpperCase() === "VERDADERO()") {
-            condicionValor = true;
-        } else if (condicion.toUpperCase() === "FALSO()") {
-            condicionValor = false;
-        } else if (/^[A-Za-z]+\d+$/.test(condicion)) {
-            let valor = getCellValue(condicion);
-            condicionValor = valor === "VERDADERO" || valor === "TRUE" || valor === "1";
-        } else {
-            try {
-                condicionValor = eval(replaceFunctions(condicion));
-            } catch (e) {
-                condicionValor = false;
-            }
-        }
-        
-        let replacement = condicionValor ? valorVerdadero : valorFalso;
-        formula = formula.substring(0, index) + replacement + formula.substring(end + 1);
-        index = formula.indexOf("CAMBIAR(", index + 1);
-    }
-    return formula;
-}
+// ===== PROCESAMIENTO DE FÓRMULAS =====
 
-function replaceFALSO(formula) {
-    let index = formula.indexOf("FALSO()");
-    while (index !== -1) {
-        formula = formula.substring(0, index) + "false" + formula.substring(index + 7);
-        index = formula.indexOf("FALSO()", index + 1);
-    }
-    return formula;
-}
-
-function replaceNO(formula) {
-    let index = formula.indexOf("NO(");
-    while (index !== -1) {
-        let end = findMatchingParen(formula, index + 2);
-        if (end === -1) break;
-        
-        let inside = formula.substring(index + 3, end);
-        let argumento = inside.trim();
-        let valor;
-        
-        if (argumento.toUpperCase() === "VERDADERO()") {
-            valor = false;
-        } else if (argumento.toUpperCase() === "FALSO()") {
-            valor = true;
-        } else if (/^[A-Za-z]+\d+$/.test(argumento)) {
-            let celdaValor = getCellValue(argumento);
-            if (celdaValor === "VERDADERO" || celdaValor === "TRUE" || celdaValor === "1" || celdaValor === true) {
-                valor = false;
-            } else if (celdaValor === "FALSO" || celdaValor === "FALSE" || celdaValor === "0" || celdaValor === false) {
-                valor = true;
-            } else {
-                valor = true; // Si no es un valor booleano válido, se considera falso
-            }
-        } else {
-            try {
-                let evalResult = eval(replaceFunctions(argumento));
-                valor = !evalResult;
-            } catch (e) {
-                valor = true;
-            }
-        }
-        
-        formula = formula.substring(0, index) + valor + formula.substring(end + 1);
-        index = formula.indexOf("NO(", index + 1);
-    }
-    return formula;
-}
-
-function replaceVERDADERO(formula) {
-    let index = formula.indexOf("VERDADERO()");
-    while (index !== -1) {
-        formula = formula.substring(0, index) + "true" + formula.substring(index + 11);
-        index = formula.indexOf("VERDADERO()", index + 1);
-    }
-    return formula;
-}
-
-function replaceCONTAR(formula) {
-    let index = formula.indexOf("CONTAR(");
-    while (index !== -1) {
-        let end = findMatchingParen(formula, index + 6);
-        if (end === -1) break;
-        
-        let inside = formula.substring(index + 7, end);
-        let args = extractFunctionArguments(inside);
-        let conteo = 0;
-        
-        for (let arg of args) {
-            arg = arg.trim();
-            if (arg.includes(":")) {
-                let parts = arg.split(":");
-                if (parts.length === 2) {
-                    let startCoords = getCellCoords(parts[0].trim());
-                    let endCoords = getCellCoords(parts[1].trim());
-                    let startX = Math.min(startCoords[0], endCoords[0]);
-                    let endX = Math.max(startCoords[0], endCoords[0]);
-                    let startY = Math.min(startCoords[1], endCoords[1]);
-                    let endY = Math.max(startCoords[1], endCoords[1]);
-                    
-                    for (let x = startX; x <= endX; x++) {
-                        for (let y = startY; y <= endY; y++) {
-                            if (state[x] && state[x][y]) {
-                                let cellVal = state[x][y].computedValue;
-                                if (cellVal !== "" && !isNaN(Number(cellVal))) {
-                                    conteo++;
-                                }
-                            }
-                        }
-                    }
-                }
-            } else if (/^[A-Za-z]+\d+$/.test(arg)) {
-                let val = getCellValue(arg);
-                if (val !== "" && !isNaN(Number(val))) {
-                    conteo++;
-                }
-            } else if (!isNaN(Number(arg))) {
-                conteo++;
-            }
-        }
-        
-        formula = formula.substring(0, index) + conteo + formula.substring(end + 1);
-        index = formula.indexOf("CONTAR(", index + 1);
-    }
-    return formula;
-}
-
-
-
-//Reemplaza recursivamente las funciones MOD, SI, Y y O
+// Reemplazar funciones reconocidas en la fórmula
 function replaceFunctions(formula) {
+	// Manejar primero RESIDUO antes de que pueda ser alterado por otras funciones
+	if (formula.includes("RESIDUO(") || formula.includes("RESIDU(") || formula.includes("MOD(")) {
+		formula = replaceMOD(formula);
+	}
+	
 	let prev;
 	do {
 		prev = formula;
@@ -1073,7 +1124,6 @@ function replaceFunctions(formula) {
 		formula = replaceSI(formula);
 		formula = replaceCAMBIAR(formula);
 		// Finalmente las demás funciones
-		formula = replaceMOD(formula);
 		formula = replaceSUMA(formula);
 		formula = replacePROMEDIO(formula);
 		formula = replaceMAX(formula);
@@ -1081,11 +1131,11 @@ function replaceFunctions(formula) {
 		formula = replaceEXTRAE(formula);
 		formula = replaceCONTAR(formula);
 	} while (formula !== prev);
+	
 	return formula;
 }
 
-//Calcula el valor computado de una celda a partir de su contenido.
-//Se eliminan espacios extra luego del signo "=" y entre el nombre de la función y el paréntesis.
+// Calcular el valor computado a partir de una fórmula
 function calculateComputedValue(value) {
 	const strValue = String(value).trim();
 	if (!strValue) return "";
@@ -1112,9 +1162,7 @@ function calculateComputedValue(value) {
 		return values.join(' + ');
 	});
 
-
 	formula = replaceFunctions(formula);
-
 
 	// Reemplazar referencias de celdas
 	formula = formula.replace(/([A-Za-z]+\d+)/gi, match => {
@@ -1123,9 +1171,6 @@ function calculateComputedValue(value) {
 		if (isNaN(val)) return `"${val}"`;
 		return val;
 	});
-
-	// Depuración: ver la fórmula resultante antes de eval()
-	console.log("Evaluating formula:", formula);
 
 	try {
 		const result = eval(formula);
@@ -1136,7 +1181,9 @@ function calculateComputedValue(value) {
 	}
 }
 
-//Actualiza una celda en la posición (x, y) con el nuevo valor y recalcula la fórmula.
+// ===== ACTUALIZACIÓN DE CELDAS =====
+
+// Actualizar una celda específica
 function updateCell(x, y, value) {
 	x = parseInt(x);
 	y = parseInt(y);
@@ -1160,16 +1207,14 @@ function updateCell(x, y, value) {
 	}
 }
 
-//Recalcula todas las celdas que tengan fórmulas.
+// Recalcular todas las celdas con fórmulas
 function updateAllDependentCells() {
 	state.forEach((col, x) => {
 		col.forEach((cell, y) => {
 			if (cell.value.startsWith('=')) {
-				// Recalcular valor
 				const newValue = calculateComputedValue(cell.value);
 				state[x][y].computedValue = newValue;
 
-				// Actualizar DOM
 				const selector = `td[data-x="${x}"][data-y="${y}"]`;
 				const cellElement = document.querySelector(selector);
 				if (cellElement) {
@@ -1180,7 +1225,9 @@ function updateAllDependentCells() {
 	});
 }
 
-//Limpia las selecciones (columnas, filas y celdas resaltadas).
+// ===== FUNCIONES DE SELECCIÓN Y UI =====
+
+// Limpiar selecciones de celdas
 function clearSelections() {
 	$$('.selected-column').forEach(el => el.classList.remove('selected-column'));
 	$$('.selected-row').forEach(el => el.classList.remove('selected-row'));
@@ -1191,7 +1238,7 @@ function clearSelections() {
 	selectedRow = null;
 }
 
-//Actualiza la celda activa
+// Actualizar visualización de celda activa
 function updateActiveCellDisplay(x, y) {
 	activeCell = { x, y };
 	const columnLetter = letras[x];
@@ -1200,12 +1247,12 @@ function updateActiveCellDisplay(x, y) {
 	formulaInput.value = state[x][y].value;
 }
 
-//Función para resaltar el rango
+// Limpiar selección de rango
 function clearRangeSelection() {
 	$$('.selected-range').forEach(el => el.classList.remove('selected-range'));
 }
 
-
+// Resaltar un rango
 function highlightRange(start, end) {
 	clearRangeSelection();
 	const startX = Math.min(start.x, end.x);
@@ -1222,8 +1269,7 @@ function highlightRange(start, end) {
 	}
 }
 
-//Función para actualizar la visualización del rango en la "caja de nombre"
-
+// Actualizar visualización de rango seleccionado
 function updateActiveCellDisplayRange(start, end) {
 	const startX = Math.min(start.x, end.x);
 	const endX = Math.max(start.x, end.x);
@@ -1234,6 +1280,7 @@ function updateActiveCellDisplayRange(start, end) {
 	activeCellDisplay.textContent = (startRef === endRef) ? startRef : `${startRef}:${endRef}`;
 }
 
+// ===== EVENTOS DE INTERACCIÓN =====
 
 // Eventos en el encabezado
 $head.addEventListener('click', event => {
@@ -1246,7 +1293,7 @@ $head.addEventListener('click', event => {
 	$$(`tr td:nth-child(${x + 2})`).forEach(td => td.classList.add('selected-column'));
 });
 
-// Eventos en el cuerpo
+// Eventos en el cuerpo de la tabla
 $body.addEventListener('click', event => {
 	const th = event.target.closest('th.row-header');
 	const td = event.target.closest('td');
@@ -1269,8 +1316,7 @@ $body.addEventListener('click', event => {
 	}
 });
 
-
-//Eventos para Seleccionar Rango Body 
+// Eventos para selección de rango
 $body.addEventListener('mousedown', event => {
 	const td = event.target.closest('td');
 	if (!td) return;
@@ -1282,9 +1328,9 @@ $body.addEventListener('mousedown', event => {
 	selectionEnd = { x, y };
 	highlightRange(selectionStart, selectionEnd);
 	updateActiveCellDisplayRange(selectionStart, selectionEnd);
-  });
+});
   
-  $body.addEventListener('mouseover', event => {
+$body.addEventListener('mouseover', event => {
 	if (!isSelectingRange) return;
 	const td = event.target.closest('td');
 	if (!td) return;
@@ -1293,144 +1339,124 @@ $body.addEventListener('mousedown', event => {
 	selectionEnd = { x, y };
 	highlightRange(selectionStart, selectionEnd);
 	updateActiveCellDisplayRange(selectionStart, selectionEnd);
-  });
-  
-  document.addEventListener('mouseup', event => {
-	if (isSelectingRange) {
-	  isSelectingRange = false;
-	}
 });
   
+document.addEventListener('mouseup', event => {
+	if (isSelectingRange) {
+		isSelectingRange = false;
+	}
+});
 
-// Manejo de copiar en una celda
+// Manejo de portapapeles - copiar
 document.addEventListener('copy', (e) => {
 	let data = [];
 	const selectedRangeCells = document.querySelectorAll('td.selected-range');
 	
-	// Si hay un rango de celdas seleccionado
 	if (selectedRangeCells.length > 0) {
-	  // Determinar el rectángulo que abarca el rango
-	  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-	  selectedRangeCells.forEach(cell => {
-		let x = parseInt(cell.dataset.x);
-		let y = parseInt(cell.dataset.y);
-		if (x < minX) minX = x;
-		if (x > maxX) maxX = x;
-		if (y < minY) minY = y;
-		if (y > maxY) maxY = y;
-	  });
-	  
-	  for (let y = minY; y <= maxY; y++) {
-		let rowData = [];
-		for (let x = minX; x <= maxX; x++) {
-		  const cell = document.querySelector(`td[data-x="${x}"][data-y="${y}"]`);
-		  if (cell && cell.classList.contains('selected-range')) {
-			rowData.push(cell.querySelector('span').textContent);
-		  } else {
-			rowData.push("");
-		  }
+		let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+		selectedRangeCells.forEach(cell => {
+			let x = parseInt(cell.dataset.x);
+			let y = parseInt(cell.dataset.y);
+			if (x < minX) minX = x;
+			if (x > maxX) maxX = x;
+			if (y < minY) minY = y;
+			if (y > maxY) maxY = y;
+		});
+		
+		for (let y = minY; y <= maxY; y++) {
+			let rowData = [];
+			for (let x = minX; x <= maxX; x++) {
+				const cell = document.querySelector(`td[data-x="${x}"][data-y="${y}"]`);
+				if (cell && cell.classList.contains('selected-range')) {
+					rowData.push(cell.querySelector('span').textContent);
+				} else {
+					rowData.push("");
+				}
+			}
+			data.push(rowData.join("\t"));
 		}
-		data.push(rowData.join("\t"));
-	  }
-	} 
-	// Si hay una columna seleccionada
-	else if (selectedColumn !== null) {
-	  data = state[selectedColumn]
-		.map(cell => cell.computedValue)
-		.filter(value => value !== "");
-	} 
-	// Si hay una fila seleccionada
-	else if (selectedRow !== null) {
-	  data = state.map(col => col[selectedRow].computedValue)
-		.filter(value => value !== "");
-	}
-	// Si hay una celda individual seleccionada
-	else {
-	  const selectedCell = document.querySelector('td.celdailumida');
-	  if (selectedCell) {
-		const x = parseInt(selectedCell.dataset.x);
-		const y = parseInt(selectedCell.dataset.y);
-		data.push(state[x][y].computedValue);
-	  }
+	} else if (selectedColumn !== null) {
+		data = state[selectedColumn]
+			.map(cell => cell.computedValue)
+			.filter(value => value !== "");
+	} else if (selectedRow !== null) {
+		data = state.map(col => col[selectedRow].computedValue)
+			.filter(value => value !== "");
+	} else {
+		const selectedCell = document.querySelector('td.celdailumida');
+		if (selectedCell) {
+			const x = parseInt(selectedCell.dataset.x);
+			const y = parseInt(selectedCell.dataset.y);
+			data.push(state[x][y].computedValue);
+		}
 	}
 	
 	if (data.length > 0) {
-	  e.clipboardData.setData('text/plain', data.join('\n'));
-	  e.preventDefault();
+		e.clipboardData.setData('text/plain', data.join('\n'));
+		e.preventDefault();
 	}
 });
 
-// Manejo de pegar
+// Manejo de portapapeles - pegar
 document.addEventListener('paste', (e) => {
 	if (e.target === formulaInput) return;
 	const clipboardData = e.clipboardData.getData('text/plain');
 	if (!clipboardData) return;
-  
-	// Separamos por líneas y filtramos líneas vacías.
+
 	const rowsData = clipboardData.split('\n').filter(v => v !== '');
-	// Determinamos si es un único valor (sin tabuladores y solo una línea)
 	const isSingleValue = (rowsData.length === 1 && rowsData[0].indexOf('\t') === -1);
-  
-	// Revisamos si hay celdas seleccionadas como rango.
+
 	const selectedRangeCells = document.querySelectorAll('td.selected-range');
 	if (selectedRangeCells.length > 0) {
-	  // Obtenemos la celda superior izquierda del rango.
-	  let minX = Infinity, minY = Infinity;
-	  selectedRangeCells.forEach(cell => {
-		const x = parseInt(cell.dataset.x);
-		const y = parseInt(cell.dataset.y);
-		if (x < minX) minX = x;
-		if (y < minY) minY = y;
-	  });
-	  
-	  if (isSingleValue) {
-		// Si es un único valor, lo asignamos a todas las celdas seleccionadas.
+		let minX = Infinity, minY = Infinity;
 		selectedRangeCells.forEach(cell => {
-		  const x = parseInt(cell.dataset.x);
-		  const y = parseInt(cell.dataset.y);
-		  updateCell(x, y, clipboardData);
+			const x = parseInt(cell.dataset.x);
+			const y = parseInt(cell.dataset.y);
+			if (x < minX) minX = x;
+			if (y < minY) minY = y;
 		});
-	  } else {
-		// Si es un rango multi-celda, pegamos respetando la forma copiada a partir de la celda superior izquierda.
-		rowsData.forEach((row, rowIndex) => {
-		  const cells = row.split('\t');
-		  cells.forEach((cellValue, colIndex) => {
-			const targetX = minX + colIndex;
-			const targetY = minY + rowIndex;
-			if (targetX < cols && targetY < rows) {
-			  updateCell(targetX, targetY, cellValue);
-			}
-		  });
-		});
-	  }
-	  e.preventDefault();
-	  return;
+		
+		if (isSingleValue) {
+			selectedRangeCells.forEach(cell => {
+				const x = parseInt(cell.dataset.x);
+				const y = parseInt(cell.dataset.y);
+				updateCell(x, y, clipboardData);
+			});
+		} else {
+			rowsData.forEach((row, rowIndex) => {
+				const cells = row.split('\t');
+				cells.forEach((cellValue, colIndex) => {
+					const targetX = minX + colIndex;
+					const targetY = minY + rowIndex;
+					if (targetX < cols && targetY < rows) {
+						updateCell(targetX, targetY, cellValue);
+					}
+				});
+			});
+		}
+		e.preventDefault();
+		return;
 	} else if (selectedColumn !== null) {
-	  // Si se ha seleccionado una columna completa, pegamos en cada celda de esa columna.
-	  rowsData.forEach((value, y) => {
-		if (y < rows) updateCell(selectedColumn, y, value);
-	  });
-	  e.preventDefault();
-	  return;
+		rowsData.forEach((value, y) => {
+			if (y < rows) updateCell(selectedColumn, y, value);
+		});
+		e.preventDefault();
+		return;
 	} else if (selectedRow !== null) {
-	  // Si se ha seleccionado una fila completa, pegamos en cada celda de esa fila.
-	  rowsData.forEach((row, x) => {
-		if (x < cols) updateCell(x, selectedRow, row);
-	  });
-	  e.preventDefault();
-	  return;
+		rowsData.forEach((row, x) => {
+			if (x < cols) updateCell(x, selectedRow, row);
+		});
+		e.preventDefault();
+		return;
 	} else {
-	  // Si no hay selección de rango, se pega en la celda activa.
-	  if (activeCell) {
-		updateCell(activeCell.x, activeCell.y, clipboardData);
-	  }
+		if (activeCell) {
+			updateCell(activeCell.x, activeCell.y, clipboardData);
+		}
 	}
 	e.preventDefault();
 });
-  
-  
 
-// Doble clic para editar la celda
+// Edición de celdas
 $body.addEventListener('dblclick', event => {
 	const td = event.target.closest('td');
 	if (!td) return;
@@ -1449,7 +1475,7 @@ $body.addEventListener('dblclick', event => {
 	});
 });
 
-// Borrar contenido con Delete o Backspace en una celda
+// Borrado de contenido
 document.addEventListener('keydown', (e) => {
 	if (e.key === 'Delete' || e.key === 'Backspace') {
 		if (selectedColumn !== null) {
@@ -1465,50 +1491,42 @@ document.addEventListener('keydown', (e) => {
 	}
 });
 
-//En multicelda
 document.addEventListener('keydown', (e) => {
 	if (e.key === 'Delete' || e.key === 'Backspace') {
-	  // Si existen celdas con la clase 'selected-range', se borra su contenido
-	  const selectedRangeCells = document.querySelectorAll('td.selected-range');
-	  if (selectedRangeCells.length > 0) {
-		selectedRangeCells.forEach(cell => {
-		  const x = parseInt(cell.dataset.x);
-		  const y = parseInt(cell.dataset.y);
-		  updateCell(x, y, "");
-		});
-		e.preventDefault();
-	  }
-	  // Si no hay rango, se revisa si se tiene una columna o fila seleccionada
-	  else if (selectedColumn !== null) {
-		state[selectedColumn].forEach((cell, y) => {
-		  updateCell(selectedColumn, y, "");
-		});
-		e.preventDefault();
-	  } else if (selectedRow !== null) {
-		state.forEach((col, x) => {
-		  updateCell(x, selectedRow, "");
-		});
-		e.preventDefault();
-	  }
+		const selectedRangeCells = document.querySelectorAll('td.selected-range');
+		if (selectedRangeCells.length > 0) {
+			selectedRangeCells.forEach(cell => {
+				const x = parseInt(cell.dataset.x);
+				const y = parseInt(cell.dataset.y);
+				updateCell(x, y, "");
+			});
+			e.preventDefault();
+		} else if (selectedColumn !== null) {
+			state[selectedColumn].forEach((cell, y) => {
+				updateCell(selectedColumn, y, "");
+			});
+			e.preventDefault();
+		} else if (selectedRow !== null) {
+			state.forEach((col, x) => {
+				updateCell(x, selectedRow, "");
+			});
+			e.preventDefault();
+		}
 	}
 });
-  
 
-//Cambia a la hoja especificada por índice.
+// ===== GESTIÓN DE HOJAS =====
+
+// Cambiar a una hoja específica
 function switchSheet(index) {
-    // Guardar los datos de la hoja actual
     sheets[currentSheetIndex].data = state;
-
-    // Cambiar a nueva hoja
     currentSheetIndex = index;
     state = sheets[currentSheetIndex].data;
 
-    // Actualizar clases active
     document.querySelectorAll('.sheet').forEach((sheet, i) => {
         sheet.classList.toggle('active', i === index);
     });
 
-    // Disparar un evento personalizado para notificar el cambio de hoja
     const event = new CustomEvent('sheetChanged', { 
         detail: { 
             previousIndex: currentSheetIndex,
@@ -1528,7 +1546,7 @@ document.querySelector('.sheets-container').addEventListener('click', (e) => {
 	}
 });
 
-// Agregar nueva hoja
+// Agregar y gestionar hojas
 document.addEventListener("DOMContentLoaded", function () {
 	const sheetsContainer = document.querySelector(".sheets-container");
 	const addSheetBtn = document.getElementById("add-sheet");
@@ -1538,33 +1556,24 @@ document.addEventListener("DOMContentLoaded", function () {
 	function addNewSheet() {
 		sheetCount++;
 
-		// Añadir nueva hoja al array sheets
 		const newSheetData = {
 			name: `Hoja${sheetCount}`,
 			data: range(cols).map(() =>
 				range(rows).map(() => ({ computedValue: "", value: "" }))
 			),
-			textBoxes: [] // Inicializar el array de cuadros de texto
+			textBoxes: []
 		};
 		sheets.push(newSheetData);
 
-		// Crear elemento en el DOM
 		let newSheetElement = document.createElement("div");
 		newSheetElement.classList.add("sheet");
 		newSheetElement.textContent = `Hoja${sheetCount}`;
 		sheetsContainer.appendChild(newSheetElement);
 
-		// Activar la nueva hoja automáticamente
 		switchSheet(sheets.length - 1);
 	}
 
 	addSheetBtn.addEventListener("click", addNewSheet);
-
-	sheetsContainer.addEventListener("click", function (e) {
-		if (e.target.classList.contains("sheet")) {
-			activateSheet(e.target);
-		}
-	});
 
 	sheetsContainer.addEventListener("contextmenu", function (e) {
 		e.preventDefault();
@@ -1582,7 +1591,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 			document.body.appendChild(contextMenu);
 
-			// Obtener la posición exacta de la hoja
 			const rect = selectedSheet.getBoundingClientRect();
 			const menuHeight = contextMenu.offsetHeight;
 
@@ -1595,32 +1603,22 @@ document.addEventListener("DOMContentLoaded", function () {
 			contextMenu.style.top = `${topPosition}px`;
 			contextMenu.style.left = `${rect.left}px`;
 
-			// Editar nombre
 			document.getElementById("rename-sheet").addEventListener("click", function () {
                 let newName = prompt("Nuevo nombre de la hoja:", selectedSheet.textContent);
                 if (newName) {
                     selectedSheet.textContent = newName;
-                    // Obtener índice de la hoja
                     let sheetIndex = Array.from(document.querySelectorAll(".sheet")).indexOf(selectedSheet);
-
-                    // Actualizar el nombre en el array `sheets`
                     sheets[sheetIndex].name = newName;
                 }
                 contextMenu.remove();
-                });
+            });
 
-			// Eliminar hoja
 			document.getElementById("delete-sheet").addEventListener("click", function () {
 				if (document.querySelectorAll(".sheet").length > 1) {
 					const sheetIndex = Array.from(sheetsContainer.children).indexOf(selectedSheet);
-
-					// Eliminar del array
 					sheets.splice(sheetIndex, 1);
-
-					// Eliminar del DOM
 					selectedSheet.remove();
 
-					// Cambiar a hoja 0 si era la actual
 					if (currentSheetIndex === sheetIndex) {
 						switchSheet(0);
 					}
@@ -1630,7 +1628,6 @@ document.addEventListener("DOMContentLoaded", function () {
 				contextMenu.remove();
 			});
 
-			// Cerrar menú al hacer clic afuera
 			document.addEventListener("click", function closeMenu(e) {
 				if (!contextMenu.contains(e.target)) {
 					contextMenu.remove();
@@ -1641,11 +1638,9 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 });
 
-// ================================
-// Eventos en la Barra de Fórmulas
-// ================================
+// ===== BARRA DE FÓRMULAS =====
 
-// Actualizar celda al presionar Enter en el input de fórmulas
+// Actualización de la barra de fórmulas
 formulaInput.addEventListener('keydown', (e) => {
 	if (e.key === 'Enter') {
 		const { x, y } = activeCell;
@@ -1660,6 +1655,5 @@ document.querySelector('.formula-prefix').addEventListener('click', () => {
 	formulaInput.focus();
 });
 
+// Inicializar la hoja de cálculo
 renderSpreadsheet();
-
-// Función para ordenar la tabla
