@@ -43,9 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnOrientacion = $(".ribbon-buttons button[title='Orientación']");
     const btnSangria = $(".ribbon-buttons button[title='Sangría']");
     
+    // Botones de búsqueda y reemplazo
+    const btnBuscar = $(".ribbon-buttons button[title='Buscar']");
+    const btnReemplazar = $(".ribbon-buttons button[title='Reemplazar']");
+    
     // Variables para portapapeles
     let clipboardContent = null;
     let clipboardFormat = null;
+    
+    // Variables para búsqueda
+    let searchResults = [];
+    let currentSearchIndex = -1;
     
     // ===== FUNCIONES UTILITARIAS =====
     
@@ -847,6 +855,464 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateCellValue(cell, null, { paddingLeft: hasIndent ? "0px" : "20px" });
             });
             focusActiveCell();
+        });
+    }
+    
+    // Funciones de búsqueda y reemplazo
+    
+    // Crear modal para búsqueda
+    function createSearchModal() {
+        // Eliminar modal existente si hay alguno
+        const existingModal = document.getElementById('search-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        const modal = document.createElement('div');
+        modal.id = 'search-modal';
+        modal.className = 'modal';
+        modal.style.display = 'block';
+        modal.style.position = 'fixed';
+        modal.style.zIndex = '1000';
+        modal.style.left = '0';
+        modal.style.top = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.overflow = 'auto';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.4)';
+        
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        modalContent.style.backgroundColor = '#fefefe';
+        modalContent.style.margin = '15% auto';
+        modalContent.style.padding = '20px';
+        modalContent.style.border = '1px solid #888';
+        modalContent.style.width = '300px';
+        modalContent.style.borderRadius = '5px';
+        
+        const closeBtn = document.createElement('span');
+        closeBtn.className = 'close-btn';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.style.color = '#aaa';
+        closeBtn.style.float = 'right';
+        closeBtn.style.fontSize = '28px';
+        closeBtn.style.fontWeight = 'bold';
+        closeBtn.style.cursor = 'pointer';
+        
+        closeBtn.addEventListener('click', () => {
+            modal.remove();
+        });
+        
+        const title = document.createElement('h3');
+        title.textContent = 'Buscar';
+        title.style.marginTop = '0';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Término a buscar';
+        input.style.width = '100%';
+        input.style.padding = '8px';
+        input.style.marginBottom = '10px';
+        input.style.boxSizing = 'border-box';
+        
+        const matchCase = document.createElement('div');
+        matchCase.style.marginBottom = '10px';
+        
+        const matchCaseCheckbox = document.createElement('input');
+        matchCaseCheckbox.type = 'checkbox';
+        matchCaseCheckbox.id = 'match-case';
+        
+        const matchCaseLabel = document.createElement('label');
+        matchCaseLabel.htmlFor = 'match-case';
+        matchCaseLabel.textContent = 'Coincidir mayúsculas/minúsculas';
+        matchCaseLabel.style.marginLeft = '5px';
+        
+        matchCase.appendChild(matchCaseCheckbox);
+        matchCase.appendChild(matchCaseLabel);
+        
+        const buttons = document.createElement('div');
+        buttons.style.textAlign = 'right';
+        
+        const searchBtn = document.createElement('button');
+        searchBtn.textContent = 'Buscar';
+        searchBtn.style.padding = '8px 16px';
+        searchBtn.style.backgroundColor = '#217346';
+        searchBtn.style.color = 'white';
+        searchBtn.style.border = 'none';
+        searchBtn.style.borderRadius = '4px';
+        searchBtn.style.cursor = 'pointer';
+        searchBtn.style.marginLeft = '10px';
+        
+        const findNextBtn = document.createElement('button');
+        findNextBtn.textContent = 'Buscar siguiente';
+        findNextBtn.style.padding = '8px 16px';
+        findNextBtn.style.backgroundColor = '#f0f0f0';
+        findNextBtn.style.border = '1px solid #ccc';
+        findNextBtn.style.borderRadius = '4px';
+        findNextBtn.style.cursor = 'pointer';
+        findNextBtn.disabled = true;
+        
+        buttons.appendChild(findNextBtn);
+        buttons.appendChild(searchBtn);
+        
+        modalContent.appendChild(closeBtn);
+        modalContent.appendChild(title);
+        modalContent.appendChild(input);
+        modalContent.appendChild(matchCase);
+        modalContent.appendChild(buttons);
+        
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+        input.focus();
+        
+        // Búsqueda en celdas
+        searchBtn.addEventListener('click', () => {
+            const searchTerm = input.value.trim();
+            if (!searchTerm) return;
+            
+            const isCaseSensitive = matchCaseCheckbox.checked;
+            
+            searchResults = [];
+            currentSearchIndex = -1;
+            
+            // Buscar en todas las celdas
+            for (let x = 0; x < state.length; x++) {
+                for (let y = 0; y < state[x].length; y++) {
+                    const cellValue = state[x][y].value;
+                    const cellComputedValue = state[x][y].computedValue;
+                    
+                    if (cellValue || cellComputedValue) {
+                        let valueToSearch = cellValue || cellComputedValue;
+                        if (typeof valueToSearch !== 'string') {
+                            valueToSearch = String(valueToSearch);
+                        }
+                        
+                        const termToFind = isCaseSensitive ? searchTerm : searchTerm.toLowerCase();
+                        const valueToCompare = isCaseSensitive ? valueToSearch : valueToSearch.toLowerCase();
+                        
+                        if (valueToCompare.includes(termToFind)) {
+                            searchResults.push({ x, y });
+                        }
+                    }
+                }
+            }
+            
+            if (searchResults.length > 0) {
+                findNextBtn.disabled = false;
+                highlightNextResult();
+            } else {
+                alert('No se encontraron resultados.');
+                findNextBtn.disabled = true;
+            }
+        });
+        
+        findNextBtn.addEventListener('click', () => {
+            highlightNextResult();
+        });
+        
+        return modal;
+    }
+    
+    // Crear modal para reemplazo
+    function createReplaceModal() {
+        // Eliminar modal existente si hay alguno
+        const existingModal = document.getElementById('replace-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        const modal = document.createElement('div');
+        modal.id = 'replace-modal';
+        modal.className = 'modal';
+        modal.style.display = 'block';
+        modal.style.position = 'fixed';
+        modal.style.zIndex = '1000';
+        modal.style.left = '0';
+        modal.style.top = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.overflow = 'auto';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.4)';
+        
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        modalContent.style.backgroundColor = '#fefefe';
+        modalContent.style.margin = '15% auto';
+        modalContent.style.padding = '20px';
+        modalContent.style.border = '1px solid #888';
+        modalContent.style.width = '350px';
+        modalContent.style.borderRadius = '5px';
+        
+        const closeBtn = document.createElement('span');
+        closeBtn.className = 'close-btn';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.style.color = '#aaa';
+        closeBtn.style.float = 'right';
+        closeBtn.style.fontSize = '28px';
+        closeBtn.style.fontWeight = 'bold';
+        closeBtn.style.cursor = 'pointer';
+        
+        closeBtn.addEventListener('click', () => {
+            modal.remove();
+        });
+        
+        const title = document.createElement('h3');
+        title.textContent = 'Buscar y Reemplazar';
+        title.style.marginTop = '0';
+        
+        const findLabel = document.createElement('label');
+        findLabel.textContent = 'Buscar:';
+        findLabel.style.display = 'block';
+        findLabel.style.marginBottom = '5px';
+        
+        const findInput = document.createElement('input');
+        findInput.type = 'text';
+        findInput.placeholder = 'Término a buscar';
+        findInput.style.width = '100%';
+        findInput.style.padding = '8px';
+        findInput.style.marginBottom = '10px';
+        findInput.style.boxSizing = 'border-box';
+        
+        const replaceLabel = document.createElement('label');
+        replaceLabel.textContent = 'Reemplazar con:';
+        replaceLabel.style.display = 'block';
+        replaceLabel.style.marginBottom = '5px';
+        
+        const replaceInput = document.createElement('input');
+        replaceInput.type = 'text';
+        replaceInput.placeholder = 'Término de reemplazo';
+        replaceInput.style.width = '100%';
+        replaceInput.style.padding = '8px';
+        replaceInput.style.marginBottom = '10px';
+        replaceInput.style.boxSizing = 'border-box';
+        
+        const matchCase = document.createElement('div');
+        matchCase.style.marginBottom = '10px';
+        
+        const matchCaseCheckbox = document.createElement('input');
+        matchCaseCheckbox.type = 'checkbox';
+        matchCaseCheckbox.id = 'match-case-replace';
+        
+        const matchCaseLabel = document.createElement('label');
+        matchCaseLabel.htmlFor = 'match-case-replace';
+        matchCaseLabel.textContent = 'Coincidir mayúsculas/minúsculas';
+        matchCaseLabel.style.marginLeft = '5px';
+        
+        matchCase.appendChild(matchCaseCheckbox);
+        matchCase.appendChild(matchCaseLabel);
+        
+        const buttons = document.createElement('div');
+        buttons.style.textAlign = 'right';
+        buttons.style.marginTop = '15px';
+        
+        const findBtn = document.createElement('button');
+        findBtn.textContent = 'Buscar';
+        findBtn.style.padding = '8px 16px';
+        findBtn.style.backgroundColor = '#f0f0f0';
+        findBtn.style.border = '1px solid #ccc';
+        findBtn.style.borderRadius = '4px';
+        findBtn.style.cursor = 'pointer';
+        
+        const replaceBtn = document.createElement('button');
+        replaceBtn.textContent = 'Reemplazar';
+        replaceBtn.style.padding = '8px 16px';
+        replaceBtn.style.backgroundColor = '#f0f0f0';
+        replaceBtn.style.border = '1px solid #ccc';
+        replaceBtn.style.borderRadius = '4px';
+        replaceBtn.style.cursor = 'pointer';
+        replaceBtn.style.marginLeft = '5px';
+        
+        const replaceAllBtn = document.createElement('button');
+        replaceAllBtn.textContent = 'Reemplazar todo';
+        replaceAllBtn.style.padding = '8px 16px';
+        replaceAllBtn.style.backgroundColor = '#217346';
+        replaceAllBtn.style.color = 'white';
+        replaceAllBtn.style.border = 'none';
+        replaceAllBtn.style.borderRadius = '4px';
+        replaceAllBtn.style.cursor = 'pointer';
+        replaceAllBtn.style.marginLeft = '5px';
+        
+        buttons.appendChild(findBtn);
+        buttons.appendChild(replaceBtn);
+        buttons.appendChild(replaceAllBtn);
+        
+        modalContent.appendChild(closeBtn);
+        modalContent.appendChild(title);
+        modalContent.appendChild(findLabel);
+        modalContent.appendChild(findInput);
+        modalContent.appendChild(replaceLabel);
+        modalContent.appendChild(replaceInput);
+        modalContent.appendChild(matchCase);
+        modalContent.appendChild(buttons);
+        
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+        findInput.focus();
+        
+        // Buscar términos en celdas
+        findBtn.addEventListener('click', () => {
+            const searchTerm = findInput.value.trim();
+            if (!searchTerm) return;
+            
+            const isCaseSensitive = matchCaseCheckbox.checked;
+            
+            searchResults = [];
+            currentSearchIndex = -1;
+            
+            // Buscar en todas las celdas
+            for (let x = 0; x < state.length; x++) {
+                for (let y = 0; y < state[x].length; y++) {
+                    const cellValue = state[x][y].value;
+                    const cellComputedValue = state[x][y].computedValue;
+                    
+                    if (cellValue || cellComputedValue) {
+                        let valueToSearch = cellValue || cellComputedValue;
+                        if (typeof valueToSearch !== 'string') {
+                            valueToSearch = String(valueToSearch);
+                        }
+                        
+                        const termToFind = isCaseSensitive ? searchTerm : searchTerm.toLowerCase();
+                        const valueToCompare = isCaseSensitive ? valueToSearch : valueToSearch.toLowerCase();
+                        
+                        if (valueToCompare.includes(termToFind)) {
+                            searchResults.push({ x, y });
+                        }
+                    }
+                }
+            }
+            
+            if (searchResults.length > 0) {
+                highlightNextResult();
+            } else {
+                alert('No se encontraron resultados.');
+            }
+        });
+        
+        // Reemplazar el término en la celda actual
+        replaceBtn.addEventListener('click', () => {
+            if (currentSearchIndex === -1 || searchResults.length === 0) {
+                alert('Primero debe buscar un término.');
+                return;
+            }
+            
+            const searchTerm = findInput.value.trim();
+            const replaceTerm = replaceInput.value;
+            const isCaseSensitive = matchCaseCheckbox.checked;
+            
+            const { x, y } = searchResults[currentSearchIndex];
+            let cellValue = state[x][y].value;
+            
+            if (cellValue.startsWith('=')) {
+                // Si es una fórmula, no la reemplazamos
+                alert('No se puede reemplazar texto en una fórmula.');
+                return;
+            }
+            
+            if (typeof cellValue !== 'string') {
+                cellValue = String(cellValue);
+            }
+            
+            let newValue;
+            if (isCaseSensitive) {
+                newValue = cellValue.replace(searchTerm, replaceTerm);
+            } else {
+                // Reemplazar sin importar mayúsculas/minúsculas
+                const regex = new RegExp(searchTerm, 'gi');
+                newValue = cellValue.replace(regex, replaceTerm);
+            }
+            
+            // Actualizar la celda
+            updateCell(x, y, newValue);
+            
+            // Mover al siguiente resultado si existe
+            if (currentSearchIndex < searchResults.length - 1) {
+                currentSearchIndex++;
+                highlightNextResult();
+            } else {
+                // Volver al inicio si hemos llegado al final
+                currentSearchIndex = -1;
+                searchResults = [];
+                alert('Reemplazo completado. No hay más resultados.');
+            }
+        });
+        
+        // Reemplazar todos los términos encontrados
+        replaceAllBtn.addEventListener('click', () => {
+            const searchTerm = findInput.value.trim();
+            if (!searchTerm) return;
+            
+            const replaceTerm = replaceInput.value;
+            const isCaseSensitive = matchCaseCheckbox.checked;
+            
+            let replacesCount = 0;
+            
+            // Buscar y reemplazar en todas las celdas
+            for (let x = 0; x < state.length; x++) {
+                for (let y = 0; y < state[x].length; y++) {
+                    const cellValue = state[x][y].value;
+                    
+                    if (cellValue && !cellValue.startsWith('=')) {
+                        if (typeof cellValue !== 'string') {
+                            continue;
+                        }
+                        
+                        const termToFind = isCaseSensitive ? searchTerm : searchTerm.toLowerCase();
+                        const valueToCompare = isCaseSensitive ? cellValue : cellValue.toLowerCase();
+                        
+                        if (valueToCompare.includes(termToFind)) {
+                            let newValue;
+                            if (isCaseSensitive) {
+                                newValue = cellValue.replace(new RegExp(searchTerm, 'g'), replaceTerm);
+                            } else {
+                                const regex = new RegExp(searchTerm, 'gi');
+                                newValue = cellValue.replace(regex, replaceTerm);
+                            }
+                            
+                            // Actualizar la celda
+                            updateCell(x, y, newValue);
+                            replacesCount++;
+                        }
+                    }
+                }
+            }
+            
+            alert(`Se realizaron ${replacesCount} reemplazos.`);
+        });
+        
+        return modal;
+    }
+    
+    // Resaltar siguiente resultado de búsqueda
+    function highlightNextResult() {
+        if (searchResults.length === 0) return;
+        
+        currentSearchIndex = (currentSearchIndex + 1) % searchResults.length;
+        const { x, y } = searchResults[currentSearchIndex];
+        
+        // Limpiar selecciones anteriores
+        clearSelections();
+        
+        // Seleccionar la celda con el resultado
+        const cell = document.querySelector(`td[data-x="${x}"][data-y="${y}"]`);
+        if (cell) {
+            cell.classList.add('celdailumida');
+            cell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            updateActiveCellDisplay(x, y);
+        }
+    }
+    
+    // Eventos para botones de búsqueda y reemplazo
+    if (btnBuscar) {
+        btnBuscar.addEventListener('click', () => {
+            createSearchModal();
+        });
+    }
+    
+    if (btnReemplazar) {
+        btnReemplazar.addEventListener('click', () => {
+            createReplaceModal();
         });
     }
     

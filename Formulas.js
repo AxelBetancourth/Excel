@@ -386,7 +386,7 @@ function insertarConcatenar() {
         formulaInput.value = `=CONCATENAR(${Array.from(selectedCells).map(celda => celda.id).join(',')})`;
     } else {
         const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = '=CONCATENAR(texto1,texto2,...)';
+        formulaInput.value = '=CONCATENAR("texto1","texto2")';
     }
 }
 
@@ -431,10 +431,22 @@ function insertarReemplazar() {
     
     if (selectedCells.length >= 1) {
         const formulaInput = document.getElementById('formula-input');
-        formulaInput.value = `=REEMPLAZAR(${selectedCells[0].id},posición_inicial,número_caracteres,"texto_nuevo")`;
+        formulaInput.value = `=REEMPLAZAR(${selectedCells[0].id}Texto,posición_inicial,número_caracteres,"texto_nuevo")`;
     } else {
         const formulaInput = document.getElementById('formula-input');
         formulaInput.value = '=REEMPLAZAR(texto,posición_inicial,número_caracteres,"texto_nuevo")';
+    }
+}
+
+function insertarExtrae() {
+    const selectedCells = document.querySelectorAll('.selected');
+    
+    if (selectedCells.length >= 1) {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = `=EXTRAE(${selectedCells[0].id}Texto;posición_inicial;posición_final)`;
+    } else {
+        const formulaInput = document.getElementById('formula-input');
+        formulaInput.value = '=EXTRAE(Texto;posición_inicial;posición_final)';
     }
 }
 
@@ -459,6 +471,9 @@ document.querySelector('.dropdown-content-texto').addEventListener('click', func
             break;
         case 'REEMPLAZAR':
             insertarReemplazar();
+            break;
+        case 'EXTRAE':
+            insertarExtrae();
             break;
     }
 });
